@@ -24,6 +24,12 @@ built from your own questions.
 
 ### 1.
 
+Based on the information in 00-rook/, what are the top 3 priorities to tackle immediately?
+
 ### 2.
 
+Help me create KPIs for a kill switch for any potential solutions to the top 3 priorities that can be established across Rook.
+
 ### 3.
+
+What's contradictory or missing, not just in the company documents, but across everything in 00-rook?
