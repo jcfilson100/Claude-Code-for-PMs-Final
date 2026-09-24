@@ -182,3 +182,34 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
   needs a runtime kill switch, which doesn't exist yet.
 - **Working style:** keep deliverables as files in this folder rather than publishing them.
   Prompts worth keeping go in the `prompts.md` of each module folder.
+
+### Conclusions so far (session 2: interviews and tickets)
+- **Interviews** (4 handlers, from Sofia's console-redesign research):
+  - offers vanish before the responder can answer: 3 of 4
+  - handler alerts are too weak: 3 of 4
+  - the console is hard to read: 3 of 4
+  - uneven or quiet work: 2 of 4
+
+  The plain-language summary page is `interview-signals.html`.
+- **Tickets** (25, filed 13 Aug–5 Sep; 15 by handlers, 10 by responders):
+  - quiet only: 16
+  - vanished only: 4
+  - both, i.e. first offer in weeks then lost: 5
+  - "Is my account broken?": 10
+  - handler has no answer to give: 4
+- **Overlap:** only three themes appear in both sources: silence, vanishing offers, and nobody
+  being able to explain either. No console complaint appears in any ticket.
+- **Tickets undercount the problem.** Vesper and Meteor Mite are frozen out in the CSV but never
+  filed a ticket, and overloaded responders (7 of 16 in the CSV) never file at all. Use Ravi's
+  per-responder data to find everyone affected.
+- **The tickets get worse over time, not better.** Reported quiet stretches grow from six days to
+  almost a month, severity rises to Medium and High, and handlers file follow-up tickets.
+- **The before/after comparison is incomplete.** There are no pre-12 Aug tickets in the folder, so
+  ask Nadia for June–July tickets as a baseline. Six tickets say trouble began before the
+  release; the CSV doesn't show it. Check with Ravi before calling 4.2 the only cause.
+- **One-line summary:** 4.2 split responders into starved (quiet for weeks, then losing the rare
+  offer) and overloaded, with nobody able to see why.
+- **Next steps, ranked by ticket count:**
+  1. Fix the silence (21 tickets).
+  2. Give responders time to answer (9 tickets).
+  3. Send handlers an honest message (10 "is it broken?" tickets).
