@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>What the Handlers Told Us</title>
+<title>What Handlers and Heroes Told Us</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
@@ -14,12 +14,16 @@
     --accent: #0E6E6B;
     --now: #C2410C;
     --now-soft: #FDEBDD;
+    --watch: #6D28D9;
+    --watch-soft: #EDE7FB;
     --next: #A16207;
     --next-soft: #FBF1D6;
     --later: #4B5B6B;
     --later-soft: #E6EBF0;
     --quote-bg: #EEF4F3;
     --dot-off: #D5DBE1;
+    --bar-bg: #E3E8ED;
+    --bar: #2F4A63;
     --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
     --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   }
@@ -34,12 +38,16 @@
       --accent: #4FC3BE;
       --now: #FB8B55;
       --now-soft: #3A2217;
+      --watch: #B69CF5;
+      --watch-soft: #2A2340;
       --next: #E8B64A;
       --next-soft: #362C14;
       --later: #A9B8C7;
       --later-soft: #25303B;
       --quote-bg: #1C2D2D;
       --dot-off: #3A4652;
+      --bar-bg: #2A3541;
+      --bar: #9DB6CE;
     }
   }
   :root[data-theme="dark"] {
@@ -52,12 +60,16 @@
     --accent: #4FC3BE;
     --now: #FB8B55;
     --now-soft: #3A2217;
+    --watch: #B69CF5;
+    --watch-soft: #2A2340;
     --next: #E8B64A;
     --next-soft: #362C14;
     --later: #A9B8C7;
     --later-soft: #25303B;
     --quote-bg: #1C2D2D;
     --dot-off: #3A4652;
+    --bar-bg: #2A3541;
+    --bar: #9DB6CE;
   }
 
   * { box-sizing: border-box; }
@@ -68,7 +80,7 @@
     font: 17px/1.55 var(--body);
   }
   .wrap {
-    max-width: 880px;
+    max-width: 900px;
     margin: 0 auto;
     padding-inline: 20px;
     padding-block: 40px 64px;
@@ -105,18 +117,25 @@
   .word b { display: block; font-family: var(--display); font-size: 1.05rem; }
   .word span { color: var(--muted); font-size: 0.95rem; }
 
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 24px;
+    font-size: 0.95rem; color: var(--muted);
+  }
+  .legend b { color: var(--ink); }
+
   .lane { display: grid; gap: 16px; }
   .lane-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 14px; }
+  .lane-head + p { color: var(--muted); }
   .pill {
     font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
     padding: 4px 10px; border-radius: 999px;
   }
   .lane.now .pill { background: var(--now-soft); color: var(--now); }
+  .lane.watch .pill { background: var(--watch-soft); color: var(--watch); }
   .lane.next .pill { background: var(--next-soft); color: var(--next); }
   .lane.later .pill { background: var(--later-soft); color: var(--later); }
-  .lane-head p { color: var(--muted); }
 
-  .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
   .card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -125,18 +144,32 @@
     display: grid; gap: 12px; align-content: start;
   }
   .lane.now .card { border-left: 6px solid var(--now); }
+  .lane.watch .card { border-left: 6px solid var(--watch); }
   .lane.next .card { border-left: 6px solid var(--next); }
 
+  .rank {
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--now);
+  }
+  .moved { font-size: 0.85rem; font-weight: 700; color: var(--accent); }
+
+  .counts { display: grid; gap: 8px; }
   .tally { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .dots { display: flex; gap: 6px; }
+  .tally .label { font-size: 0.85rem; color: var(--muted); min-width: 4.5em; }
+  .dots { display: flex; gap: 5px; }
   .dot {
-    width: 30px; height: 30px; border-radius: 50%;
+    width: 26px; height: 26px; border-radius: 50%;
     display: grid; place-items: center;
-    font: 700 0.8rem/1 var(--body);
+    font: 700 0.75rem/1 var(--body);
     background: var(--dot-off); color: var(--muted);
   }
   .dot.on { background: var(--accent); color: var(--surface); }
-  .tally .count { font-weight: 700; }
+  .bar {
+    flex: 1 1 110px; max-width: 160px; height: 12px;
+    background: var(--bar-bg); border-radius: 999px; overflow: hidden;
+  }
+  .bar i { display: block; height: 100%; background: var(--bar); border-radius: 999px; }
+  .tally .count { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
 
   blockquote {
     margin: 0; padding: 12px 14px;
@@ -155,14 +188,14 @@
     display: grid; gap: 6px;
   }
   .small .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
-  .small .who { font-size: 0.9rem; color: var(--muted); }
-  .flag {
-    font-size: 0.85rem; font-weight: 700; color: var(--now);
-  }
+  .small .who { font-size: 0.9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .small .note-line { font-size: 0.95rem; color: var(--muted); }
+  .flag { font-size: 0.85rem; font-weight: 700; color: var(--now); }
 
-  .notes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .note { border-top: 3px solid var(--line); padding-top: 12px; display: grid; gap: 6px; }
+  .notes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .note { border-top: 3px solid var(--line); padding-top: 12px; display: grid; gap: 6px; align-content: start; }
   .note.good { border-color: var(--accent); }
+  .note.caught { border-color: var(--watch); }
 
   footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 16px; }
 </style>
@@ -170,9 +203,9 @@
 <div class="wrap">
 
   <header>
-    <div class="eyebrow">Rook Dispatch · 4 handler interviews · Sept 2026</div>
-    <h1>What the Handlers Told Us</h1>
-    <p class="lede">We talked to four handlers. Here is what bugs them, sorted into what to fix first, what to fix next, and what can wait.</p>
+    <div class="eyebrow">Rook Dispatch · 4 handler talks + 25 help tickets · Sept 2026</div>
+    <h1>What Handlers and Heroes Told Us</h1>
+    <p class="lede">We listened two ways: four long talks with handlers, and 25 help tickets people sent us. Here is what bugs them, sorted into what to fix first, what to fix next, and what can wait.</p>
   </header>
 
   <section class="words" aria-label="Words to know">
@@ -180,12 +213,19 @@
     <div class="word"><b>Responder</b><span>The hero who goes out on the job.</span></div>
     <div class="word"><b>Callout</b><span>A job offer that pops up on the hero's phone.</span></div>
     <div class="word"><b>Console</b><span>The screen the handler watches.</span></div>
+    <div class="word"><b>Ticket</b><span>A help message someone sends to Rook.</span></div>
   </section>
 
   <section class="bigidea">
     <div class="eyebrow">The big idea</div>
-    <p><b>The two worst problems are about callouts, not the screen.</b> Nobody asked about callouts. Three of the four handlers brought them up anyway. Both problems started with the August update (4.2). They are probably one problem with two faces.</p>
+    <p><b>The talks and the tickets agree on three things, and all three are about job offers, not the screen.</b> Some heroes stopped getting jobs. When a job finally comes, it disappears before they can grab it. Nobody can explain why, so people think their account is broken.</p>
+    <p>The screen problems are real, but nobody sent a ticket about them. So they move down the list.</p>
   </section>
+
+  <div class="legend" aria-label="How to read the counts">
+    <span><b>Talks:</b> the circles show which of the 4 handlers said it (A = Ambrose, D = Dot, H = Halloran, K = Kip).</span>
+    <span><b>Tickets:</b> the bar shows how many of the 25 tickets said it.</span>
+  </div>
 
   <!-- FIX FIRST -->
   <section class="lane now">
@@ -193,32 +233,113 @@
       <span class="pill">Fix first</span>
       <h2>Heroes are missing jobs</h2>
     </div>
+    <p>These three are really one problem seen from three sides.</p>
     <div class="cards">
 
       <article class="card">
-        <h3>The job disappears before the hero can say yes</h3>
-        <p>The phone buzzes. The hero grabs it. The job is already gone to someone else.</p>
-        <div class="tally">
-          <div class="dots" role="img" aria-label="3 of 4 handlers raised this: Ambrose, Dot, Halloran">
-            <span class="dot on">A</span><span class="dot on">D</span><span class="dot on">H</span><span class="dot">K</span>
+        <span class="rank">No. 1 · Biggest</span>
+        <h3>Some heroes stopped getting jobs</h3>
+        <p>The phone just sits there for days, then weeks. It's getting longer, not shorter.</p>
+        <div class="counts">
+          <div class="tally">
+            <span class="label">Talks</span>
+            <div class="dots" role="img" aria-label="2 of 4 handlers: Dot, Kip">
+              <span class="dot">A</span><span class="dot on">D</span><span class="dot">H</span><span class="dot on">K</span>
+            </div>
+            <span class="count">2 of 4</span>
           </div>
-          <span class="count">3 of 4 said this</span>
+          <div class="tally">
+            <span class="label">Tickets</span>
+            <div class="bar" role="img" aria-label="21 of 25 tickets"><i style="width:84%"></i></div>
+            <span class="count">21 of 25</span>
+          </div>
         </div>
-        <blockquote>"It didn't used to feel like a fair race, phone to stairs, and now it does, and he loses it more than he wins it."<cite>Dot</cite></blockquote>
-        <p class="why"><b>Why first:</b> heroes who lose jobs may stop using Dispatch. In August, the time to answer went from 90 seconds to 60.</p>
+        <blockquote>"nothing again this week. starting to wonder if im still even in the system"<cite>The Undertow, in a ticket</cite></blockquote>
+        <p class="moved">Moved up from No. 2. The tickets showed this is the biggest problem.</p>
       </article>
 
       <article class="card">
-        <h3>Some heroes get almost no jobs. Others get too many.</h3>
-        <p>One hero sits at home all week. Another hero in the same city never stops.</p>
-        <div class="tally">
-          <div class="dots" role="img" aria-label="2 of 4 handlers raised this: Dot, Kip">
-            <span class="dot">A</span><span class="dot on">D</span><span class="dot">H</span><span class="dot on">K</span>
+        <span class="rank">No. 2</span>
+        <h3>The job disappears before the hero can say yes</h3>
+        <p>The phone buzzes. The hero grabs it. The job has already gone to someone else.</p>
+        <div class="counts">
+          <div class="tally">
+            <span class="label">Talks</span>
+            <div class="dots" role="img" aria-label="3 of 4 handlers: Ambrose, Dot, Halloran">
+              <span class="dot on">A</span><span class="dot on">D</span><span class="dot on">H</span><span class="dot">K</span>
+            </div>
+            <span class="count">3 of 4</span>
           </div>
-          <span class="count">2 of 4 said this</span>
+          <div class="tally">
+            <span class="label">Tickets</span>
+            <div class="bar" role="img" aria-label="9 of 25 tickets"><i style="width:36%"></i></div>
+            <span class="count">9 of 25</span>
+          </div>
         </div>
-        <blockquote>"I'm looking at two cards on the same screen that might as well be two different products."<cite>Kip</cite></blockquote>
-        <p class="why"><b>Why first:</b> the quiet heroes feel forgotten, and the busy ones get worn out. Handlers can't explain it, so they have nothing to tell their heroes.</p>
+        <blockquote>"It didn't used to feel like a fair race, phone to stairs, and now it does, and he loses it more than he wins it."<cite>Dot, in a talk</cite></blockquote>
+        <p class="why"><b>Watch out:</b> missing a job pushes a hero further down the list. So this feeds No. 1.</p>
+      </article>
+
+      <article class="card">
+        <span class="rank">No. 3 · New</span>
+        <h3>"Is my account broken?"</h3>
+        <p>Heroes think something is wrong with them. Handlers have no answer to give.</p>
+        <div class="counts">
+          <div class="tally">
+            <span class="label">Talks</span>
+            <div class="dots" role="img" aria-label="2 of 4 handlers: Dot, Kip">
+              <span class="dot">A</span><span class="dot on">D</span><span class="dot">H</span><span class="dot on">K</span>
+            </div>
+            <span class="count">2 of 4</span>
+          </div>
+          <div class="tally">
+            <span class="label">Tickets</span>
+            <div class="bar" role="img" aria-label="10 of 25 tickets"><i style="width:40%"></i></div>
+            <span class="count">10 of 25</span>
+          </div>
+        </div>
+        <blockquote>"I'd like something more to tell her than 'I don't know.'"<cite>Linda Pruitt, handler, in a ticket</cite></blockquote>
+        <p class="why"><b>Can start today:</b> send handlers an honest message. Their accounts aren't broken, and a fix is coming.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- WATCH THE NUMBERS -->
+  <section class="lane watch">
+    <div class="lane-head">
+      <span class="pill">Check the numbers</span>
+      <h2>Problems people don't write in about</h2>
+    </div>
+    <div class="cards">
+
+      <article class="card">
+        <span class="moved">New</span>
+        <h3>Some heroes get too many jobs</h3>
+        <p>While some heroes sit at home, others never stop. Nobody sends a ticket to say they're too busy.</p>
+        <div class="counts">
+          <div class="tally">
+            <span class="label">Talks</span>
+            <div class="dots" role="img" aria-label="1 of 4 handlers: Kip">
+              <span class="dot">A</span><span class="dot">D</span><span class="dot">H</span><span class="dot on">K</span>
+            </div>
+            <span class="count">1 of 4</span>
+          </div>
+          <div class="tally">
+            <span class="label">Tickets</span>
+            <div class="bar" role="img" aria-label="0 of 25 tickets"><i style="width:0%"></i></div>
+            <span class="count">0 of 25</span>
+          </div>
+        </div>
+        <blockquote>"Mite thinks Mite's been forgotten. Gale's exhausted."<cite>Kip, in a talk</cite></blockquote>
+        <p class="why"><b>Next step:</b> ask Ravi for the real numbers. Our sample shows 7 of 16 heroes getting far more jobs than usual.</p>
+      </article>
+
+      <article class="card">
+        <span class="moved">New</span>
+        <h3>Quiet heroes who never complain</h3>
+        <p>Two of the heroes who lost the most jobs, Vesper and Meteor Mite, never sent a ticket. We only heard about them in the talks.</p>
+        <p class="why"><b>Next step:</b> use the numbers, not the tickets, to find every hero who is stuck. The tickets miss people.</p>
       </article>
 
     </div>
@@ -228,34 +349,29 @@
   <section class="lane next">
     <div class="lane-head">
       <span class="pill">Fix next</span>
-      <h2>The screen is hard to use</h2>
+      <h2>Help heroes catch the job in time</h2>
     </div>
     <div class="cards">
 
       <article class="card">
         <h3>The alerts don't tell the handler enough</h3>
         <p>Handlers want to know the moment a job pops up, and which hero it's for.</p>
-        <div class="tally">
-          <div class="dots" role="img" aria-label="3 of 4 handlers raised this: Ambrose, Dot, Kip">
-            <span class="dot on">A</span><span class="dot on">D</span><span class="dot">H</span><span class="dot on">K</span>
+        <div class="counts">
+          <div class="tally">
+            <span class="label">Talks</span>
+            <div class="dots" role="img" aria-label="3 of 4 handlers: Ambrose, Dot, Kip">
+              <span class="dot on">A</span><span class="dot on">D</span><span class="dot">H</span><span class="dot on">K</span>
+            </div>
+            <span class="count">3 of 4</span>
           </div>
-          <span class="count">3 of 4 said this</span>
-        </div>
-        <blockquote>"Maybe something that tells me too, not just him, when something's come in, so I'm not relying on hearing a buzz through a ceiling."<cite>Dot</cite></blockquote>
-        <p class="why"><b>Why next:</b> better alerts would also help heroes catch jobs before they vanish.</p>
-      </article>
-
-      <article class="card">
-        <h3>The screen is hard to read</h3>
-        <p>The words are too small, and the screen is too bright at night.</p>
-        <div class="tally">
-          <div class="dots" role="img" aria-label="3 of 4 handlers raised this: Ambrose, Dot, Kip">
-            <span class="dot on">A</span><span class="dot on">D</span><span class="dot">H</span><span class="dot on">K</span>
+          <div class="tally">
+            <span class="label">Tickets</span>
+            <div class="bar" role="img" aria-label="0 of 25 tickets"><i style="width:0%"></i></div>
+            <span class="count">0 of 25</span>
           </div>
-          <span class="count">3 of 4 said this</span>
         </div>
-        <blockquote>"The console is just this wall of white light in the middle of my face."<cite>Kip, asking for dark mode</cite></blockquote>
-        <p class="why"><b>Why next:</b> lots of people want it, and it fits the screen redesign Sofia is already working on.</p>
+        <blockquote>"Maybe something that tells me too, not just him, when something's come in, so I'm not relying on hearing a buzz through a ceiling."<cite>Dot, in a talk</cite></blockquote>
+        <p class="why"><b>Why it's here:</b> nobody sent a ticket about it. But a better alert would help heroes catch jobs before they disappear (No. 2).</p>
       </article>
 
     </div>
@@ -265,20 +381,30 @@
   <section class="lane later">
     <div class="lane-head">
       <span class="pill">Later</span>
-      <h2>Small fixes, one person each</h2>
+      <h2>Real, but not what's hurting people right now</h2>
     </div>
     <div class="small-list">
       <div class="small">
-        <div class="row"><h3>Saved filters reset without warning</h3><span class="who">1 of 4 · Ambrose</span></div>
-        <blockquote>"I'd rather it warned me the filter had reset than simply reset it."</blockquote>
+        <div class="row"><h3>The screen is hard to read</h3><span class="who">Talks 3 of 4 · Tickets 0 of 25</span></div>
+        <blockquote>"The console is just this wall of white light in the middle of my face."<cite>Kip, asking for dark mode</cite></blockquote>
+        <span class="moved">Moved down from "Fix next". Lots of handlers want it, but it belongs in the screen redesign, not the emergency fix.</span>
       </div>
       <div class="small">
-        <div class="row"><h3>Too much clicking to check on a job</h3><span class="who">1 of 4 · Ambrose</span></div>
-        <blockquote>"More than I'd like, but I don't know that there's a fix for it that doesn't clutter the view for everyone else."</blockquote>
+        <div class="row"><h3>Heroes can't see their own job history</h3><span class="who">Talks 0 of 4 · Tickets 1 of 25</span></div>
+        <blockquote>"She asked if there was a way to see her own history and I had to tell her there isn't."<cite>Teresa Alvarez, handler, in a ticket</cite></blockquote>
+        <span class="moved">New. This is the long-term answer to "is my account broken?"</span>
       </div>
       <div class="small">
-        <div class="row"><h3>The list of hero skills is hard to find</h3><span class="who">1 of 4 · Ambrose</span></div>
-        <blockquote>"It sits in a drawer off the responder detail panel."</blockquote>
+        <div class="row"><h3>Saved filters reset without warning</h3><span class="who">Talks 1 of 4 · Tickets 0 of 25</span></div>
+        <blockquote>"I'd rather it warned me the filter had reset than simply reset it."<cite>Ambrose</cite></blockquote>
+      </div>
+      <div class="small">
+        <div class="row"><h3>Too much clicking to check on a job</h3><span class="who">Talks 1 of 4 · Tickets 0 of 25</span></div>
+        <blockquote>"More than I'd like, but I don't know that there's a fix for it that doesn't clutter the view for everyone else."<cite>Ambrose</cite></blockquote>
+      </div>
+      <div class="small">
+        <div class="row"><h3>The list of hero skills is hard to find</h3><span class="who">Talks 1 of 4 · Tickets 0 of 25</span></div>
+        <blockquote>"It sits in a drawer off the responder detail panel."<cite>Ambrose</cite></blockquote>
       </div>
     </div>
   </section>
@@ -292,16 +418,16 @@
     <p>Halloran also handles gear, the Supply side of Rook. These belong to the Supply team.</p>
     <div class="small-list">
       <div class="small">
-        <div class="row"><h3>Urgent gear orders wait in the same line as small ones</h3><span class="who">1 of 4 · Halloran</span></div>
+        <div class="row"><h3>Urgent gear orders wait in the same line as small ones</h3><span class="who">Talks 1 of 4 · Halloran</span></div>
         <blockquote>"One queue, everything in it, doesn't matter if it's laces or plate."</blockquote>
         <span class="flag">Tell Supply today: a cracked vest plate waited 11 days. That's a safety problem.</span>
       </div>
       <div class="small">
-        <div class="row"><h3>Nobody replies to broken-gear reports</h3><span class="who">1 of 4 · Halloran</span></div>
+        <div class="row"><h3>Nobody replies to broken-gear reports</h3><span class="who">Talks 1 of 4 · Halloran</span></div>
         <blockquote>"I file a failure report and it goes into a void."</blockquote>
       </div>
       <div class="small">
-        <div class="row"><h3>Searching for gear is hard</h3><span class="who">1 of 4 · Halloran</span></div>
+        <div class="row"><h3>Searching for gear is hard</h3><span class="who">Talks 1 of 4 · Halloran</span></div>
         <blockquote>"If I don't know the exact item name I'm not finding it."</blockquote>
       </div>
     </div>
@@ -310,14 +436,18 @@
   <section class="notes" aria-label="Keep in mind">
     <div class="note">
       <h3>Remember</h3>
-      <p>Four people is a small group. This shows us what to look at, not how big the problem is. The handlers are also telling us what their heroes said, not what they saw themselves.</p>
+      <p>Each way of listening misses something. Tickets come from people who feel something is broken. Talks come from four handlers who were asked about the screen. We need both, plus the real numbers.</p>
+    </div>
+    <div class="note caught">
+      <h3>What only the talks caught</h3>
+      <p>Heroes with too much work. Quiet heroes who never write in. And Dot noticed that the quiet weeks and the vanishing jobs go together.</p>
     </div>
     <div class="note good">
       <h3>Good news</h3>
-      <p>Saved filters saved Ambrose five minutes a night. Halloran says maintenance scheduling has "gotten smarter." Kip likes seeing two heroes side by side.</p>
+      <p>Saved filters save Ambrose five minutes a night. Halloran says maintenance scheduling has "gotten smarter." Kip likes seeing two heroes side by side.</p>
     </div>
   </section>
 
-  <footer>From the four interviews in 00-rook/feedback/interviews/, run by Sofia Marino, 2–5 Sept 2026. Circles show who raised each thing: A = Ambrose, D = Dot, H = Halloran, K = Kip.</footer>
+  <footer>From the four talks in 00-rook/feedback/interviews/ (run by Sofia Marino, 2–5 Sept 2026) and the 25 tickets in 00-rook/feedback/tickets/ (13 Aug–5 Sept 2026). Some tickets count toward more than one problem.</footer>
 
 </div>
