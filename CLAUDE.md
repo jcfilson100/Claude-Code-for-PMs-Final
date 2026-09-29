@@ -182,6 +182,10 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
   needs a runtime kill switch, which doesn't exist yet.
 - **Working style:** keep deliverables as files in this folder rather than publishing them.
   Prompts worth keeping go in the `prompts.md` of each module folder.
+- **How to explain things (user's standing request, 28 Sep):** use simple, 5th-grade language.
+  Short sentences, everyday words ("heroes", "helpers", "job offers", "help messages", "the
+  chart"), and plain sections like "Where they agree / Where they don't / What that means /
+  What to do next". Keep exact numbers and names, but explain any jargon, or skip it.
 
 ### Conclusions so far (session 2: interviews and tickets)
 - **Interviews** (4 handlers, from Sofia's console-redesign research):
