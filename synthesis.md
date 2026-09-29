@@ -140,7 +140,209 @@ history, so they might be.
 Stormwrack and Ironvale, the three where the stories clash the most. That will show which one to
 trust. Until then, don't tell leadership "1 in 4 heroes got cut off" as if it's certain.
 
+## Looking for the cause: two checks
+
+*In plain words. These use the chart (the data file) and the rules written in the routing code.
+They show what is **likely**, not what is proven. Wen can prove it with the real scores.*
+
+### Check 1: was it the shorter answer time, or the new "closer heroes first" rule?
+
+The update changed two things at the same time:
+- **Shorter answer time:** heroes got 60 seconds to answer instead of 90.
+- **"Closer heroes first":** being close to the emergency now counts for more.
+
+We want to know which one pushed the four heroes out.
+
+**The clue: what came first, the misses or the drop in offers?**
+
+| Hero | Offers a week before the update | Update week (10 Aug) | Missed in update week | The week after (17 Aug) |
+|---|---|---|---|---|
+| Farlight | 12 | 10 (−17%) | 6 | **3 (−75%)** |
+| Meteor Mite | 11 | 10 (−10%) | 6 | **4 (−64%)** |
+| The Undertow | 12 | 11 (−8%) | 7 | **4 (−67%)** |
+| Vesper | 14 | 12 (−13%) | 6 | **5 (−64%)** |
+| All other 12 heroes | — | 0% to +15% | 3 to 7 | −20% to +31% |
+
+**What this tells us:**
+- **The misses came first.** In the update week, the four heroes still got almost their normal
+  number of offers, but they missed about half of them. Their offers only crashed the *next*
+  week. If the "closer heroes first" rule had pushed them out, their offers would have dropped
+  straight away, not a week later.
+- **There was a small early dip.** These four were the only heroes whose offers fell at all in
+  the update week (−8% to −17%). The update went live on Wednesday 12 Aug, so that dip could be
+  their misses starting to count mid-week. It could also be the distance rule nudging them down
+  a little. Weekly numbers can't tell these apart; daily numbers could.
+- **The "closer heroes first" change actually made a bad score matter *less*.** Before the
+  update, a hero with the worst possible score needed to be about **40 minutes** closer than a
+  hero with a perfect score to get the job. After the update, only about **19 minutes** closer.
+  So the new distance rule didn't create the trap. The misses did.
+
+**Answer (likely):** the **shorter answer time** was the trigger. It made these heroes miss lots
+of offers, and the misses pushed them down the list. The distance rule may have added a small
+push, and may be why Ashgrove and Halfmoon are slipping (see Check 2).
+
+**Still unknown:** why these four missed so many more than everyone else. It wasn't a bad track
+record; Vesper was one of the best at saying yes. It may be that they just take longer to reach
+their phone. Dot's story of Vesper running down the stairs fits that. Answer-time data would show
+it.
+
+### Check 2: does the "60% rule" predict who got stuck?
+
+**The rule, from the code:** every time a hero says yes, their score goes **up 0.08**. Every
+time they miss or say no, it goes **down 0.12**. The score can't go above 1 or below 0, and it
+never recovers on its own. So to stay level, a hero has to say yes to **at least 60%** of their
+offers.
+
+**Starting point:** before the update, every hero in the chart said yes to 60% or more every
+single week. So by 10 Aug, every hero's score should have been at the top (1.00).
+
+**What the scores would have done, week by week** (worked out from the chart):
+
+| Hero | After 10 Aug | After 17 Aug | After 24 Aug | After 31 Aug |
+|---|---|---|---|---|
+| **The Undertow** | **0.48** | 0.20 | 0.08 | **0.00** |
+| **Farlight** | **0.60** | 0.24 | 0.12 | **0.12** |
+| **Meteor Mite** | **0.60** | 0.32 | 0.08 | **0.00** |
+| **Vesper** | **0.76** | 0.36 | 0.12 | **0.00** |
+| Sgt. Bulwark | 0.80 | 1.00 | 1.00 | 1.00 |
+| Halfmoon | 0.88 | 0.80 | 0.84 | 1.00 |
+| Nightwell | 0.88 | 1.00 | 1.00 | 1.00 |
+| Ironvale, Stormwrack | 0.92 | 1.00 | 1.00 | 1.00 |
+| The Drift | 0.96 | 1.00 | 1.00 | 1.00 |
+| Everyone else | 1.00 | 1.00 | 1.00 (Longcast 0.92) | 1.00 |
+
+**What this tells us:**
+- **The rule picks out the right four, but only in one version of the maths.** If each week's
+  yeses and misses are added up together, the four lowest scores belong to exactly the four
+  heroes who got cut off.
+  - **Correction:** this depends on an assumption. If a hero's misses happened *after* their
+    yeses within the week, other heroes such as Nightwell would score lower than Vesper, and
+    Nightwell didn't get cut off.
+  - The rule shows how heroes got *stuck*. It doesn't prove *which* heroes would get stuck.
+- **After that, they could never climb back.** They got so few offers that every miss dragged
+  them lower, and they had no chance to earn points back. By 31 Aug three of them are at 0.
+- **Everyone else bounced back.** Heroes who dipped a little, like Nightwell and Halfmoon, still
+  got enough offers to recover to 1.00 within a week or three.
+- **It was close.** Sgt. Bulwark scored 0.80, just above Vesper's 0.76, and he recovered. The
+  difference is that he kept getting about 10 offers, while Vesper dropped to 5. So the score
+  isn't the whole story. Where a hero sits compared with nearby heroes matters too.
+
+**What the rule does *not* explain:** Corporal Ashgrove and Halfmoon. By this maths their scores
+are back at 1.00, but they still get about 30% fewer offers than before. Something else is
+pushing them down, most likely the **"closer heroes first" rule**, if they live further from the
+emergencies than other heroes. We'd need to know where heroes are to check.
+
+### What the two checks add up to
+
+**Likely cause:** there are two causes working together.
+1. **The shorter answer time made heroes miss more offers.** For four heroes, the misses were
+   bad enough to push them below the 60% line.
+2. **The score rule has no way back up.** Once a hero is low on the list, they rarely get
+   offers, so they can't earn their score back. They stay stuck.
+
+A third, smaller cause may be hurting Ashgrove and Halfmoon: the "closer heroes first" rule.
+
+**What this means for the fix:** giving the stuck heroes a fresh score won't be enough on its
+own, because the same trap would catch them again. The fix needs to:
+- give heroes a way to climb back up
+- treat "didn't answer in time" more gently than "said no", or give back the 90 seconds
+- reset the heroes who are already stuck
+
+**How sure are we?**
+- **All four stuck heroes are backed up outside the chart.** The Undertow and Farlight appear in
+  the tickets. Meteor Mite and Vesper appear in Kip's and Dot's interviews.
+  - **Correction:** an earlier version said we were "less sure" about Meteor Mite and Vesper.
+- **Caveats:** these checks use weekly totals, not every single offer, and assume all scores
+  were at the top on 10 Aug. The chart's source is also still unknown.
+- **To prove it:** Wen can confirm with the real scores, and by replaying August with the old
+  and new settings.
+
+## What five investigators concluded (28 Sep)
+
+*In plain words.* Five investigators each tested one explanation, then read each other's findings,
+argued about them and voted. **All five agreed on the basic answer**, with changes.
+**Confidence: medium.** It's likely, but not proven.
+
+### Who tested what
+
+| Investigator | Explanation tested | Where they ended up |
+|---|---|---|
+| A | Shorter answer time (90 → 60 seconds) | The **trigger**, but not the whole story |
+| B | The score rule (no way back up) | The **trap** that kept heroes stuck; a weakness that sat unnoticed until 4.2 |
+| C | "Closer heroes first" | **Not the cause** (about 85% sure). It made the trap weaker. |
+| D | Can we trust the evidence? | The chart is wrong or different for 7 heroes, but right for the four stuck ones. Late delivery is now about 35% likely. |
+| E | The sceptic: is it even 4.2? | Not a quiet August. It *is* the update, and how it was released made it worse. |
+
+### What they agreed on
+
+**Likely root cause:**
+1. **The update made heroes miss far more job offers.** Misses rose from about 1 in 5 offers to
+   nearly 1 in 2 in the update week. The shorter answer time is the main suspect.
+2. **An old rule in the code turned those misses into a trap.** The rule has three problems:
+   - "Didn't answer in time" counts the same as "said no."
+   - A miss costs more points than a yes earns.
+   - There's no way to climb back up.
+
+   It never mattered before, because nobody ever missed that many. After the update, the heroes
+   who said yes least often sank to the bottom and stayed there.
+3. **How it was released made it worse.** Two big changes went out at once, with no gradual
+   rollout, no fairness checks and no kill switch.
+
+**Ruled out:**
+- **A quiet August.** Everything was steady for six weeks, then dropped the exact week of the
+  update. The only comparison with last year points the other way.
+- **Heroes' availability settings.** Handlers checked them, and nothing in the code changes them.
+- **"Closer heroes first" as the trigger.** It made the trap weaker, not stronger. **Undoing it on
+  its own would probably make things worse.**
+
+### What they still disagree on
+
+**1. Why *these* four heroes?**
+- Other heroes, such as Nightwell and The Gale, missed just as many offers but didn't get stuck.
+  The four said yes much less often: 4–6 times in the update week, against about 9.
+- Sgt. Bulwark and Vesper both said yes to exactly half their offers. One got stuck and one
+  didn't.
+- Three ideas are still open:
+  - **Location** (A and C): a stuck hero only gets skipped if other heroes are close enough to be
+    asked first. So where a hero lives may decide who gets trapped.
+  - **Late delivery** (D): some offers may reach phones late, leaving only seconds to answer. That
+    fits tickets saying offers vanished "in a few seconds" (T-019, T-020, T-023, T-025), which a
+    60-second window can't explain. The update also changed how offer notifications are sent
+    (the "duplicate notification" fix).
+  - **Can't tell from this data** (B and E).
+
+**2. Can we trust the chart?**
+- It's right for the four stuck heroes, because tickets or interviews back all four.
+- It contradicts the tickets for 7 other heroes.
+- It may be counting something different from what handlers count. For example, The Drift's
+  handler says "two or three a week"; the chart says 6–7.
+
+### Information needed to settle it
+
+All five investigators asked for item 1 first.
+
+| # | What to get | From | What it settles |
+|---|---|---|---|
+| 1 | **A log of every offer since 3 Aug**: when it was sent, when it reached the phone, when the hero answered, "no" vs "too late", and the hero's score and list position at that moment | Wen / Ravi | Slow answers (timeout) vs late delivery, and whether the four's scores really hit zero |
+| 2 | **Replay August four ways**: old or new answer time × old or new "closer heroes first", plus one run with a "climb back up" fix | Wen | Which change caused it, and whether the fix works |
+| 3 | **Official per-hero numbers**, and what the chart actually counts | Ravi | Whether the chart or the tickets are right for the 7 heroes |
+| 4 | **What 4.2 changed about offer notifications** | Wen | Whether late delivery is part of the cause |
+| 5 | **Travel times** for the stuck heroes vs the busy ones (numbers only, never identities) | Wen | Whether location decides who gets trapped |
+| 6 | **Where scores are stored**, and restart dates | Wen | Whether restarts reset scores, and how to build the fix and kill switch |
+| 7 | **Emergencies per week, unfilled jobs, June–July tickets, last year's August** | Ravi / Nadia | Whether less work or earlier problems play any part |
+
+### What this means for the fix
+
+- **Can go ahead in outline now:** let heroes climb back up, stop treating "too late" as harshly
+  as "no", and reset the four stuck heroes.
+- **Don't** undo "closer heroes first" on its own.
+- **Wait for item 1** before choosing between 60 and 90 seconds. If late delivery is the real
+  problem, the 90 seconds alone won't fix it.
+
 ## Open questions (for Ravi and Wen)
+
+*See the table "Information needed to settle it" above for the fuller list from the
+investigation.*
 
 1. Does the official per-responder data match this CSV, especially for the ~7 ticketed
    responders who show *more* pings here?
