@@ -418,6 +418,94 @@ the offer, not just bring back 90 seconds.
    Ashgrove and Halfmoon for a month.
 7. **Still open:** flag the cracked vest plate to the Supply team.
 
+## Hypotheses to test (2 Oct)
+
+*In plain words.* Ten hypotheses from what we learned in the code, ranked by how much testing
+each one would tell us about the **root cause**. Each is written the scientific way:
+- what we saw
+- the question
+- a testable "If… then… because…"
+- a "nothing's there" version (the null hypothesis)
+- how to test it
+- what would back it up or knock it down
+
+### Ranking, and why #1 and #2 come first
+
+| Rank | Hypothesis | How likely it's true | Why it's ranked here |
+|---|---|---|---|
+| **1** | **H2: Late delivery** | Medium | **Recommended:** it's the only one that can change the fix itself ("start the clock on arrival" vs "bring back 90 seconds"). |
+| **2** | **H1: Shorter answer time** | High | **Recommended:** the miss surge is the first domino, and nothing else happens without it. |
+| 3 | H3: Score trap | Very high | The trap only fires once misses surge, so it explains why heroes *stayed down*, not what *started* it. |
+| 4 | H4: "No answer" = "no" | High | Tested by the same log as #1 and #2. It only matters once we know why answers came too late. |
+| 5 | H6: Location | Medium | Explains *who* got hit, not *what* broke. |
+| 6 | H9: What the chart counts | Medium–high | A trust check, not a cause. Ask Ravi at the same time. |
+| 7 | H7: "Closer heroes first" | Medium | A side issue for two heroes. All five investigators said it isn't the main cause. |
+| 8 | H5: Saved scores | High | Affects *how we fix it*, not *what caused it*. |
+| 9 | H8: Manual overrides | Low | Nothing points to it yet. At most it adds to the story. |
+| 10 | H10: Unfilled jobs | Unknown | Measures the damage, not the cause. Important for leadership. |
+
+**Data that supports putting #1 and #2 first:**
+- **The miss surge hit everyone at once, and offers didn't change.** In the update week, misses
+  went from 38 a week to 81 (22% → 46%) while offers stayed level (172 → 177). All 16 heroes
+  missed more.
+- **Nothing else had moved before it.** The share of offers taken was flat at 75–78% for six
+  weeks, then dropped to 54% in the update week. The four heroes' offers only fell the week
+  *after* they missed.
+- **The trap couldn't fire without the misses.** Before the update, no hero ever fell below the
+  60% line. The trap rule has existed since at least 2019 and never caught anyone.
+- **Some misses are too fast for 60 seconds.** T-019 ("gone by the time he'd even finished
+  reading"), T-020 ("almost instantly"), T-023 ("before i could even swipe") and T-025 ("a few
+  seconds") all fit late delivery.
+- **The code and the update notes back #2.** The clock starts at "sent" (`offer.py`), and 4.2
+  changed how notifications are sent ("duplicate push notification on re-offer").
+- **Everyone points to the misses.**
+  - interviews: 3 of 4
+  - help messages: 9 of 25
+  - investigators: all 5 named the miss surge, and 4 of them flagged late delivery
+- **The answer changes the fix.** If #1 is true and #2 is false, bring back 90 seconds. If #2 is
+  true, start the clock when the phone gets the offer.
+
+### Table 1: what we saw and what we think
+
+| Rank | Name | What we saw | Question | Hypothesis (If… then… because…) |
+|---|---|---|---|---|
+| **1** | **H2: Late delivery** | 4 messages say offers vanished in "a few seconds"; the clock starts when an offer is *sent*; 4.2 changed notifications | Are offers reaching some phones late? | **If** offers arrive late, **then** those heroes miss far more, **because** the clock is already running before the phone buzzes. |
+| **2** | **H1: Shorter answer time** | Misses jumped from 22% to 46% in the update week, for all 16 heroes; offers stayed level (172 → 177) | Did cutting 90s to 60s cause most of the extra misses? | **If** heroes often answered in 60–90 seconds, **then** the cut turned those answers into misses, **because** they now came after the offer was pulled. |
+| 3 | H3: Score trap | Four heroes fell to 0–1 offers a week and never recovered; no recovery rule in `history.py` | Does the score rule keep them at the bottom? | **If** a score falls low enough, **then** the hero stays stuck, **because** they're rarely asked, can't earn points back, and each rare miss lowers it again. |
+| 4 | H4: "No answer" = "no" | The code records both separately but penalises both −0.12 | Did the four run out of time, or say no on purpose? | **If** most of their misses were "no answer", **then** a gentler penalty would have kept them out of the trap, **because** they'd never have fallen below the 60% line. |
+| 5 | H6: Location | Vesper (50% yes) got stuck; Bulwark (50% yes) didn't | Does closeness to other free heroes decide who gets trapped? | **If** a low-scoring hero has nearby competitors, **then** they get skipped, **because** those heroes rank above them and the asking stops at the first yes. |
+| 6 | H9: What the chart counts | For 7 heroes, the chart shows more offers but the messages say "quiet" | Does the chart count something different from what helpers count? | **If** the chart counts bulk sends or repeat offers, **then** it shows more offers than heroes notice, **because** one job sent to many counts once per hero. |
+| 7 | H7: "Closer heroes first" | Ashgrove and Halfmoon get about 30% fewer offers despite good scores | Did the weighting change push them down? Would undoing it help the four? | **If** they're further from most jobs, **then** the higher travel weight lowered their rank, **because** travel now counts 60% instead of 45%. |
+| 8 | H5: Saved scores | Outline code keeps scores in memory, yet no stuck hero bounced back | Are scores saved through restarts? | **If** scores are saved, **then** restarts won't reset them, **because** they're stored outside memory. |
+| 9 | H8: Manual overrides | Helpers can override by hand, and overrides are logged (since 4.0) | Did helpers pass over the four by hand? | **If** helpers often picked others over the four, **then** the four lost extra offers, **because** overrides skipped them on purpose. |
+| 10 | H10: Unfilled jobs | Jobs taken fell 9% (132 → 120 a week) | Were the missing jobs unfilled, or was there less work? | **If** emergencies stayed level, **then** the missing jobs went unfilled or late, **because** fewer heroes were able to take them. |
+
+### Table 2: how we test it
+
+| Rank | Null hypothesis (nothing's there) | Experiment | Supported if | Rejected if |
+|---|---|---|---|---|
+| **1** | Delivery time is the same for everyone and makes no difference | Offer log for 3–31 Aug. *Test:* delay from sent to arrived. *Measure:* answered or timed out. *Compare:* before/after 12 Aug, and the four vs the rest. Ask Wen whether the clock starts at "sent" or "arrived". | Misses cluster on long delays, and delays grew after 12 Aug or are worse for the four | Delivery takes a second or two for everyone, or the real clock starts on arrival |
+| **2** | Almost no answers ever took over 60 seconds | (A) Share of pre-12 Aug yeses that took 60–90 seconds. (B) Wen replays August at 90 seconds with everything else the same. *Measure:* share missed. | A real share took 60–90 seconds, **and** the 90-second replay brings misses back near 22% | Almost all yeses were under 60 seconds, or the replay still shows the surge |
+| 3 | The four's real scores are normal | Real weekly scores for the four, with Bulwark, Ashgrove and Halfmoon for comparison. Replay with a "drift back to the middle" rule. *Measure:* offers per week. | Scores sit near 0 from mid-August, **and** the recovery replay frees them | Scores are fine, or the four stay stuck even with recovery |
+| 4 | The four mostly said "no" on purpose | Split their misses into "no" and "no answer". Replay with a smaller "no answer" penalty. *Measure:* do they get stuck? | Mostly "no answer", **and** the replay keeps them out of the trap | Mostly deliberate "no"s |
+| 5 | Nearby competitors make no difference | Travel minutes for each offer vs other free heroes (minutes only, never addresses). *Measure:* offers per week. *Compare:* the four vs Bulwark. | The four usually had 2 or more nearby competitors; Bulwark didn't | The four were often closest and still skipped |
+| 6 | The chart counts personal offers correctly | Ravi explains what "pings_sent" counts and pulls official numbers for Nightwell, Stormwrack and Ironvale | Official numbers are clearly lower than the chart | Official numbers match the chart |
+| 7 | The weighting makes no difference | Travel times vs average. Replay with old weights at 60 seconds. *Measure:* offers for Ashgrove, Halfmoon and the four. | They're further than average; the old weights restore them but don't free the four | Average distance, or the old weights free the four |
+| 8 | Scores reset to 0.5 on every restart | Restart dates and storage location from Wen. Check for jumps back to 0.5. | No jumps after restarts | Scores reset after restarts |
+| 9 | Overrides were rare and didn't involve the four | Count overrides against the four in the override records, before vs after 12 Aug | Overrides against the four rose after 12 Aug | Few or none |
+| 10 | Emergencies fell by about the same amount | Emergencies per week, unfilled jobs and time to assign, before vs after (Ravi) | Emergencies level; unfilled jobs or waits up | Emergencies fell about 9% |
+
+### Which data tests which hypothesis
+
+| Data source | From | Tests ranks |
+|---|---|---|
+| **Offer-by-offer log** (sent, arrived and answered times; "no" vs "no answer"; score; place in list; travel time) | Wen / Ravi | **1, 2, 3, 4, 5, 9** |
+| **Replays of August**, changing one setting at a time | Wen | 2, 3, 4, 7 |
+| **What the chart counts, plus official numbers** | Ravi | 6 |
+| **Restart dates and where scores are saved** | Wen | 8 |
+| **Override records** | Wen / Marcus | 9 |
+| **Emergencies, unfilled jobs, wait times** | Ravi | 10 |
+
 ## Open questions (for Ravi and Wen)
 
 *See the table "Information needed to settle it" above for the fuller list from the
