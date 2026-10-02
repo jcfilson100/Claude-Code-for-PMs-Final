@@ -117,8 +117,9 @@ handler phone app and Dispatch shared cover between responders are Q4 exploratio
   source unknown, not Ravi's) shows four responders frozen out since 4.2: Farlight, Meteor Mite,
   The Undertow and Vesper. But it shows *more* offers for about seven responders whose handlers
   report silence: Nightwell, Ironvale, Stormwrack, Cindermark, Falkirk, The Drift and The
-  Longcast. One hypothesis: offers are logged as sent but never reach phones, then time out and
-  are scored as misses. Treat the CSV as unverified.
+  Longcast. *Update, session 3:* "offers sent but never reach phones" can't explain these rows,
+  because they show high *accepted* counts, and an accept needs a reply from the phone. Treat
+  the CSV as unverified for these 7.
 - **The code doesn't match the glossary.** The glossary says declines and timeouts are distinct
   and that the score recovers. The code penalises both the same (−0.12 per miss vs +0.08 per
   accept), with a floor at 0 and no decay; the decay TODO has been open since 2019.
@@ -217,3 +218,31 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
   1. Fix the silence (21 tickets).
   2. Give responders time to answer (9 tickets).
   3. Send handlers an honest message (10 "is it broken?" tickets).
+
+### Conclusions so far (session 3: the callout data and root cause)
+- **`synthesis.md` is now the main 4.2 document.** It holds the data before and after 12 Aug,
+  the "1 in 4" finding, the ticket-vs-data check, the two root-cause checks, and the
+  five-investigator result. Add new findings there, in plain language.
+- **Raw counts matter more than the rate.** Pings taken are 132 a week before 4.2 and 120 in the
+  week of 31 Aug (−9%), while the rate looks almost recovered (73%). Always show counts and
+  fairness next to the rate.
+- **"1 in 4 responders effectively cut off"** (Farlight, Meteor Mite, The Undertow, Vesper) is
+  the headline for leadership, but it's flagged *not certain* until Ravi confirms the CSV. All
+  four are backed by tickets or interviews.
+- **Tickets vs CSV:** the CSV backs only 3 of 21 "phone went quiet" tickets. For Nightwell,
+  Stormwrack and Ironvale they tell opposite stories; these three are the test cases for
+  Ravi's data.
+- **Likely root cause** (5 investigators agreed, medium confidence): 4.2's miss surge (60s
+  timeout as main suspect; late push delivery is a live alternative for the "gone in seconds"
+  tickets) plus the old no-recovery score rule (60% break-even), made worse by shipping two
+  changes at once with no rollout, fairness checks or kill switch.
+  - **Unresolved:** why *these* four (location vs late delivery).
+  - **Don't** revert "closer heroes first" alone; it would make the trap worse.
+  - **Wait for the per-offer log** before choosing 60s vs 90s.
+- **Scores probably are stored**, not held in memory: no stuck responder ever rebounds. Still
+  confirm with Wen.
+- **Watch list for a month:** the four cut off first, then Ashgrove and Halfmoon (slipping), then
+  Nightwell, Stormwrack and Ironvale (data test cases), then the overloaded The Gale, Falkirk and
+  Vantage.
+- **Repo:** all PRs (#1–#3) are merged into `main`. The old module branches can be deleted.
+  Start each module on a fresh branch off `main`.
