@@ -443,6 +443,8 @@ each one would tell us about the **root cause**. Each is written the scientific 
 | 8 | H5: Saved scores | High | Affects *how we fix it*, not *what caused it*. |
 | 9 | H8: Manual overrides | Low | Nothing points to it yet. At most it adds to the story. |
 | 10 | H10: Unfilled jobs | Unknown | Measures the damage, not the cause. Important for leadership. |
+| 11 | H11: Applied to everyone at once | High | Answers Marcus's question, not the root cause. Confirms there was no partial rollout. |
+| 12 | H12: Softened the penalty for decliners | Medium–high | Answers Marcus's question, not the root cause. Can't be tested with our chart, because no hero had a low score before 12 Aug. |
 
 **Data that supports putting #1 and #2 first:**
 - **The miss surge hit everyone at once, and offers didn't change.** In the update week, misses
@@ -479,6 +481,8 @@ each one would tell us about the **root cause**. Each is written the scientific 
 | 8 | H5: Saved scores | Outline code keeps scores in memory, yet no stuck hero bounced back | Are scores saved through restarts? | **If** scores are saved, **then** restarts won't reset them, **because** they're stored outside memory. |
 | 9 | H8: Manual overrides | Helpers can override by hand, and overrides are logged (since 4.0) | Did helpers pass over the four by hand? | **If** helpers often picked others over the four, **then** the four lost extra offers, **because** overrides skipped them on purpose. |
 | 10 | H10: Unfilled jobs | Jobs taken fell 9% (132 → 120 a week) | Were the missing jobs unfilled, or was there less work? | **If** emergencies stayed level, **then** the missing jobs went unfilled or late, **because** fewer heroes were able to take them. |
+| 11 | H11: Applied to everyone at once | `config.py` has single values with no exceptions, but this folder is partly outlines | Did 4.2 go live for every hero at once, with no gradual rollout? | **If** 4.2 went live for all heroes at once, **then** every offer was ranked with the new weights from 12 Aug, **because** there's one setting and no rollout. |
+| 12 | H12: Softened the penalty for decliners | "Says yes lately" dropped from 40% to 25% of the score | Did heroes who'd been turning jobs down rank higher after 4.2? | **If** history carried over (H5) and it applied to everyone (H11), **then** low-score heroes ranked higher than the old weights would allow, **because** their low score counts for less. |
 
 ### Table 2: how we test it
 
@@ -494,15 +498,18 @@ each one would tell us about the **root cause**. Each is written the scientific 
 | 8 | Scores reset to 0.5 on every restart | Restart dates and storage location from Wen. Check for jumps back to 0.5. | No jumps after restarts | Scores reset after restarts |
 | 9 | Overrides were rare and didn't involve the four | Count overrides against the four in the override records, before vs after 12 Aug | Overrides against the four rose after 12 Aug | Few or none |
 | 10 | Emergencies fell by about the same amount | Emergencies per week, unfilled jobs and time to assign, before vs after (Ravi) | Emergencies level; unfilled jobs or waits up | Emergencies fell about 9% |
+| 11 | The change was switched on for some heroes or areas first, or new and existing heroes were handled differently | Ask Wen about gradual rollout or on/off switches in 4.2. In the offer log, check that every offer after 12 Aug used the new weights. | No gradual rollout; every offer after 12 Aug used the new weights | Some heroes or areas stayed on old weights after 12 Aug |
+| 12 | Low-score heroes ranked the same or lower under the new weights | Replay August at 90 seconds (no extra misses), once with old weights and once with new. Compare offers for heroes with low scores before 12 Aug. Needs a wider set of heroes than our chart. | Those heroes get more offers with the new weights | Same or fewer offers |
 
 ### Which data tests which hypothesis
 
 | Data source | From | Tests ranks |
 |---|---|---|
-| **Offer-by-offer log** (sent, arrived and answered times; "no" vs "no answer"; score; place in list; travel time) | Wen / Ravi | **1, 2, 3, 4, 5, 9** |
-| **Replays of August**, changing one setting at a time | Wen | 2, 3, 4, 7 |
+| **Offer-by-offer log** (sent, arrived and answered times; "no" vs "no answer"; score; place in list; travel time) | Wen / Ravi | **1, 2, 3, 4, 5, 9**, 11 |
+| **Replays of August**, changing one setting at a time | Wen | 2, 3, 4, 7, 12 |
 | **What the chart counts, plus official numbers** | Ravi | 6 |
-| **Restart dates and where scores are saved** | Wen | 8 |
+| **Restart dates and where scores are saved** | Wen | 8 (also confirms Marcus's answer) |
+| **4.2 rollout details** (gradual rollout or on/off switches?) | Wen | 11 |
 | **Override records** | Wen / Marcus | 9 |
 | **Emergencies, unfilled jobs, wait times** | Ravi | 10 |
 
@@ -537,17 +544,34 @@ misses on top.
 - **Was it a deliberate choice?** There's no 4.2 decision record, so nothing says whether
   applying it to everyone was intended.
 
-**Reply drafted for Marcus** (not sent):
-> Checked the routing code: the 4.2 weight change applies to everyone, not just new responders.
-> The weights are single global values in config.py, and every responder is re-scored on every
-> callout, so anyone with a history of turning jobs down was ranked with their existing low score
-> under the new weights from 12 Aug. For them it actually softened the penalty (acceptance history
-> went from 40% to 25% of the score).
+**How to confirm the answer:** three checks, H5, H11 and H12, in "Hypotheses to test" above.
+- **H5:** did history carry over?
+- **H11:** did it apply to everyone at once?
+- **H12:** did it actually help decliners?
+
+**Slack reply drafted for Marcus** (not sent):
+> @Marcus short answer from the code: **everyone**, including responders who'd already been
+> turning jobs down. Not just new ones.
 >
-> Two things I can't confirm from this folder, so worth asking Wen: (1) whether the 4.2 deploy
-> reset scores. In the sample code they live in memory and would go back to 0.5 on restart,
-> though the data suggests the real system saves them. (2) Whether applying it to everyone was a
-> deliberate decision. I can't find any record either way.
+> • The weights are single values in `config.py`, with no new/existing split and no exceptions.
+> • Every responder is re-scored on every callout, so from 12 Aug anyone with a history of
+> declining was ranked with their *existing* low acceptance score under the new weights.
+> • If anything it **softened** things for them: acceptance history dropped from 40% to 25% of
+> the score. What hurt after 12 Aug was the 60s timeout adding new misses on top.
+>
+> What I can't confirm from the code (the routing folder is partly stubs), so I don't want to
+> overstate it:
+> 1. **Did the 4.2 deploy reset scores?** In the code they're held in memory and would go back to
+> 0.5 on restart. The data suggests they're actually saved (nobody ever bounced back), but if
+> they did reset, the real answer is "everyone, but everyone started fresh on 12 Aug."
+> 2. **Was 4.2 switched on for everyone at once,** or rolled out to some responders or regions
+> first?
+> 3. **Was applying it to decliners a deliberate call?** I can't find a decision record either
+> way.
+>
+> Could we grab 15 min with Wen on 1 and 2? I'd also like to ask her for a replay of August
+> (old vs new weights at 90s) to confirm the "softened" part for decliners. Our sample can't show
+> it, because nobody had a low score before 12 Aug.
 
 ## Open questions (for Ravi and Wen)
 
