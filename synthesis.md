@@ -339,6 +339,300 @@ All five investigators asked for item 1 first.
 - **Wait for item 1** before choosing between 60 and 90 seconds. If late delivery is the real
   problem, the 90 seconds alone won't fix it.
 
+## What the code tells us (2 Oct)
+
+*In plain words.* We walked through `00-rook/code/dispatch-routing/` step by step, from an
+emergency coming in to a hero's phone buzzing. Almost everything we saw in the data can be traced
+to a specific step in the code.
+
+### How a job gets to a phone
+
+| Step | What happens | File |
+|---|---|---|
+| 1 | Emergency comes in | *Not in this folder* (the helpers' screen or another system) |
+| 2 | Start finding someone | `offer.py` |
+| 3 | Find who's free nearby; only the hero or helper can set this | `availability.py` |
+| 4 | Score each hero: travel time 60%, says-yes-lately 25%, skills 15%. Over 45 minutes away gets zero travel points. | `routing.py` (with `availability.py`, `history.py`, `config.py`) |
+| 5 | Put them in order. Nobody is removed, but the list stops at the first yes. | `routing.py` |
+| 6 | Buzz the top person's phone | `offer.py` |
+| 7 | Wait 60 seconds (was 90). Yes: score up 0.08. No or too late: score down 0.12, next person. | `offer.py`, `config.py`, `history.py` |
+
+The update only changed three numbers in `config.py`: the answer time and two score weights.
+
+### What we saw, and where it comes from
+
+| What we saw in the data | Where it comes from in the code |
+|---|---|
+| Everyone missed more in the update week | **Step 7:** 60 seconds instead of 90 |
+| A miss hurt more than a yes helped (the 60% line) | **Step 7:** "too late" counts as "no"; −0.12 per miss vs +0.08 per yes |
+| Offers dried up a week later | **Steps 4–5:** the score fell first, then the hero slid down a list that stops at the first yes |
+| The four never recovered | `history.py` has no way back up. The "should this ease back?" note has been open since 2019. |
+| They missed almost every rare offer (3 of 25) | Unexpected buzz, then a miss, then the score drops again. Nothing breaks the loop. |
+| Others got overloaded | **Step 5:** skipped heroes' work goes to whoever is next |
+| The rate "recovered" but jobs taken are still down | Stuck heroes barely get buzzed, so their misses stop counting |
+| "My phone never goes off" | Last on a list that stops at the first yes is the same as never being asked |
+| Helpers can't explain it | Nothing shows a hero or helper their score |
+| Ashgrove and Halfmoon slipping despite good scores | **Step 4:** travel time now counts for more, and over 45 minutes away gets zero |
+| Why these four, not others | **Step 4:** a low score only matters if other free heroes are close enough to go first |
+
+### New clue: the clock starts too early
+
+In `offer.py`, the 60-second clock starts **when the offer is sent**, not when it reaches the
+phone. If the offer arrives late, the hero gets less time. A 50-second delay leaves only 10
+seconds.
+
+That fits the help messages saying jobs vanished "in a few seconds" (T-019, T-020, T-023, T-025),
+which a full 60 seconds can't explain. The update also changed how offer notifications are sent.
+
+**Ask Wen:** does the real system start the clock at "sent" or at "received", and how late do
+offers arrive? If the clock starts at "sent", the fix should start it when the phone receives
+the offer, not just bring back 90 seconds.
+
+### What the code can't explain
+
+- **The 7 heroes where the chart and the help messages disagree.** A "yes" can only come from the
+  phone, so those heroes really answered. Either the chart is wrong or memories are.
+- **Complaints from before 12 Aug.** Nothing in the code changed then.
+- **Whether offers arrive late.** The phone-sending part is only an outline in this folder.
+- **Why scores never reset.** In this code, scores live only in memory, so a restart would wipe
+  them. But nobody ever bounced back, so the real system probably saves them somewhere.
+
+### What to do next
+
+1. **Ask Wen this week:**
+   - does the clock start at sent or at received?
+   - a log of every offer (sent, arrived, answered)
+   - where scores are saved
+   - a replay of August
+2. **Ask Ravi:** official numbers for Nightwell, Stormwrack and Ironvale, and what the chart
+   counts.
+3. **Tell the helpers now:** an honest message through Nadia.
+4. **Plan the fix with Marcus and Wen** (a point release Helen approves):
+   - let heroes climb back up
+   - treat "too late" more gently than "no"
+   - reset the four stuck heroes
+   - start the clock when the phone gets the offer
+5. **Don't:** undo "closer heroes first" on its own, or pick 60 vs 90 seconds before the offer log
+   comes back.
+6. **Before the fix ships:** agree the kill-switch measures. Then watch the four stuck heroes,
+   Ashgrove and Halfmoon for a month.
+7. **Still open:** flag the cracked vest plate to the Supply team.
+
+## Points off, and points back on (2 Oct)
+
+*In plain words.* We searched all five code files for every place a hero's "says yes lately"
+score goes down or up. There's **one** way to lose points and **one** way to get them back.
+
+### What takes points off
+
+**`history.py`, lines 35–39:**
+```python
+def record_declined(responder):
+    """They turned it down, or we ran out of time waiting. Score goes
+    down. Same either way — we asked and we didn't get a yes.
+    """
+    _set(responder, recent_acceptance(responder) - DECLINE_PENALTY)
+```
+- **In plain English:** when a hero doesn't take a job, take **0.12** off their score. The amount
+  is set in `config.py`, line 19: `DECLINE_PENALTY = 0.12`.
+- **"No" and "ran out of time" are treated the same:** "Same either way."
+
+**What triggers it is in `offer.py`, lines 26–30:** if the answer is yes, give points and stop.
+**Anything else** (both "no" and "no answer") takes points off.
+
+### Everything that puts points back on
+
+Only one thing: **saying yes to a job.** It's in `history.py`, lines 25–27 (`record_accepted`),
+and adds **0.08**. The amount is set in `config.py`, line 18: `ACCEPTANCE_CREDIT = 0.08`.
+
+**Nothing else adds points:**
+- **No time-based recovery.** Wen's 2019 note (`history.py`, lines 30–34) asked whether scores
+  should drift back up over time, and ended "Leaving it as-is for now."
+- **No reset or manual override.** No helper or engineer can raise a score.
+- **No credit** for being available, finishing a job, or going a while without a miss.
+
+**Two things that look like recovery, but aren't:**
+- **New heroes start at 0.5** (`history.py`, line 22). That's a starting point, not a way back up.
+- **A restart would reset everyone to 0.5,** because scores live only in memory here
+  (`history.py`, line 17). That would be an accident, not a feature, and the data suggests the
+  real system saves scores.
+
+### Why it matters
+
+| | Points |
+|---|---|
+| Miss or say no | **−0.12** |
+| Say yes | **+0.08** |
+| Anything else | nothing |
+
+- **It takes 3 yeses to make up for 2 misses,** so a hero must say yes to at least **60%** of
+  offers just to stay level.
+- **The only way back up is saying yes.** A hero at the bottom is rarely asked, so they almost
+  never get the chance. That's the trap that froze out the four heroes.
+- **What this means for the fix:** add a second way to earn points back (for example, slow drift
+  back toward 0.5), and score "no answer" separately from "no." The code already tells them
+  apart; it just doesn't use the difference.
+
+## Hypotheses to test (2 Oct)
+
+*In plain words.* Ten hypotheses from what we learned in the code, ranked by how much testing
+each one would tell us about the **root cause**. Each is written the scientific way:
+- what we saw
+- the question
+- a testable "If… then… because…"
+- a "nothing's there" version (the null hypothesis)
+- how to test it
+- what would back it up or knock it down
+
+### Ranking, and why #1 and #2 come first
+
+| Rank | Hypothesis | How likely it's true | Why it's ranked here |
+|---|---|---|---|
+| **1** | **H2: Late delivery** | Medium | **Recommended:** it's the only one that can change the fix itself ("start the clock on arrival" vs "bring back 90 seconds"). |
+| **2** | **H1: Shorter answer time** | High | **Recommended:** the miss surge is the first domino, and nothing else happens without it. |
+| 3 | H3: Score trap | Very high | The trap only fires once misses surge, so it explains why heroes *stayed down*, not what *started* it. |
+| 4 | H4: "No answer" = "no" | High | Tested by the same log as #1 and #2. It only matters once we know why answers came too late. |
+| 5 | H6: Location | Medium | Explains *who* got hit, not *what* broke. |
+| 6 | H9: What the chart counts | Medium–high | A trust check, not a cause. Ask Ravi at the same time. |
+| 7 | H7: "Closer heroes first" | Medium | A side issue for two heroes. All five investigators said it isn't the main cause. |
+| 8 | H5: Saved scores | High | Affects *how we fix it*, not *what caused it*. |
+| 9 | H8: Manual overrides | Low | Nothing points to it yet. At most it adds to the story. |
+| 10 | H10: Unfilled jobs | Unknown | Measures the damage, not the cause. Important for leadership. |
+| 11 | H11: Applied to everyone at once | High | Answers Marcus's question, not the root cause. Confirms there was no partial rollout. |
+| 12 | H12: Softened the penalty for decliners | Medium–high | Answers Marcus's question, not the root cause. Can't be tested with our chart, because no hero had a low score before 12 Aug. |
+
+**Data that supports putting #1 and #2 first:**
+- **The miss surge hit everyone at once, and offers didn't change.** In the update week, misses
+  went from 38 a week to 81 (22% → 46%) while offers stayed level (172 → 177). All 16 heroes
+  missed more.
+- **Nothing else had moved before it.** The share of offers taken was flat at 75–78% for six
+  weeks, then dropped to 54% in the update week. The four heroes' offers only fell the week
+  *after* they missed.
+- **The trap couldn't fire without the misses.** Before the update, no hero ever fell below the
+  60% line. The trap rule has existed since at least 2019 and never caught anyone.
+- **Some misses are too fast for 60 seconds.** T-019 ("gone by the time he'd even finished
+  reading"), T-020 ("almost instantly"), T-023 ("before i could even swipe") and T-025 ("a few
+  seconds") all fit late delivery.
+- **The code and the update notes back #2.** The clock starts at "sent" (`offer.py`), and 4.2
+  changed how notifications are sent ("duplicate push notification on re-offer").
+- **Everyone points to the misses.**
+  - interviews: 3 of 4
+  - help messages: 9 of 25
+  - investigators: all 5 named the miss surge, and 4 of them flagged late delivery
+- **The answer changes the fix.** If #1 is true and #2 is false, bring back 90 seconds. If #2 is
+  true, start the clock when the phone gets the offer.
+
+### Table 1: what we saw and what we think
+
+| Rank | Name | What we saw | Question | Hypothesis (If… then… because…) |
+|---|---|---|---|---|
+| **1** | **H2: Late delivery** | 4 messages say offers vanished in "a few seconds"; the clock starts when an offer is *sent*; 4.2 changed notifications | Are offers reaching some phones late? | **If** offers arrive late, **then** those heroes miss far more, **because** the clock is already running before the phone buzzes. |
+| **2** | **H1: Shorter answer time** | Misses jumped from 22% to 46% in the update week, for all 16 heroes; offers stayed level (172 → 177) | Did cutting 90s to 60s cause most of the extra misses? | **If** heroes often answered in 60–90 seconds, **then** the cut turned those answers into misses, **because** they now came after the offer was pulled. |
+| 3 | H3: Score trap | Four heroes fell to 0–1 offers a week and never recovered; no recovery rule in `history.py` | Does the score rule keep them at the bottom? | **If** a score falls low enough, **then** the hero stays stuck, **because** they're rarely asked, can't earn points back, and each rare miss lowers it again. |
+| 4 | H4: "No answer" = "no" | The code records both separately but penalises both −0.12 | Did the four run out of time, or say no on purpose? | **If** most of their misses were "no answer", **then** a gentler penalty would have kept them out of the trap, **because** they'd never have fallen below the 60% line. |
+| 5 | H6: Location | Vesper (50% yes) got stuck; Bulwark (50% yes) didn't | Does closeness to other free heroes decide who gets trapped? | **If** a low-scoring hero has nearby competitors, **then** they get skipped, **because** those heroes rank above them and the asking stops at the first yes. |
+| 6 | H9: What the chart counts | For 7 heroes, the chart shows more offers but the messages say "quiet" | Does the chart count something different from what helpers count? | **If** the chart counts bulk sends or repeat offers, **then** it shows more offers than heroes notice, **because** one job sent to many counts once per hero. |
+| 7 | H7: "Closer heroes first" | Ashgrove and Halfmoon get about 30% fewer offers despite good scores | Did the weighting change push them down? Would undoing it help the four? | **If** they're further from most jobs, **then** the higher travel weight lowered their rank, **because** travel now counts 60% instead of 45%. |
+| 8 | H5: Saved scores | Outline code keeps scores in memory, yet no stuck hero bounced back | Are scores saved through restarts? | **If** scores are saved, **then** restarts won't reset them, **because** they're stored outside memory. |
+| 9 | H8: Manual overrides | Helpers can override by hand, and overrides are logged (since 4.0) | Did helpers pass over the four by hand? | **If** helpers often picked others over the four, **then** the four lost extra offers, **because** overrides skipped them on purpose. |
+| 10 | H10: Unfilled jobs | Jobs taken fell 9% (132 → 120 a week) | Were the missing jobs unfilled, or was there less work? | **If** emergencies stayed level, **then** the missing jobs went unfilled or late, **because** fewer heroes were able to take them. |
+| 11 | H11: Applied to everyone at once | `config.py` has single values with no exceptions, but this folder is partly outlines | Did 4.2 go live for every hero at once, with no gradual rollout? | **If** 4.2 went live for all heroes at once, **then** every offer was ranked with the new weights from 12 Aug, **because** there's one setting and no rollout. |
+| 12 | H12: Softened the penalty for decliners | "Says yes lately" dropped from 40% to 25% of the score | Did heroes who'd been turning jobs down rank higher after 4.2? | **If** history carried over (H5) and it applied to everyone (H11), **then** low-score heroes ranked higher than the old weights would allow, **because** their low score counts for less. |
+
+### Table 2: how we test it
+
+| Rank | Null hypothesis (nothing's there) | Experiment | Supported if | Rejected if |
+|---|---|---|---|---|
+| **1** | Delivery time is the same for everyone and makes no difference | Offer log for 3–31 Aug. *Test:* delay from sent to arrived. *Measure:* answered or timed out. *Compare:* before/after 12 Aug, and the four vs the rest. Ask Wen whether the clock starts at "sent" or "arrived". | Misses cluster on long delays, and delays grew after 12 Aug or are worse for the four | Delivery takes a second or two for everyone, or the real clock starts on arrival |
+| **2** | Almost no answers ever took over 60 seconds | (A) Share of pre-12 Aug yeses that took 60–90 seconds. (B) Wen replays August at 90 seconds with everything else the same. *Measure:* share missed. | A real share took 60–90 seconds, **and** the 90-second replay brings misses back near 22% | Almost all yeses were under 60 seconds, or the replay still shows the surge |
+| 3 | The four's real scores are normal | Real weekly scores for the four, with Bulwark, Ashgrove and Halfmoon for comparison. Replay with a "drift back to the middle" rule. *Measure:* offers per week. | Scores sit near 0 from mid-August, **and** the recovery replay frees them | Scores are fine, or the four stay stuck even with recovery |
+| 4 | The four mostly said "no" on purpose | Split their misses into "no" and "no answer". Replay with a smaller "no answer" penalty. *Measure:* do they get stuck? | Mostly "no answer", **and** the replay keeps them out of the trap | Mostly deliberate "no"s |
+| 5 | Nearby competitors make no difference | Travel minutes for each offer vs other free heroes (minutes only, never addresses). *Measure:* offers per week. *Compare:* the four vs Bulwark. | The four usually had 2 or more nearby competitors; Bulwark didn't | The four were often closest and still skipped |
+| 6 | The chart counts personal offers correctly | Ravi explains what "pings_sent" counts and pulls official numbers for Nightwell, Stormwrack and Ironvale | Official numbers are clearly lower than the chart | Official numbers match the chart |
+| 7 | The weighting makes no difference | Travel times vs average. Replay with old weights at 60 seconds. *Measure:* offers for Ashgrove, Halfmoon and the four. | They're further than average; the old weights restore them but don't free the four | Average distance, or the old weights free the four |
+| 8 | Scores reset to 0.5 on every restart | Restart dates and storage location from Wen. Check for jumps back to 0.5. | No jumps after restarts | Scores reset after restarts |
+| 9 | Overrides were rare and didn't involve the four | Count overrides against the four in the override records, before vs after 12 Aug | Overrides against the four rose after 12 Aug | Few or none |
+| 10 | Emergencies fell by about the same amount | Emergencies per week, unfilled jobs and time to assign, before vs after (Ravi) | Emergencies level; unfilled jobs or waits up | Emergencies fell about 9% |
+| 11 | The change was switched on for some heroes or areas first, or new and existing heroes were handled differently | Ask Wen about gradual rollout or on/off switches in 4.2. In the offer log, check that every offer after 12 Aug used the new weights. | No gradual rollout; every offer after 12 Aug used the new weights | Some heroes or areas stayed on old weights after 12 Aug |
+| 12 | Low-score heroes ranked the same or lower under the new weights | Replay August at 90 seconds (no extra misses), once with old weights and once with new. Compare offers for heroes with low scores before 12 Aug. Needs a wider set of heroes than our chart. | Those heroes get more offers with the new weights | Same or fewer offers |
+
+### Which data tests which hypothesis
+
+| Data source | From | Tests ranks |
+|---|---|---|
+| **Offer-by-offer log** (sent, arrived and answered times; "no" vs "no answer"; score; place in list; travel time) | Wen / Ravi | **1, 2, 3, 4, 5, 9**, 11 |
+| **Replays of August**, changing one setting at a time | Wen | 2, 3, 4, 7, 12 |
+| **What the chart counts, plus official numbers** | Ravi | 6 |
+| **Restart dates and where scores are saved** | Wen | 8 (also confirms Marcus's answer) |
+| **4.2 rollout details** (gradual rollout or on/off switches?) | Wen | 11 |
+| **Override records** | Wen / Marcus | 9 |
+| **Emergencies, unfilled jobs, wait times** | Ravi | 10 |
+
+## Marcus's question: did the 4.2 change apply to responders who were already turning jobs down? (2 Oct)
+
+*Marcus first asked this on 14 Aug, and it was never answered.*
+
+**Short answer:** yes, it applied to everyone, including responders who'd already been turning
+jobs down. The code has no "new vs existing" split anywhere. One caveat needs Wen to confirm.
+
+**What the code shows:**
+- **One setting for everybody.** The 4.2 change was two numbers in `config.py`: travel time went
+  from 45% to 60%, and "says yes lately" from 40% to 25%. They're single values, with no
+  exceptions, no list of who they apply to, and no start date.
+- **The score is worked out fresh for every job.** Each time a job comes in, `routing.py` scores
+  every free hero with those numbers. From the moment 4.2 went live, every hero was ranked under
+  the new weights.
+- **History carried over.** The "says yes lately" score in `history.py` wasn't touched by 4.2.
+  Heroes who'd been turning jobs down kept their low score and were ranked with it under the new
+  weights. Only brand-new heroes start fresh, at 0.5.
+
+**The surprise:** for heroes who'd been turning jobs down, the change actually **helped**. Their
+low score now counts for 25% instead of 40%, so it drags them down less. The weight change didn't
+push decliners further down. What hurt them after 12 Aug was the shorter answer time adding new
+misses on top.
+
+**Caveats (don't guess on these):**
+- **Did the 4.2 install reset scores?** In this version of the code, scores live only in memory.
+  If the real system works the same way, restarting it for 4.2 would have reset every hero to
+  0.5, wiping all history, good and bad. The data hints scores are saved (nobody ever bounced
+  back), but only Wen can confirm.
+- **Was it a deliberate choice?** There's no 4.2 decision record, so nothing says whether
+  applying it to everyone was intended.
+
+**How to confirm the answer:** three checks, H5, H11 and H12, in "Hypotheses to test" above.
+- **H5:** did history carry over?
+- **H11:** did it apply to everyone at once?
+- **H12:** did it actually help decliners?
+
+**Slack reply drafted for Marcus** (not sent):
+> @Marcus short answer from the code: **everyone**, including responders who'd already been
+> turning jobs down. Not just new ones.
+>
+> • The weights are single values in `config.py`, with no new/existing split and no exceptions.
+> • Every responder is re-scored on every callout, so from 12 Aug anyone with a history of
+> declining was ranked with their *existing* low acceptance score under the new weights.
+> • If anything it **softened** things for them: acceptance history dropped from 40% to 25% of
+> the score. What hurt after 12 Aug was the 60s timeout adding new misses on top.
+>
+> What I can't confirm from the code (the routing folder is partly stubs), so I don't want to
+> overstate it:
+> 1. **Did the 4.2 deploy reset scores?** In the code they're held in memory and would go back to
+> 0.5 on restart. The data suggests they're actually saved (nobody ever bounced back), but if
+> they did reset, the real answer is "everyone, but everyone started fresh on 12 Aug."
+> 2. **Was 4.2 switched on for everyone at once,** or rolled out to some responders or regions
+> first?
+> 3. **Was applying it to decliners a deliberate call?** I can't find a decision record either
+> way.
+> 4. **Was it really just config?** The routing CHANGELOG only lists the weight and timeout
+> changes, but the 4.2 release notes also include the "duplicate push notification on re-offer"
+> fix, which isn't in this folder (the push code here is a stub). Can we see the routing and push
+> code diff from 4.1 to 4.2, and what that fix changed? In particular, did it affect when offers
+> reach phones, or when the 60s clock starts?
+>
+> Could we grab 15 min with Wen on 1, 2 and 4? I'd also like to ask her for a replay of August
+> (old vs new weights at 90s) to confirm the "softened" part for decliners. Our sample can't show
+> it, because nobody had a low score before 12 Aug.
+
 ## Open questions (for Ravi and Wen)
 
 *See the table "Information needed to settle it" above for the fuller list from the
