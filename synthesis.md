@@ -339,6 +339,85 @@ All five investigators asked for item 1 first.
 - **Wait for item 1** before choosing between 60 and 90 seconds. If late delivery is the real
   problem, the 90 seconds alone won't fix it.
 
+## What the code tells us (2 Oct)
+
+*In plain words.* We walked through `00-rook/code/dispatch-routing/` step by step, from an
+emergency coming in to a hero's phone buzzing. Almost everything we saw in the data can be traced
+to a specific step in the code.
+
+### How a job gets to a phone
+
+| Step | What happens | File |
+|---|---|---|
+| 1 | Emergency comes in | *Not in this folder* (the helpers' screen or another system) |
+| 2 | Start finding someone | `offer.py` |
+| 3 | Find who's free nearby; only the hero or helper can set this | `availability.py` |
+| 4 | Score each hero: travel time 60%, says-yes-lately 25%, skills 15%. Over 45 minutes away gets zero travel points. | `routing.py` (with `availability.py`, `history.py`, `config.py`) |
+| 5 | Put them in order. Nobody is removed, but the list stops at the first yes. | `routing.py` |
+| 6 | Buzz the top person's phone | `offer.py` |
+| 7 | Wait 60 seconds (was 90). Yes: score up 0.08. No or too late: score down 0.12, next person. | `offer.py`, `config.py`, `history.py` |
+
+The update only changed three numbers in `config.py`: the answer time and two score weights.
+
+### What we saw, and where it comes from
+
+| What we saw in the data | Where it comes from in the code |
+|---|---|
+| Everyone missed more in the update week | **Step 7:** 60 seconds instead of 90 |
+| A miss hurt more than a yes helped (the 60% line) | **Step 7:** "too late" counts as "no"; −0.12 per miss vs +0.08 per yes |
+| Offers dried up a week later | **Steps 4–5:** the score fell first, then the hero slid down a list that stops at the first yes |
+| The four never recovered | `history.py` has no way back up. The "should this ease back?" note has been open since 2019. |
+| They missed almost every rare offer (3 of 25) | Unexpected buzz, then a miss, then the score drops again. Nothing breaks the loop. |
+| Others got overloaded | **Step 5:** skipped heroes' work goes to whoever is next |
+| The rate "recovered" but jobs taken are still down | Stuck heroes barely get buzzed, so their misses stop counting |
+| "My phone never goes off" | Last on a list that stops at the first yes is the same as never being asked |
+| Helpers can't explain it | Nothing shows a hero or helper their score |
+| Ashgrove and Halfmoon slipping despite good scores | **Step 4:** travel time now counts for more, and over 45 minutes away gets zero |
+| Why these four, not others | **Step 4:** a low score only matters if other free heroes are close enough to go first |
+
+### New clue: the clock starts too early
+
+In `offer.py`, the 60-second clock starts **when the offer is sent**, not when it reaches the
+phone. If the offer arrives late, the hero gets less time. A 50-second delay leaves only 10
+seconds.
+
+That fits the help messages saying jobs vanished "in a few seconds" (T-019, T-020, T-023, T-025),
+which a full 60 seconds can't explain. The update also changed how offer notifications are sent.
+
+**Ask Wen:** does the real system start the clock at "sent" or at "received", and how late do
+offers arrive? If the clock starts at "sent", the fix should start it when the phone receives
+the offer, not just bring back 90 seconds.
+
+### What the code can't explain
+
+- **The 7 heroes where the chart and the help messages disagree.** A "yes" can only come from the
+  phone, so those heroes really answered. Either the chart is wrong or memories are.
+- **Complaints from before 12 Aug.** Nothing in the code changed then.
+- **Whether offers arrive late.** The phone-sending part is only an outline in this folder.
+- **Why scores never reset.** In this code, scores live only in memory, so a restart would wipe
+  them. But nobody ever bounced back, so the real system probably saves them somewhere.
+
+### What to do next
+
+1. **Ask Wen this week:**
+   - does the clock start at sent or at received?
+   - a log of every offer (sent, arrived, answered)
+   - where scores are saved
+   - a replay of August
+2. **Ask Ravi:** official numbers for Nightwell, Stormwrack and Ironvale, and what the chart
+   counts.
+3. **Tell the helpers now:** an honest message through Nadia.
+4. **Plan the fix with Marcus and Wen** (a point release Helen approves):
+   - let heroes climb back up
+   - treat "too late" more gently than "no"
+   - reset the four stuck heroes
+   - start the clock when the phone gets the offer
+5. **Don't:** undo "closer heroes first" on its own, or pick 60 vs 90 seconds before the offer log
+   comes back.
+6. **Before the fix ships:** agree the kill-switch measures. Then watch the four stuck heroes,
+   Ashgrove and Halfmoon for a month.
+7. **Still open:** flag the cracked vest plate to the Supply team.
+
 ## Open questions (for Ravi and Wen)
 
 *See the table "Information needed to settle it" above for the fuller list from the
