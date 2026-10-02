@@ -506,6 +506,49 @@ each one would tell us about the **root cause**. Each is written the scientific 
 | **Override records** | Wen / Marcus | 9 |
 | **Emergencies, unfilled jobs, wait times** | Ravi | 10 |
 
+## Marcus's question: did the 4.2 change apply to responders who were already turning jobs down? (2 Oct)
+
+*Marcus first asked this on 14 Aug, and it was never answered.*
+
+**Short answer:** yes, it applied to everyone, including responders who'd already been turning
+jobs down. The code has no "new vs existing" split anywhere. One caveat needs Wen to confirm.
+
+**What the code shows:**
+- **One setting for everybody.** The 4.2 change was two numbers in `config.py`: travel time went
+  from 45% to 60%, and "says yes lately" from 40% to 25%. They're single values, with no
+  exceptions, no list of who they apply to, and no start date.
+- **The score is worked out fresh for every job.** Each time a job comes in, `routing.py` scores
+  every free hero with those numbers. From the moment 4.2 went live, every hero was ranked under
+  the new weights.
+- **History carried over.** The "says yes lately" score in `history.py` wasn't touched by 4.2.
+  Heroes who'd been turning jobs down kept their low score and were ranked with it under the new
+  weights. Only brand-new heroes start fresh, at 0.5.
+
+**The surprise:** for heroes who'd been turning jobs down, the change actually **helped**. Their
+low score now counts for 25% instead of 40%, so it drags them down less. The weight change didn't
+push decliners further down. What hurt them after 12 Aug was the shorter answer time adding new
+misses on top.
+
+**Caveats (don't guess on these):**
+- **Did the 4.2 install reset scores?** In this version of the code, scores live only in memory.
+  If the real system works the same way, restarting it for 4.2 would have reset every hero to
+  0.5, wiping all history, good and bad. The data hints scores are saved (nobody ever bounced
+  back), but only Wen can confirm.
+- **Was it a deliberate choice?** There's no 4.2 decision record, so nothing says whether
+  applying it to everyone was intended.
+
+**Reply drafted for Marcus** (not sent):
+> Checked the routing code: the 4.2 weight change applies to everyone, not just new responders.
+> The weights are single global values in config.py, and every responder is re-scored on every
+> callout, so anyone with a history of turning jobs down was ranked with their existing low score
+> under the new weights from 12 Aug. For them it actually softened the penalty (acceptance history
+> went from 40% to 25% of the score).
+>
+> Two things I can't confirm from this folder, so worth asking Wen: (1) whether the 4.2 deploy
+> reset scores. In the sample code they live in memory and would go back to 0.5 on restart,
+> though the data suggests the real system saves them. (2) Whether applying it to everyone was a
+> deliberate decision. I can't find any record either way.
+
 ## Open questions (for Ravi and Wen)
 
 *See the table "Information needed to settle it" above for the fuller list from the
