@@ -418,6 +418,61 @@ the offer, not just bring back 90 seconds.
    Ashgrove and Halfmoon for a month.
 7. **Still open:** flag the cracked vest plate to the Supply team.
 
+## Points off, and points back on (2 Oct)
+
+*In plain words.* We searched all five code files for every place a hero's "says yes lately"
+score goes down or up. There's **one** way to lose points and **one** way to get them back.
+
+### What takes points off
+
+**`history.py`, lines 35–39:**
+```python
+def record_declined(responder):
+    """They turned it down, or we ran out of time waiting. Score goes
+    down. Same either way — we asked and we didn't get a yes.
+    """
+    _set(responder, recent_acceptance(responder) - DECLINE_PENALTY)
+```
+- **In plain English:** when a hero doesn't take a job, take **0.12** off their score. The amount
+  is set in `config.py`, line 19: `DECLINE_PENALTY = 0.12`.
+- **"No" and "ran out of time" are treated the same:** "Same either way."
+
+**What triggers it is in `offer.py`, lines 26–30:** if the answer is yes, give points and stop.
+**Anything else** (both "no" and "no answer") takes points off.
+
+### Everything that puts points back on
+
+Only one thing: **saying yes to a job.** It's in `history.py`, lines 25–27 (`record_accepted`),
+and adds **0.08**. The amount is set in `config.py`, line 18: `ACCEPTANCE_CREDIT = 0.08`.
+
+**Nothing else adds points:**
+- **No time-based recovery.** Wen's 2019 note (`history.py`, lines 30–34) asked whether scores
+  should drift back up over time, and ended "Leaving it as-is for now."
+- **No reset or manual override.** No helper or engineer can raise a score.
+- **No credit** for being available, finishing a job, or going a while without a miss.
+
+**Two things that look like recovery, but aren't:**
+- **New heroes start at 0.5** (`history.py`, line 22). That's a starting point, not a way back up.
+- **A restart would reset everyone to 0.5,** because scores live only in memory here
+  (`history.py`, line 17). That would be an accident, not a feature, and the data suggests the
+  real system saves scores.
+
+### Why it matters
+
+| | Points |
+|---|---|
+| Miss or say no | **−0.12** |
+| Say yes | **+0.08** |
+| Anything else | nothing |
+
+- **It takes 3 yeses to make up for 2 misses,** so a hero must say yes to at least **60%** of
+  offers just to stay level.
+- **The only way back up is saying yes.** A hero at the bottom is rarely asked, so they almost
+  never get the chance. That's the trap that froze out the four heroes.
+- **What this means for the fix:** add a second way to earn points back (for example, slow drift
+  back toward 0.5), and score "no answer" separately from "no." The code already tells them
+  apart; it just doesn't use the difference.
+
 ## Hypotheses to test (2 Oct)
 
 *In plain words.* Ten hypotheses from what we learned in the code, ranked by how much testing
@@ -568,8 +623,13 @@ misses on top.
 > first?
 > 3. **Was applying it to decliners a deliberate call?** I can't find a decision record either
 > way.
+> 4. **Was it really just config?** The routing CHANGELOG only lists the weight and timeout
+> changes, but the 4.2 release notes also include the "duplicate push notification on re-offer"
+> fix, which isn't in this folder (the push code here is a stub). Can we see the routing and push
+> code diff from 4.1 to 4.2, and what that fix changed? In particular, did it affect when offers
+> reach phones, or when the 60s clock starts?
 >
-> Could we grab 15 min with Wen on 1 and 2? I'd also like to ask her for a replay of August
+> Could we grab 15 min with Wen on 1, 2 and 4? I'd also like to ask her for a replay of August
 > (old vs new weights at 90s) to confirm the "softened" part for decliners. Our sample can't show
 > it, because nobody had a low score before 12 Aug.
 
