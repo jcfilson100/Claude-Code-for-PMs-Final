@@ -246,3 +246,44 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
   Vantage.
 - **Repo:** all PRs (#1–#3) are merged into `main`. The old module branches can be deleted.
   Start each module on a fresh branch off `main`.
+
+### Conclusions so far (session 4: the routing code)
+- **The code walkthrough, hypotheses and points breakdown are in `synthesis.md`.**
+- **Flow:** `offer.py` asks `routing.py` for an order. `routing.py` uses `availability.py` (who's
+  free, travel time) and `history.py` (says-yes score). `offer.py` buzzes heroes one at a time
+  until the first yes. All numbers live in `config.py`.
+  - In this folder, **4.2 changed only three numbers in `config.py`**.
+  - Push, polling and travel time are **empty outlines**, so this folder is a simplified
+    snapshot. For example, bulk callout (4.1) isn't in it.
+- **Points:**
+  - Only a yes adds points (+0.08).
+  - "No" and "no answer" both cost −0.12.
+  - Nothing else restores a score: no decay, no reset, no credit.
+  - A hero at 0 needs 7 straight yeses to reach 0.5 and 13 to reach 1.0, while getting about 1
+    offer a week.
+- **New clue:** the 60s clock starts when the offer is **sent**, not when the phone receives it
+  (`offer.py`). The 4.2 release notes also include a "duplicate push on re-offer" fix that isn't
+  in the routing changelog. So **"4.2 was just config" is unproven** beyond this folder.
+- **No location or travel-time data exists anywhere in the repo.** Other possible data sources:
+  - the routing override audit log (shipped 4.0)
+  - whether the CSV counts bulk callouts (shipped 4.1)
+- **Hypotheses H1–H12** are in `synthesis.md`, framed with the scientific method.
+  - Test **H2 (late delivery)** and **H1 (shorter answer time)** first.
+  - One offer-by-offer log from Wen tests most of them.
+- **Marcus's 14 Aug question is answered:** the 4.2 weights applied to everyone, including
+  existing decliners, and actually softened their penalty. Open checks for Wen:
+  - whether the deploy reset scores
+  - whether 4.2 had a gradual rollout
+  - whether the decision was deliberate
+  - the 4.1→4.2 diff
+- **Slack:**
+  - Posted to `product-school.slack.com`, channel `C0B8LTV13EJ`: the Marcus reply
+    (p1790933401443459) and the "they'd need to say yes" summary (p1791243919710579).
+  - Waiting on Marcus and Wen. Read the channel for replies next session.
+  - Use the **Slack connector**, not Chrome (Chrome wasn't connected).
+  - It's a real workspace, so **never @-tag** fictional people.
+  - The session scope says to stay inside this folder, so posting to Slack needs the user's
+    explicit OK each time.
+- **Next module:** Helen's request (`05-super-speed/director-request.txt`) for a one-pager plus a
+  clickable prototype, showing the fix from the handler's and responder's point of view.
+- **PR #4** (`module-4-x-ray-vision`) is open, not merged.
