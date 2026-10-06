@@ -1,0 +1,150 @@
+/* COMIC SKIN for the Rook Dispatch prototypes.
+   Layout concept: a comic-book page. Newsprint with halftone dots, ink-outlined panels with hard
+   shadows, yellow caption boxes, speech-bubble notes, a cover strip with an issue number.
+   Applied after each page's own styles; it only re-skins, it never changes behaviour.
+   Prototype styles, not Rook's design system. */
+
+:root {
+  --ground: #F3E9CF; --surface: #FFFBEF; --sunk: #EADFC2; --ink: #141414; --muted: #4B4134; --line: #141414;
+  --accent: #1D5BB8; --accent-soft: #D6E5FA; --warn: #C81E26; --warn-soft: #FBDADB;
+  --amber: #A35F00; --amber-soft: #FFE9A3; --good: #17803C; --good-soft: #D8F0DF;
+  --today: #7A6F5E; --fresh: #B8156F; --fresh-soft: #F9D6EA;
+  --phone: #141414; --phone-screen: #FFFBEF; --shadow: rgba(20, 20, 20, .9); --on-strong: #FFFBEF;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(29, 91, 184, .14); --hard: #141414; --kapow: #E0262E;
+  --display: "Bangers", "Impact", "Arial Black", system-ui, sans-serif;
+  --body: "Comic Neue", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+    --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+    --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+    --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+    --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+    --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+  --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+  --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+  --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+  --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+  color-scheme: dark;
+}
+
+/* Newsprint ground with halftone dots */
+body {
+  background-color: var(--ground);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.7px);
+  background-size: 11px 11px;
+  font-family: var(--body);
+  font-size: 17px;
+}
+
+/* Cover strip, inserted at the top of each page */
+.cover-strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px;
+  background: var(--kapow); color: var(--pop);
+  border: 3px solid var(--hard); box-shadow: 6px 6px 0 var(--hard);
+  padding: 8px 14px; font: 400 1.15rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase;
+}
+.cover-strip .price {
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 8px; transform: rotate(4deg); font-size: 1rem;
+}
+
+/* Headline lettering */
+.wrap h1 {
+  font-family: var(--display); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(2.4rem, 7.5vw, 4.2rem); letter-spacing: .03em; line-height: .95;
+  color: var(--pop); -webkit-text-stroke: 2px var(--hard); paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--hard);
+}
+.wrap h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .05em; font-size: 1.55rem; }
+.wrap h3 { font-family: var(--display); font-weight: 400; letter-spacing: .04em; font-size: 1.25rem; }
+.wrap header .lede, .wrap .lede { font-size: 1.05rem; color: var(--ink); }
+
+/* Caption boxes */
+.wrap .eyebrow {
+  display: inline-block; width: fit-content; justify-self: start;
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 9px; font: 400 .95rem/1.1 var(--display); letter-spacing: .08em;
+  box-shadow: 3px 3px 0 var(--hard); transform: rotate(-1deg);
+}
+.wrap .banner, .wrap .pbanner {
+  border: 3px solid var(--hard); border-radius: 2px; box-shadow: 5px 5px 0 var(--hard);
+  font-weight: 700; transform: rotate(-.35deg);
+}
+
+/* Panels */
+.wrap .panel, .wrap .controls, .wrap .rcard, .wrap .tile, .wrap .msgbox {
+  border: 3px solid var(--line); border-radius: 4px; box-shadow: 6px 6px 0 var(--hard); background: var(--surface);
+}
+.wrap .pcard { border: 2.5px solid var(--line); border-radius: 4px; box-shadow: 3px 3px 0 var(--hard); }
+.wrap .console-bar { border: 2px solid var(--line); border-radius: 2px; font-weight: 700; color: var(--ink); }
+
+/* Speech bubbles */
+.wrap .note {
+  position: relative; border: 2.5px solid var(--line); border-radius: 18px; margin-bottom: 12px; font-weight: 700;
+}
+.wrap .note::after {
+  content: ""; position: absolute; left: 26px; bottom: -11px; width: 18px; height: 18px;
+  background: inherit; border-right: 2.5px solid var(--line); border-bottom: 2.5px solid var(--line);
+  transform: rotate(45deg);
+}
+.wrap .thought {
+  border: 2.5px dashed var(--line); border-radius: 999px; padding: 8px 14px; background: var(--surface); font-weight: 700;
+}
+
+/* Buttons: chunky ink outline, press-down feel (backgrounds stay the page's own) */
+.wrap button:not(.dot) {
+  border: 2.5px solid var(--line); border-radius: 6px; box-shadow: 3px 3px 0 var(--hard);
+  font-family: var(--body); font-weight: 700; transition: transform .08s ease, box-shadow .08s ease;
+}
+.wrap button:not(.dot):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.wrap .seg { border: 2.5px solid var(--line); border-radius: 6px; background: var(--surface); box-shadow: 3px 3px 0 var(--hard); }
+.wrap .seg button { border-color: transparent; box-shadow: none; }
+.wrap .seg button:active { transform: none; box-shadow: none; }
+.wrap .seg button[aria-pressed="true"] { background: var(--pop); color: var(--on-pop); border-color: var(--hard); }
+
+/* Phone: comic-panel frame */
+.wrap .phone { border: 3px solid var(--line); box-shadow: 8px 8px 0 var(--kapow); }
+.wrap .screen { border: 2px solid var(--line); }
+
+/* Badges, pills, chips */
+.wrap .badge, .wrap .pill, .wrap .chip, .wrap .src {
+  border: 2px solid var(--line); border-radius: 4px; font-family: var(--display); font-weight: 400; letter-spacing: .06em;
+}
+
+/* Meters: inked with screen-tone stripes */
+.wrap .meter { border: 2px solid var(--line); height: 14px; border-radius: 3px; }
+.wrap .meter i { border-radius: 0; background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, .28) 0 5px, transparent 5px 10px); }
+
+/* Big numbers in display lettering */
+.wrap .stat .n, .wrap .count, .wrap .weeklabel, .wrap .big { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.wrap th { font-family: var(--display); font-weight: 400; letter-spacing: .08em; font-size: .9rem; }
+.wrap table { border: 2.5px solid var(--line); }
+
+/* Footnotes as end-of-issue letters column */
+.wrap .fn { border-top: 3px solid var(--line); }
+.wrap .setfoot, .wrap .set { border-top: 3px dashed var(--line); }
+.wrap a { color: var(--accent); font-weight: 700; }
+
+/* Sound effects: one signature moment per page */
+.wrap .freshnote, .wrap .notif, .wrap .flagdone, .wrap .flag-done { position: relative; overflow: visible; }
+.wrap .freshnote::before, .wrap .notif::before, .wrap .flagdone::before, .wrap .flag-done::before {
+  position: absolute; top: -16px; right: 8px; z-index: 2;
+  font: 400 1.25rem/1 var(--display); letter-spacing: .06em;
+  background: var(--pop); color: var(--kapow); -webkit-text-stroke: 1px var(--hard); paint-order: stroke fill;
+  border: 2.5px solid var(--hard); padding: 3px 9px; transform: rotate(7deg); box-shadow: 2px 2px 0 var(--hard);
+}
+.wrap .freshnote::before { content: "KA-POW!"; }
+.wrap .notif::before { content: "BZZT!"; }
+.wrap .flagdone::before, .wrap .flag-done::before { content: "ZAP!"; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap button:not(.dot) { transition: none; }
+}

@@ -1,0 +1,1107 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I'm Coming Comic</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  :root {
+    --ground: #F3F5F7;
+    --surface: #FFFFFF;
+    --sunk: #EAEEF2;
+    --ink: #17222E;
+    --muted: #55626F;
+    --line: #D9DFE5;
+    --accent: #0E6E6B;
+    --accent-soft: #E1F1F0;
+    --warn: #C2410C;
+    --warn-soft: #FDEBDD;
+    --amber: #A16207;
+    --amber-soft: #FBF1D6;
+    --good: #15803D;
+    --good-soft: #E3F4E8;
+    --phone: #0F1720;
+    --phone-screen: #FAFBFC;
+    --on-strong: #FFFFFF;
+    --shadow: rgba(0, 0, 0, .14);
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC;
+      --line: #2C3844; --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217;
+      --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F;
+      --phone: #05080B; --phone-screen: #18212B; --on-strong: #0B1117; --shadow: rgba(0, 0, 0, .45);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC;
+    --line: #2C3844; --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217;
+    --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F;
+    --phone: #05080B; --phone-screen: #18212B; --on-strong: #0B1117; --shadow: rgba(0, 0, 0, .45);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--body); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 24px; }
+  .wrap > * { min-width: 0; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
+  h2 { font-size: 1.25rem; font-weight: 800; }
+  h3 { font-size: 1.05rem; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  .small { font-size: .85rem; }
+  .num, .tnum { font-variant-numeric: tabular-nums; }
+  header { display: grid; gap: 8px; }
+  header .lede { color: var(--muted); max-width: 72ch; }
+
+  /* Controls */
+  .controls {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center;
+  }
+  .group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+  .group > .label { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .seg { display: inline-flex; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button {
+    font: 700 .9rem/1 var(--body); color: var(--muted); background: transparent; border: 0;
+    padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px var(--shadow); }
+  .seg.mode button[aria-pressed="true"][data-mode="button"],
+  .seg.mode button[aria-pressed="true"][data-mode="clock"] { background: var(--accent); color: var(--on-strong); }
+  .seg button { text-align: left; }
+  button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  a { color: var(--accent); font-weight: 700; }
+  .btn {
+    font: 700 .95rem/1 var(--body); border: 0; border-radius: 10px; padding: 11px 16px; cursor: pointer;
+    background: var(--ink); color: var(--surface);
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.ghost { background: var(--sunk); color: var(--ink); }
+  .check { display: inline-flex; gap: 8px; align-items: center; font-size: .92rem; cursor: pointer; }
+  .check input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  .banner { border-radius: 12px; padding: 12px 16px; font-size: .95rem; display: grid; gap: 4px; }
+  .banner.today { background: var(--warn-soft); border-left: 5px solid var(--warn); }
+  .banner.proposed { background: var(--accent-soft); border-left: 5px solid var(--accent); }
+  .glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .glance > div { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: .92rem; }
+  .glance .k { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .flag { display: inline-block; font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--amber-soft); color: var(--amber); }
+
+  /* Stage */
+  .stage { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+  .panel > * { min-width: 0; }
+  .panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+
+  /* Console */
+  .console-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--sunk); border-radius: 10px; padding: 8px 12px; font-size: .85rem; color: var(--muted); }
+  .rcard { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: var(--surface); }
+  .rcard .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: .95rem; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: var(--good-soft); color: var(--good); font-variant-numeric: tabular-nums; }
+  .badge.offer { background: var(--amber-soft); color: var(--amber); }
+  .badge.way { background: var(--accent-soft); color: var(--accent); }
+  .badge.gone { background: var(--warn-soft); color: var(--warn); }
+  .badge.idle { background: var(--sunk); color: var(--muted); }
+  .alert {
+    border: 2px solid var(--amber); background: var(--amber-soft); border-radius: 12px; padding: 12px 14px;
+    display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap;
+  }
+  .alert.way { border-color: var(--accent); background: var(--accent-soft); }
+  .alert .t { font: 800 1.4rem/1 var(--display); font-variant-numeric: tabular-nums; color: var(--amber); }
+  .alert.way .t { color: var(--accent); }
+  .note { border-radius: 10px; padding: 10px 12px; font-size: .92rem; }
+  .note.none { background: var(--sunk); color: var(--muted); font-style: italic; }
+  .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
+  .log li { display: grid; grid-template-columns: 48px 1fr; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 4px; }
+  .log li > span:first-child { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 700; }
+  .log li > span { min-width: 0; }
+
+  /* Phone */
+  .phone-wrap { display: grid; justify-items: center; gap: 10px; min-width: 0; }
+  .phone { width: min(320px, 100%); background: var(--phone); border-radius: 36px; padding: 14px; box-shadow: 0 10px 30px var(--shadow); }
+  .screen { background: var(--phone-screen); border-radius: 26px; min-height: 520px; padding: 18px 16px; display: grid; gap: 12px; align-content: start; position: relative; overflow: hidden; }
+  .notch { width: 90px; height: 6px; border-radius: 99px; background: var(--line); justify-self: center; }
+  .lock { text-align: center; display: grid; gap: 2px; padding-top: 8px; }
+  .lock .clock { font: 800 3rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 6px; }
+  .notif { background: var(--surface); border: 2px solid var(--amber); border-radius: 16px; padding: 12px; display: grid; gap: 8px; text-align: center; box-shadow: 0 4px 14px var(--shadow); }
+  .notif-top { display: flex; justify-content: space-between; font-size: .75rem; font-weight: 700; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+  .count { font: 800 4rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .count.low { color: var(--warn); }
+  .count.ext { color: var(--accent); }
+  .answer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .accept { background: var(--good); color: var(--on-strong); font-size: 1.05rem; padding: 14px 10px; }
+  .decline { background: var(--surface); color: var(--ink); border: 2px solid var(--line); font-size: 1.05rem; padding: 12px 10px; }
+  .coming { background: var(--amber-soft); color: var(--amber); border: 2px solid var(--amber); font-size: .88rem; padding: 8px 12px; justify-self: center; }
+  .hints { display: grid; gap: 4px; text-align: left; }
+  .coming:disabled { opacity: 1; cursor: default; }
+  .coming.done { background: var(--good-soft); color: var(--good); border-color: var(--good); }
+  .coming.closed { background: var(--sunk); color: var(--muted); border-color: var(--line); }
+  .meter { height: 12px; background: var(--sunk); border-radius: 99px; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); width: 0; transition: width .2s linear; }
+  .outcome { border-radius: 16px; padding: 16px; display: grid; gap: 8px; text-align: center; }
+  .outcome.taken { background: var(--good-soft); border: 2px solid var(--good); }
+  .outcome.missed { background: var(--warn-soft); border: 2px solid var(--warn); }
+  .outcome .big { font: 800 1.8rem/1.1 var(--display); }
+  .outcome.taken .big { color: var(--good); }
+  .outcome.missed .big { color: var(--warn); }
+  .outcome.declined { background: var(--sunk); border: 2px solid var(--line); }
+  .outcome.declined .big { color: var(--ink); }
+  .bts-tag { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+
+  /* Timeline */
+  .tl { display: grid; gap: 8px; }
+  .tl-row { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; align-items: center; }
+  .tl-label { font-size: .82rem; font-weight: 700; color: var(--muted); }
+  .tl-track { position: relative; height: 22px; background: var(--sunk); border-radius: 6px; }
+  .tl-bar { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; }
+  .tl-bar.open { background: var(--amber); }
+  .tl-bar.ext { background: var(--accent); }
+  .tl-bar.ext.pending { background: transparent; border: 2px dashed var(--accent); }
+  .tl-bar.wait { background: repeating-linear-gradient(45deg, var(--line) 0 4px, transparent 4px 8px); }
+  .tl-bar.reach { background: var(--accent-soft); border: 2px solid var(--accent); }
+  .tl-mark { position: absolute; top: -3px; bottom: -3px; width: 3px; margin-left: -1px; background: var(--ink); border-radius: 2px; }
+  .tl-head { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--warn); }
+  .tl-axis { position: relative; height: 18px; font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tl-axis span { position: absolute; transform: translateX(-50%); }
+  .tl-axis span:first-child { transform: none; }
+  .tl-axis span:last-child { transform: translateX(-100%); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .82rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 14px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* Week replay */
+  .scroll-x { overflow-x: auto; }
+  .strip { display: grid; grid-template-columns: 104px repeat(12, minmax(24px, 1fr)); gap: 8px 4px; align-items: center; min-width: 420px; }
+  .strip .rl { font-size: .82rem; font-weight: 700; }
+  .strip .hd { font-size: .72rem; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  .dot {
+    width: 22px; height: 22px; border-radius: 50%; justify-self: center; border: 0; padding: 0; cursor: pointer;
+    font: 700 12px/22px var(--body); color: var(--on-strong); text-align: center;
+  }
+  .dot.taken { background: var(--good); }
+  .dot.timeout { background: var(--warn); }
+  .dot.tappedlate { background: var(--amber); }
+  .dot.silent { background: transparent; border: 3px solid var(--warn); color: var(--warn); line-height: 16px; }
+  .dot.no { background: var(--muted); }
+  .dot[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .detail { background: var(--sunk); border-radius: 10px; padding: 10px 12px; font-size: .92rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  td.n { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  tr.pick td { background: var(--accent-soft); }
+
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .split > div { min-width: 0; border-radius: 12px; padding: 12px; display: grid; gap: 6px; }
+  .split .before { background: var(--warn-soft); }
+  .split .after { background: var(--accent-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: .85rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--surface); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+
+  .quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .quote { min-width: 0; margin: 0; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--amber); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; font-size: .95rem; }
+  .quote cite { font-style: normal; font-size: .82rem; color: var(--muted); }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+  .stat { display: flex; align-items: baseline; gap: 8px; }
+  .stat .n { font: 800 2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+
+  .rules ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+  .footnotes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .fn { min-width: 0; border-top: 3px solid var(--line); padding-top: 10px; display: grid; gap: 6px; font-size: .92rem; }
+  .fn.accent { border-color: var(--accent); }
+  .fn ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  .quiet { border-left: 5px solid var(--warn); }
+  .set { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; font-size: .92rem; }
+  .set .k { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+</style>
+<style id="comic-skin">
+/* COMIC SKIN for the Rook Dispatch prototypes.
+   Layout concept: a comic-book page. Newsprint with halftone dots, ink-outlined panels with hard
+   shadows, yellow caption boxes, speech-bubble notes, a cover strip with an issue number.
+   Applied after each page's own styles; it only re-skins, it never changes behaviour.
+   Prototype styles, not Rook's design system. */
+
+:root {
+  --ground: #F3E9CF; --surface: #FFFBEF; --sunk: #EADFC2; --ink: #141414; --muted: #4B4134; --line: #141414;
+  --accent: #1D5BB8; --accent-soft: #D6E5FA; --warn: #C81E26; --warn-soft: #FBDADB;
+  --amber: #A35F00; --amber-soft: #FFE9A3; --good: #17803C; --good-soft: #D8F0DF;
+  --today: #7A6F5E; --fresh: #B8156F; --fresh-soft: #F9D6EA;
+  --phone: #141414; --phone-screen: #FFFBEF; --shadow: rgba(20, 20, 20, .9); --on-strong: #FFFBEF;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(29, 91, 184, .14); --hard: #141414; --kapow: #E0262E;
+  --display: "Bangers", "Impact", "Arial Black", system-ui, sans-serif;
+  --body: "Comic Neue", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+    --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+    --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+    --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+    --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+    --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+  --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+  --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+  --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+  --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+  color-scheme: dark;
+}
+
+/* Newsprint ground with halftone dots */
+body {
+  background-color: var(--ground);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.7px);
+  background-size: 11px 11px;
+  font-family: var(--body);
+  font-size: 17px;
+}
+
+/* Cover strip, inserted at the top of each page */
+.cover-strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px;
+  background: var(--kapow); color: var(--pop);
+  border: 3px solid var(--hard); box-shadow: 6px 6px 0 var(--hard);
+  padding: 8px 14px; font: 400 1.15rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase;
+}
+.cover-strip .price {
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 8px; transform: rotate(4deg); font-size: 1rem;
+}
+
+/* Headline lettering */
+.wrap h1 {
+  font-family: var(--display); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(2.4rem, 7.5vw, 4.2rem); letter-spacing: .03em; line-height: .95;
+  color: var(--pop); -webkit-text-stroke: 2px var(--hard); paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--hard);
+}
+.wrap h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .05em; font-size: 1.55rem; }
+.wrap h3 { font-family: var(--display); font-weight: 400; letter-spacing: .04em; font-size: 1.25rem; }
+.wrap header .lede, .wrap .lede { font-size: 1.05rem; color: var(--ink); }
+
+/* Caption boxes */
+.wrap .eyebrow {
+  display: inline-block; width: fit-content; justify-self: start;
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 9px; font: 400 .95rem/1.1 var(--display); letter-spacing: .08em;
+  box-shadow: 3px 3px 0 var(--hard); transform: rotate(-1deg);
+}
+.wrap .banner, .wrap .pbanner {
+  border: 3px solid var(--hard); border-radius: 2px; box-shadow: 5px 5px 0 var(--hard);
+  font-weight: 700; transform: rotate(-.35deg);
+}
+
+/* Panels */
+.wrap .panel, .wrap .controls, .wrap .rcard, .wrap .tile, .wrap .msgbox {
+  border: 3px solid var(--line); border-radius: 4px; box-shadow: 6px 6px 0 var(--hard); background: var(--surface);
+}
+.wrap .pcard { border: 2.5px solid var(--line); border-radius: 4px; box-shadow: 3px 3px 0 var(--hard); }
+.wrap .console-bar { border: 2px solid var(--line); border-radius: 2px; font-weight: 700; color: var(--ink); }
+
+/* Speech bubbles */
+.wrap .note {
+  position: relative; border: 2.5px solid var(--line); border-radius: 18px; margin-bottom: 12px; font-weight: 700;
+}
+.wrap .note::after {
+  content: ""; position: absolute; left: 26px; bottom: -11px; width: 18px; height: 18px;
+  background: inherit; border-right: 2.5px solid var(--line); border-bottom: 2.5px solid var(--line);
+  transform: rotate(45deg);
+}
+.wrap .thought {
+  border: 2.5px dashed var(--line); border-radius: 999px; padding: 8px 14px; background: var(--surface); font-weight: 700;
+}
+
+/* Buttons: chunky ink outline, press-down feel (backgrounds stay the page's own) */
+.wrap button:not(.dot) {
+  border: 2.5px solid var(--line); border-radius: 6px; box-shadow: 3px 3px 0 var(--hard);
+  font-family: var(--body); font-weight: 700; transition: transform .08s ease, box-shadow .08s ease;
+}
+.wrap button:not(.dot):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.wrap .seg { border: 2.5px solid var(--line); border-radius: 6px; background: var(--surface); box-shadow: 3px 3px 0 var(--hard); }
+.wrap .seg button { border-color: transparent; box-shadow: none; }
+.wrap .seg button:active { transform: none; box-shadow: none; }
+.wrap .seg button[aria-pressed="true"] { background: var(--pop); color: var(--on-pop); border-color: var(--hard); }
+
+/* Phone: comic-panel frame */
+.wrap .phone { border: 3px solid var(--line); box-shadow: 8px 8px 0 var(--kapow); }
+.wrap .screen { border: 2px solid var(--line); }
+
+/* Badges, pills, chips */
+.wrap .badge, .wrap .pill, .wrap .chip, .wrap .src {
+  border: 2px solid var(--line); border-radius: 4px; font-family: var(--display); font-weight: 400; letter-spacing: .06em;
+}
+
+/* Meters: inked with screen-tone stripes */
+.wrap .meter { border: 2px solid var(--line); height: 14px; border-radius: 3px; }
+.wrap .meter i { border-radius: 0; background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, .28) 0 5px, transparent 5px 10px); }
+
+/* Big numbers in display lettering */
+.wrap .stat .n, .wrap .count, .wrap .weeklabel, .wrap .big { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.wrap th { font-family: var(--display); font-weight: 400; letter-spacing: .08em; font-size: .9rem; }
+.wrap table { border: 2.5px solid var(--line); }
+
+/* Footnotes as end-of-issue letters column */
+.wrap .fn { border-top: 3px solid var(--line); }
+.wrap .setfoot, .wrap .set { border-top: 3px dashed var(--line); }
+.wrap a { color: var(--accent); font-weight: 700; }
+
+/* Sound effects: one signature moment per page */
+.wrap .freshnote, .wrap .notif, .wrap .flagdone, .wrap .flag-done { position: relative; overflow: visible; }
+.wrap .freshnote::before, .wrap .notif::before, .wrap .flagdone::before, .wrap .flag-done::before {
+  position: absolute; top: -16px; right: 8px; z-index: 2;
+  font: 400 1.25rem/1 var(--display); letter-spacing: .06em;
+  background: var(--pop); color: var(--kapow); -webkit-text-stroke: 1px var(--hard); paint-order: stroke fill;
+  border: 2.5px solid var(--hard); padding: 3px 9px; transform: rotate(7deg); box-shadow: 2px 2px 0 var(--hard);
+}
+.wrap .freshnote::before { content: "KA-POW!"; }
+.wrap .notif::before { content: "BZZT!"; }
+.wrap .flagdone::before, .wrap .flag-done::before { content: "ZAP!"; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap button:not(.dot) { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <div class="cover-strip" aria-hidden="true"><span>Rook Comics presents</span><span>Issue #3 · I'm coming!</span><span class="price">10¢</span></div>
+
+  <header>
+    <div class="eyebrow">Rook Dispatch · Prototype 3 of 3 · draft for Helen</div>
+    <h1>The "I'm coming" button</h1>
+    <p class="lede">When a callout offer buzzes, the responder can press <b>Accept</b> or <b>Decline</b>. If they need longer to reach the phone, they can also tap <b>"I'm coming"</b> once. That gives <b>their offer only</b> 30 more seconds. The answer window stays the same for everyone else. Their handler sees "On the way" right away.</p>
+    <p class="lede">We pair the button with a clock fix: the 60 seconds start when the offer reaches the phone, not when it is sent. <span class="flag">Clock fix pending Wen</span></p>
+    <p class="lede">Pick a story below and press <b>Play</b>. Then flip between the three rule sets.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="ev-title">
+    <div class="panel-head">
+      <h2 id="ev-title">What people told us</h2>
+      <div class="stats">
+        <div class="stat"><span class="n">3 of 4</span><span class="muted">handlers we interviewed said offers vanish</span></div>
+        <div class="stat"><span class="n">9 of 25</span><span class="muted">tickets say the same</span></div>
+        <div class="stat"><span class="n">21 of 25</span><span class="muted">tickets say the phone went quiet</span></div>
+      </div>
+    </div>
+    <p class="small muted">Some tickets say both, so the numbers add up to more than 25. This button is for the 9 about offers that vanish. The 21 about silence need a different fix (see "Too quiet?" below).</p>
+    <div class="quotes">
+      <figure class="quote"><blockquote style="margin:0">"halfway into the suit — coat on, one boot on — when it went to somebody else."</blockquote><cite>Ambrose, handler for Captain Vantage (interview)</cite></figure>
+      <figure class="quote"><blockquote style="margin:0">"It didn't used to feel like a fair race, phone to stairs, and now it does, and he loses it more than he wins it."</blockquote><cite>Aunt Dot, handler for Vesper (interview)</cite></figure>
+      <figure class="quote"><blockquote style="margin:0">"literally had my thumb on the screen and it switched to someone else"</blockquote><cite>Cindermark (ticket T-015)</cite></figure>
+      <figure class="quote"><blockquote style="margin:0">"maybe a few seconds from the buzz to opening the app"</blockquote><cite>Teresa Alvarez, handler for Ironvale (ticket T-025)</cite></figure>
+    </div>
+  </section>
+
+  <section class="panel quiet" aria-labelledby="quiet-title">
+    <div class="panel-head">
+      <h2 id="quiet-title">Too quiet?</h2>
+      <span class="muted small">The Undertow's story</span>
+    </div>
+    <p>The Undertow's phone has not gone off in weeks. There is no offer to race for, so there is nothing to tap.</p>
+    <p><b>If your phone has gone quiet, this button can't help yet.</b> That's what the fresh start and the <a href="https://claude.ai/artifact/Tw3TEXM12CNbkFr1ZCBiXC" target="_blank" rel="noopener">"Why haven't I had offers?" screen</a> are for.</p>
+    <p class="small muted">21 of 25 tickets are about silence like this. 9 of 25 are about offers that vanish. This page is about the 9.</p>
+  </section>
+
+  <section aria-labelledby="demo-title" style="display:grid;gap:16px">
+    <h2 id="demo-title">1. Watch one offer</h2>
+    <div class="controls" aria-label="Demo controls">
+      <div class="group">
+        <span class="label">Story</span>
+        <div class="seg" role="group" aria-label="Story" id="scen-seg">
+          <button id="scen-upstairs" data-scen="upstairs" aria-pressed="true">Upstairs</button>
+          <button id="scen-suiting" data-scen="suiting" aria-pressed="false">Suiting up</button>
+          <button id="scen-byphone" data-scen="byphone" aria-pressed="false">By the phone</button>
+          <button id="scen-late" data-scen="late" aria-pressed="false">Offer arrived late</button>
+        </div>
+      </div>
+      <div class="group">
+        <span class="label">Rules</span>
+        <div class="seg mode" role="group" aria-label="Rules" id="mode-seg">
+          <button id="mode-today" data-mode="today" aria-pressed="false">Today (60s, no button)</button>
+          <button id="mode-button" data-mode="button" aria-pressed="true">With "I'm coming"</button>
+          <button id="mode-clock" data-mode="clock" aria-pressed="false">With "I'm coming" + clock starts when the offer reaches the phone</button>
+        </div>
+      </div>
+      <div class="group">
+        <label class="check"><input type="checkbox" id="auto" checked> Responder taps it for me</label>
+        <span class="muted small">(they press Accept when they reach the phone, and tap "I'm coming" if they need to)</span>
+        <button class="btn" id="play">Play</button>
+        <button class="btn ghost" id="reset">Reset</button>
+      </div>
+    </div>
+
+    <div id="story" class="banner proposed"></div>
+
+    <div class="glance" aria-label="Outcome at a glance">
+      <div><div class="k">Today (60s, no button)</div><div id="glance-today"></div></div>
+      <div><div class="k">With "I'm coming"</div><div id="glance-button"></div></div>
+      <div><div class="k">With "I'm coming" + clock fix <span class="flag">pending Wen</span></div><div id="glance-clock"></div></div>
+    </div>
+
+    <div class="stage">
+      <!-- Handler console -->
+      <div class="panel" aria-labelledby="h-title">
+        <div class="panel-head">
+          <h2 id="h-title">Aunt Dot's console</h2>
+          <span class="muted" id="h-sub">Handler for Vesper</span>
+        </div>
+        <div class="console-bar"><span>Live callouts</span><span class="tnum" id="h-clock">Not started</span></div>
+        <article class="rcard">
+          <div class="top"><h3 id="h-name">Vesper</h3><span class="badge idle" id="h-badge">Available</span></div>
+          <div class="alert" id="h-alert" hidden>
+            <div><b id="h-alert-title">Offer live for Vesper</b><br><span class="muted" id="h-alert-sub">Waiting for an answer</span></div>
+            <span class="t" id="h-alert-t">60s</span>
+          </div>
+          <div class="note none" id="h-note"></div>
+        </article>
+        <div>
+          <h3 style="margin-bottom:8px">What the handler sees, step by step</h3>
+          <ul class="log" id="h-log"></ul>
+        </div>
+      </div>
+
+      <!-- Responder phone -->
+      <div class="phone-wrap">
+        <h2 id="p-title">Vesper's phone</h2>
+        <div class="phone">
+          <div class="screen" id="screen">
+            <div class="notch" aria-hidden="true"></div>
+
+            <div id="ph-idle" style="display:grid;gap:12px">
+              <div class="lock"><span class="clock">9:41</span><span class="muted">Evening</span></div>
+              <div class="pcard"><span class="eyebrow">Ready</span><p>Press <b>Play</b> to send a callout offer.</p></div>
+            </div>
+
+            <div id="ph-wait" style="display:grid;gap:12px" hidden>
+              <div class="lock"><span class="clock">9:41</span><span class="muted">No notifications yet</span></div>
+              <div class="pcard"><span class="bts-tag">Behind the scenes</span><p class="small" id="wait-text"></p></div>
+            </div>
+
+            <div id="ph-live" style="display:grid;gap:12px" hidden>
+              <div class="notif">
+                <div class="notif-top"><span>Rook Dispatch</span><span>Lock screen</span></div>
+                <b>New callout offer: <span id="ph-job">Rooftop fire</span></b>
+                <div class="count" id="count">60</div>
+                <p class="muted small" id="count-sub">seconds left to answer</p>
+                <div class="answer-row">
+                  <button class="btn accept" id="accept" type="button">Accept</button>
+                  <button class="btn decline" id="decline" type="button">Decline</button>
+                </div>
+                <p class="muted small" id="accept-note"></p>
+                <button class="btn coming" id="coming" type="button">I'm coming · +30s</button>
+                <p class="muted small" id="coming-note"></p>
+              </div>
+              <div class="pcard hints">
+                <p class="small" id="hint-tap">No tap needed if you can answer in time.</p>
+                <p class="small">Too busy? Decline. The job moves on straight away.</p>
+                <p class="small" id="hint-handler">Your handler sees "On the way" only when you tap. Not tapping is never reported.</p>
+              </div>
+              <div class="pcard">
+                <span class="eyebrow">Reaching the phone</span>
+                <div class="meter" role="progressbar" aria-label="Reaching the phone" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="reach-meter"><i id="reach-bar"></i></div>
+                <p class="small" id="reach-text"></p>
+              </div>
+            </div>
+
+            <div id="ph-done" hidden></div>
+          </div>
+        </div>
+        <p class="muted small" style="text-align:center">Runs 5× faster than real time.</p>
+        <p class="muted small" style="text-align:center" id="rm-note" hidden>Reduced motion is on, so Play jumps straight to the end. The responder taps and accepts for you.</p>
+      </div>
+    </div>
+
+    <div class="panel" aria-labelledby="tl-title">
+      <div class="panel-head">
+        <h3 id="tl-title">The race, on one line</h3>
+        <span class="muted small">Seconds since the offer was sent</span>
+      </div>
+      <div class="tl" id="tl">
+        <div class="tl-row"><span class="tl-label">Offer open</span>
+          <div class="tl-track"><i class="tl-bar open" id="tl-open"></i><i class="tl-bar ext" id="tl-ext"></i><span class="tl-head" id="tl-head1" hidden></span></div></div>
+        <div class="tl-row"><span class="tl-label">Responder</span>
+          <div class="tl-track"><i class="tl-bar wait" id="tl-wait"></i><i class="tl-bar reach" id="tl-reach"></i><b class="tl-mark" id="tl-mark"></b><span class="tl-head" id="tl-head2" hidden></span></div></div>
+        <div class="tl-row"><span></span>
+          <div class="tl-axis"><span style="left:0%">0s</span><span style="left:20%">30s</span><span style="left:40%">60s</span><span style="left:60%">90s</span><span style="left:80%">120s</span><span style="left:100%">150s</span></div></div>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--amber)"></i>Answer window (60s)</span>
+        <span><i class="sw" style="background:var(--accent)"></i>+30s after "I'm coming"</span>
+        <span><i class="sw" style="background:repeating-linear-gradient(45deg, var(--line) 0 4px, transparent 4px 8px)"></i>Not on the phone yet</span>
+        <span><i class="sw" style="background:var(--accent-soft);border:2px solid var(--accent)"></i>Getting to the phone</span>
+        <span><i class="sw" style="background:var(--ink);width:4px"></i>Ready to answer</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="wk-title">
+    <div class="panel-head">
+      <h2 id="wk-title">2. Replay a week</h2>
+      <span class="flag">Illustrative numbers</span>
+    </div>
+    <p>Twelve offers to one responder. Each number is how many seconds they need to reach the phone. Ten of them want the job. In one they say no. In one the phone is in another room and they never see it. We play the same week four ways.</p>
+    <div class="group">
+      <span class="label">Extra time per tap</span>
+      <div class="seg" role="group" aria-label="Extra time per tap" id="extra-seg">
+        <button id="extra-20" data-extra="20" aria-pressed="false">+20s</button>
+        <button id="extra-30" data-extra="30" aria-pressed="true">+30s (proposed)</button>
+        <button id="extra-40" data-extra="40" aria-pressed="false">+40s</button>
+      </div>
+    </div>
+    <div class="scroll-x">
+      <div class="strip" id="strip" role="group" aria-label="Twelve offers, four ways"></div>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--good)"></i>Taken</span>
+      <span><i class="sw" style="background:var(--warn)"></i>Ran out of time (can't tell why)</span>
+      <span><i class="sw" style="background:var(--amber)"></i>Tapped "I'm coming", still too late</span>
+      <span><i class="sw" style="border:2px solid var(--warn)"></i>Never responded</span>
+      <span><i class="sw" style="background:var(--muted)"></i>Said no</span>
+    </div>
+    <p class="detail" id="dot-detail" aria-live="polite">Tap any dot to see what happened to that offer.</p>
+    <div class="scroll-x">
+      <table id="cmp">
+        <thead><tr><th>Option</th><th>Taken</th><th>Missed</th><th>Extra wait for the job</th><th>Can we tell why they missed?</th></tr></thead>
+        <tbody id="cmp-body"></tbody>
+        <tfoot><tr><td></td><td></td><td></td><td class="small"><b>We'll watch how long jobs wait. If tapping slows jobs down, we cap it.</b></td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="small"><b>Why the clock fix row matches the button row:</b> in this week every offer reaches the phone on time, so starting the clock on arrival changes nothing. It only matters when an offer arrives late, like Ironvale's.</p>
+    <p class="small muted"><b>Extra wait</b> is our safety check. It counts the extra seconds a job sits on someone who still won't take it, before it moves to the next responder. We watch it as part of time-to-assign. With 90s for everyone, every offer nobody answers waits 30s longer. With the button, a job only waits longer when someone taps and still can't make it.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h4-title">
+    <div class="panel-head">
+      <h2 id="h4-title">3. What it tells us</h2>
+      <span class="muted small">Hypothesis H4: was a miss "too slow" or "not interested"?</span>
+    </div>
+    <div class="split" id="h4"></div>
+    <p>Today a slow responder and an uninterested one look the same in our data. The button splits them on day one. That matters, because our simulator showed the scoring fix only stops the next freeze-out if most misses were "too slow".</p>
+  </section>
+
+  <section class="panel rules" aria-labelledby="rules-title">
+    <h2 id="rules-title">4. The rules</h2>
+    <ol>
+      <li>Every offer has <b>Accept</b> and <b>Decline</b>. Too busy? Decline. The job moves on straight away.</li>
+      <li>"I'm coming" is optional. No tap needed if you can answer in time.</li>
+      <li>One tap per offer.</li>
+      <li>Only in the first 20 seconds after the phone buzzes. It works from the lock screen.</li>
+      <li>It adds 30 seconds.</li>
+      <li>It changes only that responder's offer. Everyone else keeps the normal window.</li>
+      <li>If they still miss, it counts as "ran out of time". That costs −0.04 under the proposed scoring, not −0.12 like a "no".</li>
+      <li>The handler sees "Offer live" for every offer. They see "On the way" only when the responder taps. Not tapping is never reported.</li>
+      <li>Paired fix: the 60 seconds start when the offer reaches the phone, not when it is sent. <span class="flag">pending Wen</span></li>
+    </ol>
+  </section>
+
+  <section class="footnotes" aria-label="Notes">
+    <div class="fn accent">
+      <h3>Late delivery is a different problem</h3>
+      <p>If offers reach some phones late (H2, unconfirmed), the button only helps part way. The responder gets less time than everyone else, and an offer that arrives after 60 seconds has nothing left to tap. The button alone is a bandage. The real fix is to start the clock when the offer reaches the phone. That is why we pair them. Try "Offer arrived late" with the third rule set. <span class="flag">Clock fix pending Wen</span></p>
+    </div>
+    <div class="fn">
+      <h3>What is illustrative</h3>
+      <ul>
+        <li>All reach times are examples, not measurements. The stories are built from interviews and tickets.</li>
+        <li>The week replay is a made-up week to show the trade-off.</li>
+        <li>The 50-second delay for Ironvale is an example of H2, not a measured delay.</li>
+      </ul>
+    </div>
+    <div class="fn">
+      <h3>Still to confirm</h3>
+      <ul>
+        <li><b>With Wen:</b> how many misses are "ran out of time" vs "said no" today, whether offers arrive late, and whether the clock can start when the offer reaches the phone.</li>
+        <li><b>With Sofia:</b> whether a lock-screen action is possible on both phone types.</li>
+        <li><b>Privacy:</b> screens show cover names and offer status only.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="set" aria-label="Part of a set">
+    <span class="k">Part of a set</span>
+    <a href="https://claude.ai/artifact/TTn1NduJL7gS54qt67tjbP" target="_blank" rel="noopener">The Way Back</a>
+    <a href="https://claude.ai/artifact/Tw3TEXM12CNbkFr1ZCBiXC" target="_blank" rel="noopener">Why Haven't I Had Offers?</a>
+    <span class="muted">The I'm Coming Button (this page)</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var SCALE = 150;   // timeline shows 0 to 150 seconds
+  var TICK_MS = 200; // 1 simulated second every 200ms = 5x speed
+  var EXTRA = 30;
+  var WINDOW = 60;
+  var MODES = ['today', 'button', 'clock'];
+  var reduced = false;
+  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  var SCEN = {
+    upstairs: {
+      who: 'Vesper', handler: 'Aunt Dot', job: 'Rooftop fire', delay: 0, reach: 70, tapAt: 3,
+      steps: ['Phone buzzes upstairs', 'Heading for the stairs', 'Climbing the stairs', 'Reaching for the phone'],
+      story: 'Vesper\'s phone is upstairs. It takes about <b>70 seconds</b> to get to it. Vesper can hear the buzz, but can\'t answer yet.'
+    },
+    suiting: {
+      who: 'Captain Vantage', handler: 'Ambrose', job: 'Warehouse alarm', delay: 0, reach: 75, tapAt: 4,
+      steps: ['Phone buzzes', 'Coat on', 'One boot on', 'Second boot on', 'Grabbing the phone'],
+      story: 'Captain Vantage is getting into the suit. It takes about <b>75 seconds</b> to be ready to answer.'
+    },
+    byphone: {
+      who: 'Meteor Mite', handler: 'Kip', job: 'Water rescue', delay: 0, reach: 20, tapAt: null,
+      steps: ['Phone buzzes on the table', 'Picking it up'],
+      story: 'Meteor Mite is right by the phone. It takes about <b>20 seconds</b> to answer. The button changes nothing here, and that is the point: most offers are like this.'
+    },
+    late: {
+      who: 'Ironvale', handler: 'Teresa Alvarez', job: 'Bridge collapse', delay: 50, reach: 15, tapAt: 3,
+      steps: ['Phone buzzes at last', 'Unlocking the phone', 'Opening the app'],
+      story: 'The offer reaches Ironvale\'s phone <b>50 seconds</b> after it was sent. Today the clock starts when the offer is sent, not when it arrives. So only <b>10 seconds</b> are left when it buzzes. Ironvale needs about 15. <span class="flag">Late delivery is unconfirmed (H2)</span>'
+    }
+  };
+
+  var state = { scen: 'upstairs', mode: 'button', auto: true, t: 0, running: false, tapped: null, done: null, timer: null, log: [] };
+  try {
+    var saved = JSON.parse(localStorage.getItem('imcoming') || '{}');
+    if (saved.scen && SCEN[saved.scen]) state.scen = saved.scen;
+    if (MODES.indexOf(saved.mode) >= 0) state.mode = saved.mode;
+  } catch (e) {}
+  function save() { try { localStorage.setItem('imcoming', JSON.stringify({ scen: state.scen, mode: state.mode })); } catch (e) {} }
+
+  function S() { return SCEN[state.scen]; }
+  // When the 60-second clock starts: when sent (today, button) or when it reaches the phone (clock fix).
+  function startOf(s, mode) { return mode === 'clock' ? s.delay : 0; }
+  // A responder only taps "I'm coming" when they could not answer in time without it.
+  function wantsTap(s, mode) { return mode !== 'today' && s.tapAt !== null && s.delay + s.reach > startOf(s, mode) + WINDOW; }
+  function deadline() { return startOf(S(), state.mode) + WINDOW + (state.tapped !== null ? EXTRA : 0); }
+  function pct(s) { return Math.max(0, Math.min(100, s / SCALE * 100)) + '%'; }
+  function fmt(s) { return s + 's'; }
+
+  // Pure outcome for the "at a glance" row (assumes the responder taps only when they need to, then accepts).
+  function predict(s, mode) {
+    var tap = wantsTap(s, mode) ? s.delay + s.tapAt : null;
+    var end = startOf(s, mode) + WINDOW + (tap !== null ? EXTRA : 0);
+    var ready = s.delay + s.reach;
+    if (ready <= end) return { taken: true, at: ready, tap: tap };
+    return { taken: false, at: end, tap: tap };
+  }
+
+  function glanceText(s, mode) {
+    var p = predict(s, mode);
+    var txt;
+    if (p.taken) txt = '<b style="color:var(--good)">Taken</b> at ' + fmt(p.at) + '.';
+    else txt = '<b style="color:var(--warn)">Ran out of time</b> at ' + fmt(p.at) + '. ' + s.who + ' needed ' + fmt(s.delay + s.reach) + '.';
+    if (mode === 'today') return txt;
+    if (p.tap !== null) txt += p.taken ? ' Tapped "I\'m coming" at ' + fmt(p.tap) + '.' : ' Even with the tap.';
+    else txt += ' No tap needed.';
+    if (mode === 'clock' && s.delay > 0) txt += ' The clock started at ' + fmt(s.delay) + ', when the offer arrived.';
+    return txt;
+  }
+
+  function glance() {
+    var s = S();
+    $('glance-today').innerHTML = glanceText(s, 'today');
+    $('glance-button').innerHTML = glanceText(s, 'button');
+    $('glance-clock').innerHTML = glanceText(s, 'clock');
+  }
+
+  function addLog(text) { state.log.push({ t: state.t, text: text }); }
+
+  function reset() {
+    if (state.timer) { clearInterval(state.timer); state.timer = null; }
+    state.t = 0; state.running = false; state.tapped = null; state.done = null; state.log = [];
+    renderAll();
+  }
+
+  function play() {
+    if (state.running) return;
+    if (state.done || state.t > 0) reset();
+    var s = S();
+    state.running = true;
+    addLog('Offer sent to ' + s.who + '. ' + s.job + '.');
+    if (s.delay === 0) addLog('Offer reached ' + s.who + '\'s phone.');
+    if (reduced) {
+      var guard = 0;
+      while (state.running && guard < 300) { step(true); guard++; }
+      renderAll();
+      return;
+    }
+    renderAll();
+    state.timer = setInterval(function () { step(false); renderLive(); }, TICK_MS);
+  }
+
+  function step(forceAuto) {
+    var s = S();
+    var auto = state.auto || forceAuto;
+    state.t += 1;
+    if (s.delay > 0 && state.t === s.delay) {
+      addLog('Offer reached ' + s.who + '\'s phone, ' + s.delay + 's after it was sent.' +
+        (state.mode === 'clock' ? ' The 60s clock starts now.' : ''));
+    }
+    if (auto && wantsTap(s, state.mode) && state.tapped === null && state.t === s.delay + s.tapAt) doTap();
+    if (auto && canAccept()) { doAccept(); return; }
+    if (state.t >= deadline()) finish('timeout');
+  }
+
+  function isLive() { return state.running && state.t >= S().delay; }
+  function atPhone() { var s = S(); return state.t >= s.delay + s.reach; }
+  function canAccept() { return isLive() && atPhone() && state.t <= deadline(); }
+  function canDecline() { return isLive() && state.t < deadline(); }
+  function canTap() {
+    var s = S();
+    return isLive() && state.mode !== 'today' && state.tapped === null &&
+      state.t <= s.delay + 20 && state.t < deadline();
+  }
+
+  function doTap() {
+    if (!canTap()) return;
+    state.tapped = state.t;
+    addLog(S().who + ' tapped "I\'m coming". +30s. On the way.');
+  }
+  function doAccept() { if (canAccept()) finish('taken'); }
+  function doDecline() { if (canDecline()) finish('declined'); }
+
+  function finish(kind) {
+    if (state.timer) { clearInterval(state.timer); state.timer = null; }
+    state.running = false;
+    state.done = { kind: kind, at: state.t };
+    var s = S();
+    if (kind === 'taken') addLog(s.who + ' pressed Accept. Job assigned.');
+    else if (kind === 'declined') addLog(s.who + ' pressed Decline. Job moved to the next responder.');
+    else addLog('Time ran out. Offer moved to the next responder.');
+  }
+
+  function renderControls() {
+    ['upstairs', 'suiting', 'byphone', 'late'].forEach(function (k) { $('scen-' + k).setAttribute('aria-pressed', String(state.scen === k)); });
+    MODES.forEach(function (m) { $('mode-' + m).setAttribute('aria-pressed', String(state.mode === m)); });
+    $('play').textContent = state.done ? 'Play again' : 'Play';
+    $('play').disabled = state.running;
+    $('rm-note').hidden = !reduced;
+  }
+
+  function renderStory() {
+    var s = S();
+    var b = $('story');
+    b.className = 'banner ' + (state.mode === 'today' ? 'today' : 'proposed');
+    var rules;
+    if (state.mode === 'today') rules = '<b>Today\'s rules:</b> everyone gets 60 seconds from when the offer is sent. There is no way to ask for more.';
+    else if (state.mode === 'button') rules = '<b>With "I\'m coming":</b> one tap in the first 20 seconds after the buzz adds 30 seconds to this offer only. The clock still starts when the offer is sent.';
+    else rules = '<b>With "I\'m coming" + clock fix:</b> the 60 seconds start when the offer reaches the phone, not when it is sent. One tap still adds 30 seconds. <span class="flag">Clock fix pending Wen</span>';
+    b.innerHTML = '<span>' + s.story + '</span><span>' + rules + '</span>';
+    $('h-title').textContent = s.handler + '\'s console';
+    $('h-sub').textContent = 'Handler for ' + s.who;
+    $('h-name').textContent = s.who;
+    $('p-title').textContent = s.who + '\'s phone';
+    $('ph-job').textContent = s.job;
+  }
+
+  function renderTimeline() {
+    var s = S();
+    var start = startOf(s, state.mode);
+    var open = $('tl-open'), ext = $('tl-ext');
+    open.style.left = pct(start); open.style.width = pct(WINDOW);
+    if (state.mode !== 'today') {
+      ext.hidden = false;
+      ext.style.left = pct(start + WINDOW); ext.style.width = pct(EXTRA);
+      ext.className = 'tl-bar ext' + (state.tapped === null ? ' pending' : '');
+      if (state.done && state.tapped === null) ext.hidden = true;
+    } else {
+      ext.hidden = true;
+    }
+    var wait = $('tl-wait'), reach = $('tl-reach'), mark = $('tl-mark');
+    wait.hidden = s.delay === 0;
+    wait.style.left = '0%'; wait.style.width = pct(s.delay);
+    reach.style.left = pct(s.delay); reach.style.width = pct(s.reach);
+    mark.style.left = pct(s.delay + s.reach);
+    var showHead = state.running || state.done;
+    ['tl-head1', 'tl-head2'].forEach(function (id) {
+      var h = $(id); h.hidden = !showHead; h.style.left = pct(state.t);
+    });
+  }
+
+  function renderHandler() {
+    var s = S();
+    var badge = $('h-badge'), alertBox = $('h-alert'), note = $('h-note');
+    $('h-clock').textContent = (state.running || state.done) ? 'Sent ' + state.t + 's ago' : 'Not started';
+    var notStarted = state.mode === 'clock' && state.t < s.delay;
+    var left = notStarted ? WINDOW : Math.max(0, deadline() - state.t);
+    if (state.done) {
+      alertBox.hidden = true;
+      if (state.done.kind === 'taken') { badge.className = 'badge'; badge.textContent = 'Taken ✓'; }
+      else if (state.done.kind === 'declined') { badge.className = 'badge idle'; badge.textContent = 'Said no'; }
+      else { badge.className = 'badge gone'; badge.textContent = 'Went to someone else'; }
+    } else if (state.running) {
+      alertBox.hidden = false;
+      if (state.tapped !== null) {
+        badge.className = 'badge way'; badge.textContent = 'On the way · +30s';
+        alertBox.className = 'alert way';
+        $('h-alert-title').textContent = s.who + ' is on the way';
+        $('h-alert-sub').textContent = 'Tapped "I\'m coming" at ' + state.tapped + 's · +30s';
+      } else {
+        badge.className = 'badge offer'; badge.textContent = 'Offer live';
+        alertBox.className = 'alert';
+        $('h-alert-title').textContent = 'Offer live for ' + s.who;
+        $('h-alert-sub').textContent = state.t < s.delay
+          ? (notStarted ? 'Sent, not on the phone yet. The clock starts when it arrives.' : 'Sent, but not on the phone yet')
+          : 'Waiting for an answer';
+      }
+      $('h-alert-t').textContent = left + 's';
+    } else {
+      alertBox.hidden = true;
+      badge.className = 'badge idle'; badge.textContent = 'Available';
+    }
+    note.className = 'note none';
+    if (state.mode === 'today') {
+      note.textContent = 'Today ' + s.handler + ' can\'t tell if ' + s.who + ' is on the way or has not seen it.';
+    } else {
+      note.textContent = state.tapped !== null
+        ? s.handler + ' knows ' + s.who + ' has seen it and is coming.'
+        : s.handler + ' sees "Offer live" for every offer. If ' + s.who + ' taps "I\'m coming", it changes to "On the way". Not tapping is never reported.';
+    }
+    var ul = $('h-log');
+    ul.innerHTML = state.log.length
+      ? state.log.map(function (e) { return '<li><span>' + e.t + 's</span><span>' + e.text + '</span></li>'; }).join('')
+      : '<li><span>·</span><span class="muted">Nothing yet. Press Play.</span></li>';
+  }
+
+  function renderPhone() {
+    var s = S();
+    var idle = !state.running && !state.done;
+    var waiting = state.running && state.t < s.delay;
+    var live = isLive();
+    $('ph-idle').hidden = !idle;
+    $('ph-wait').hidden = !waiting;
+    $('ph-live').hidden = !live;
+    $('ph-done').hidden = !state.done;
+    if (waiting) {
+      $('wait-text').innerHTML = 'The offer was sent <b class="tnum">' + state.t + '</b> seconds ago. It has not reached this phone yet. ' +
+        (state.mode === 'clock'
+          ? 'The clock has not started. It starts when the offer arrives: <b class="tnum">60</b> seconds left.'
+          : 'The clock is already running: <b class="tnum">' + Math.max(0, deadline() - state.t) + '</b> seconds left.');
+    }
+    var buttonMode = state.mode !== 'today';
+    $('hint-tap').hidden = !buttonMode;
+    $('hint-handler').hidden = !buttonMode;
+    if (live) {
+      var left = Math.max(0, deadline() - state.t);
+      var c = $('count');
+      c.textContent = left;
+      c.className = 'count' + (state.tapped !== null ? ' ext' : left <= 15 ? ' low' : '');
+      $('count-sub').textContent = state.tapped !== null ? 'seconds left · 30 added'
+        : state.mode === 'clock' ? 'seconds left · clock started when it arrived' : 'seconds left to answer';
+
+      var acc = $('accept'), dec = $('decline'), accNote = $('accept-note');
+      acc.disabled = !canAccept();
+      dec.disabled = !canDecline();
+      var readyIn = Math.max(0, s.delay + s.reach - state.t);
+      if (atPhone()) accNote.textContent = state.auto ? s.who + ' is at the phone and presses Accept.' : 'At the phone. Press Accept, or Decline.';
+      else if (state.auto) accNote.textContent = s.who + ' will press Accept on reaching the phone, in ' + readyIn + 's.';
+      else accNote.textContent = 'Accept works once ' + s.who + ' reaches the phone, in ' + readyIn + 's. Decline works any time.';
+
+      var btn = $('coming'), noteEl = $('coming-note');
+      if (!buttonMode) {
+        btn.hidden = true;
+        noteEl.textContent = 'No way to ask for more time today.';
+      } else {
+        btn.hidden = false;
+        var sinceBuzz = state.t - s.delay;
+        if (state.tapped !== null) {
+          btn.disabled = true; btn.className = 'btn coming done'; btn.textContent = 'On my way ✓ +30s added';
+          noteEl.textContent = s.handler + ' can see this.';
+        } else if (!canTap()) {
+          btn.disabled = true; btn.className = 'btn coming closed'; btn.textContent = 'Tap window closed';
+          noteEl.textContent = 'Optional. The tap only works in the first 20 seconds.';
+        } else {
+          btn.disabled = false; btn.className = 'btn coming'; btn.textContent = 'I\'m coming · +30s';
+          var windowLeft = Math.min(20 - sinceBuzz, deadline() - state.t);
+          if (state.auto && wantsTap(s, state.mode)) noteEl.textContent = 'Optional. ' + s.who + ' will tap it at ' + (s.delay + s.tapAt) + 's. Or tap it yourself.';
+          else if (state.auto) noteEl.textContent = 'Optional. ' + s.who + ' can answer in time, so no tap needed.';
+          else noteEl.textContent = 'Optional. ' + windowLeft + 's left to tap.';
+        }
+      }
+      var frac = Math.max(0, Math.min(1, (state.t - s.delay) / s.reach));
+      $('reach-bar').style.width = Math.round(frac * 100) + '%';
+      $('reach-meter').setAttribute('aria-valuenow', String(Math.round(frac * 100)));
+      var idx = Math.min(s.steps.length - 1, Math.floor(frac * s.steps.length));
+      $('reach-text').textContent = readyIn > 0 ? s.steps[idx] + ' · at the phone in ' + readyIn + 's' : 'At the phone. Ready to answer.';
+    }
+    if (state.done) $('ph-done').innerHTML = outcomeHTML();
+  }
+
+  function outcomeHTML() {
+    var s = S(), d = state.done, ready = s.delay + s.reach;
+    var plain = startOf(s, state.mode) + WINDOW;
+    var html;
+    if (d.kind === 'declined') {
+      html = '<div class="outcome declined" role="status"><span class="big">Said no.</span><p>The job moved on.</p>' +
+        '<p class="small">It went to the next responder at ' + d.at + 's. Nobody waited for a timeout.</p></div>';
+    } else if (d.kind === 'taken') {
+      html = '<div class="outcome taken" role="status"><span class="big">Taken ✓</span><p>' + s.who + ' pressed Accept at ' + d.at + 's.</p>';
+      if (state.tapped !== null && ready > plain) html += '<p class="small">"I\'m coming" made the difference. Without it, the offer would have gone at ' + plain + 's.</p>';
+      if (state.scen === 'late' && state.mode === 'button') {
+        html += '<p class="small"><b>Only partly fixed.</b> ' + s.who + ' got ' + (deadline() - s.delay) + ' seconds after the buzz. Others get 60 seconds (90 if they tap). If the offer had arrived more than 60s late, there would be nothing left to tap.</p>' +
+          '<p class="small"><b>The button alone is a bandage. The clock fix is the real fix.</b> Try the third rule set.</p>';
+      }
+      if (state.scen === 'late' && state.mode === 'clock') {
+        html += '<p class="small"><b>Fully fixed.</b> The 60 seconds started when the offer reached the phone. ' + s.who + ' got the same time as everyone else. No tap needed. <span class="flag">Clock fix pending Wen</span></p>';
+      }
+      html += '</div>';
+    } else {
+      html = '<div class="outcome missed" role="status"><span class="big">Ran out of time</span><p>The offer went to someone else at ' + d.at + 's. ' + s.who + ' needed ' + ready + 's.</p>';
+      if (state.mode === 'today') html += '<p class="small">Today this costs −0.12, the same as saying no. ' + s.who + ' drops down the list.</p>';
+      else if (state.tapped !== null) html += '<p class="small">Tapped "I\'m coming" but still too late. It counts as "ran out of time": −0.04 under the proposed scoring.</p>';
+      else if (atPhone()) html += '<p class="small">' + s.who + ' reached the phone but nobody pressed Accept. Try again and press Accept.</p>';
+      else html += '<p class="small">No tap was made, so the window stayed at 60s. Try again and tap "I\'m coming" in the first 20 seconds.</p>';
+      if (state.scen === 'late' && state.mode !== 'clock') html += '<p class="small"><b>Late delivery:</b> the button alone is a bandage. The real fix is to start the clock when the offer reaches the phone. Try the third rule set. <span class="flag">pending Wen</span></p>';
+      html += '</div>';
+    }
+    return html + '<button class="btn ghost" id="again" type="button">Reset</button>';
+  }
+
+  function renderLive() { renderControls(); renderTimeline(); renderHandler(); renderPhone(); }
+  function renderAll() { renderStory(); glance(); renderLive(); }
+
+  /* ---------- Week replay (illustrative, deterministic) ---------- */
+  var OFFERS = [
+    { r: 12 }, { r: 18 }, { r: 25 }, { r: 33 }, { r: 48 },
+    { r: 62, tap: true }, { r: 68, tap: true }, { r: 74, tap: true }, { r: 83, tap: true }, { r: 95, tap: true },
+    { no: true }, { silent: true }
+  ];
+  var OPTIONS = [
+    { key: 'today', name: 'Today (60s)' },
+    { key: 'button', name: 'With "I\'m coming"' },
+    { key: 'clock', name: 'With "I\'m coming" + clock fix' },
+    { key: 'wide', name: '90s for everyone' }
+  ];
+  function usesTap(key) { return key === 'button' || key === 'clock'; }
+  var week = { extra: 30, pick: null };
+
+  // Returns { kind, extraWait } for one offer under one option.
+  function outcome(o, opt, extra) {
+    if (o.no) return { kind: 'no', extraWait: 0 };
+    if (opt === 'today') {
+      if (o.silent) return { kind: 'timeout', extraWait: 0 };
+      return o.r <= 60 ? { kind: 'taken', extraWait: 0 } : { kind: 'timeout', extraWait: 0 };
+    }
+    if (opt === 'wide') {
+      if (o.silent) return { kind: 'timeout', extraWait: 30 };
+      return o.r <= 90 ? { kind: 'taken', extraWait: 0 } : { kind: 'timeout', extraWait: 30 };
+    }
+    // 'button' and 'clock': every offer this week arrives on time, so both play out the same.
+    if (o.silent) return { kind: 'silent', extraWait: 0 };
+    if (o.r <= 60) return { kind: 'taken', extraWait: 0 };
+    if (o.tap && o.r <= 60 + extra) return { kind: 'taken', extraWait: 0 };
+    if (o.tap) return { kind: 'tappedlate', extraWait: extra };
+    return { kind: 'timeout', extraWait: 0 };
+  }
+  var GLYPH = { taken: '✓', timeout: '?', tappedlate: '!', silent: '–', no: '×' };
+  var WORDS = {
+    taken: 'Taken.',
+    timeout: 'Ran out of time. Our data can\'t tell if they were slow or not interested.',
+    tappedlate: 'Tapped "I\'m coming" but still too late. The job waited longer for nothing.',
+    silent: 'Never responded. We can\'t tell if they didn\'t see it or didn\'t want it.',
+    no: 'Said no. The job moved on straight away.'
+  };
+
+  function offerLabel(o) { return o.no ? 'No' : o.silent ? 'Away' : o.r + 's'; }
+  function offerWhat(o) { return o.no ? 'The responder says no.' : o.silent ? 'The phone is in another room. They never see it.' : 'Needs ' + o.r + 's to reach the phone.' + (o.tap ? ' Taps "I\'m coming" right away.' : ''); }
+
+  function renderWeek() {
+    ['20', '30', '40'].forEach(function (x) { $('extra-' + x).setAttribute('aria-pressed', String(week.extra === Number(x))); });
+    var html = '<span class="hd" style="text-align:left">Reach time</span>' + OFFERS.map(function (o) { return '<span class="hd">' + offerLabel(o) + '</span>'; }).join('');
+    var totals = {};
+    OPTIONS.forEach(function (opt) {
+      var t = { taken: 0, missed: 0, wait: 0, waitN: 0, kinds: { timeout: 0, tappedlate: 0, silent: 0, no: 0 } };
+      html += '<span class="rl">' + opt.name + (usesTap(opt.key) ? ' (+' + week.extra + 's)' : '') + '</span>';
+      OFFERS.forEach(function (o, i) {
+        var res = outcome(o, opt.key, week.extra);
+        if (res.kind === 'taken') t.taken++; else { t.missed++; t.kinds[res.kind]++; }
+        if (res.extraWait) { t.wait += res.extraWait; t.waitN++; }
+        var id = 'dot-' + opt.key + '-' + i;
+        var pressed = week.pick === id;
+        html += '<button type="button" class="dot ' + res.kind + '" id="' + id + '" data-opt="' + opt.key + '" data-i="' + i + '" aria-pressed="' + pressed + '" aria-label="' + opt.name + ', offer ' + (i + 1) + ': ' + WORDS[res.kind].replace(/"/g, '&quot;') + '">' + GLYPH[res.kind] + '</button>';
+      });
+      totals[opt.key] = t;
+    });
+    $('strip').innerHTML = html;
+
+    var why = {
+      today: 'No. ' + totals.today.kinds.timeout + ' look the same: no answer.',
+      button: 'Yes. ' + totals.button.kinds.tappedlate + ' tapped but too late, ' + totals.button.kinds.silent + ' never responded, ' + totals.button.kinds.no + ' said no.',
+      clock: 'Yes. Same as the button this week, because every offer arrived on time.',
+      wide: 'No. ' + totals.wide.kinds.timeout + ' look the same: no answer.'
+    };
+    $('cmp-body').innerHTML = OPTIONS.map(function (opt) {
+      var t = totals[opt.key];
+      return '<tr' + (usesTap(opt.key) ? ' class="pick"' : '') + '><td><b>' + opt.name + (usesTap(opt.key) ? ' (+' + week.extra + 's)' : '') + '</b></td>' +
+        '<td class="n">' + t.taken + ' of 12</td><td class="n">' + t.missed + '</td>' +
+        '<td class="n">' + (t.wait ? '+' + t.wait + 's' + ' <span class="muted" style="font-weight:400">(' + t.waitN + ' offer' + (t.waitN === 1 ? '' : 's') + ')</span>' : '0s') + '</td>' +
+        '<td>' + why[opt.key] + '</td></tr>';
+    }).join('');
+
+    var tb = totals.button.kinds, tt = totals.today.kinds;
+    $('h4').innerHTML =
+      '<div class="before"><b>Today: every miss looks alike</b><div class="chips"><span class="chip">' + tt.timeout + ' no answer</span><span class="chip">' + tt.no + ' said no</span></div>' +
+      '<p class="small">"No answer" is scored −0.12, the same as "no". We can\'t tell who was racing to the phone.</p></div>' +
+      '<div class="after"><b>With "I\'m coming": each miss has a reason</b><div class="chips"><span class="chip">' + tb.tappedlate + ' tapped, too late</span><span class="chip">' + tb.silent + ' never responded</span><span class="chip">' + tb.no + ' said no</span></div>' +
+      '<p class="small">"Tapped, too late" means too slow. "Said no" means not interested. "Never responded" is the only unknown left.</p></div>';
+
+    if (week.pick) showDetail(week.pick); else $('dot-detail').textContent = 'Tap any dot to see what happened to that offer.';
+  }
+
+  function showDetail(id) {
+    var el = $(id); if (!el) return;
+    var opt = el.getAttribute('data-opt'), i = Number(el.getAttribute('data-i'));
+    var o = OFFERS[i], res = outcome(o, opt, week.extra);
+    var name = OPTIONS.filter(function (x) { return x.key === opt; })[0].name;
+    var extra = res.extraWait ? ' The job waited ' + res.extraWait + 's longer before moving on.' : '';
+    $('dot-detail').innerHTML = '<b>Offer ' + (i + 1) + ', ' + name + ':</b> ' + offerWhat(o) + ' ' + WORDS[res.kind] + extra;
+  }
+
+  /* ---------- Events ---------- */
+  $('scen-seg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-scen]'); if (!b) return;
+    state.scen = b.getAttribute('data-scen'); save(); reset();
+  });
+  $('mode-seg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-mode]'); if (!b) return;
+    state.mode = b.getAttribute('data-mode'); save(); reset();
+  });
+  $('auto').addEventListener('change', function () { state.auto = $('auto').checked; renderLive(); });
+  $('play').addEventListener('click', play);
+  $('reset').addEventListener('click', reset);
+  $('coming').addEventListener('click', function () { doTap(); renderLive(); });
+  $('accept').addEventListener('click', function () { doAccept(); renderLive(); });
+  $('decline').addEventListener('click', function () { doDecline(); renderLive(); });
+  $('screen').addEventListener('click', function (e) { if (e.target.closest('#again')) reset(); });
+  $('extra-seg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-extra]'); if (!b) return;
+    week.extra = Number(b.getAttribute('data-extra')); renderWeek();
+  });
+  $('strip').addEventListener('click', function (e) {
+    var d = e.target.closest('button.dot'); if (!d) return;
+    week.pick = d.id; renderWeek();
+    var again = $(d.id); if (again) again.focus();
+  });
+
+  renderAll();
+  renderWeek();
+})();
+</script>

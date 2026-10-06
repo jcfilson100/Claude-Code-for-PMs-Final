@@ -1,0 +1,866 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why No Offers Comic</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  :root {
+    --ground: #F3F5F7;
+    --surface: #FFFFFF;
+    --sunk: #EAEEF2;
+    --ink: #17222E;
+    --muted: #55626F;
+    --line: #D9DFE5;
+    --accent: #0E6E6B;
+    --accent-soft: #E1F1F0;
+    --warn: #C2410C;
+    --warn-soft: #FDEBDD;
+    --amber: #A16207;
+    --amber-soft: #FBF1D6;
+    --good: #15803D;
+    --good-soft: #E3F4E8;
+    --phone: #0F1720;
+    --phone-screen: #FAFBFC;
+    --shadow: rgba(15, 23, 32, .16);
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC;
+      --line: #2C3844; --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217;
+      --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F;
+      --phone: #05080B; --phone-screen: #18212B; --shadow: rgba(0, 0, 0, .45);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC;
+    --line: #2C3844; --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217;
+    --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F;
+    --phone: #05080B; --phone-screen: #18212B; --shadow: rgba(0, 0, 0, .45);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--body); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 24px; }
+  .wrap > * { min-width: 0; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
+  h2 { font-size: 1.25rem; font-weight: 800; }
+  h3 { font-size: 1.05rem; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  .small { font-size: .85rem; }
+  header { display: grid; gap: 8px; }
+  header .lede { color: var(--muted); max-width: 70ch; }
+
+  /* Quotes */
+  .quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 6px 0 0; padding: 0; list-style: none; }
+  .quotes li { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 10px; padding: 10px 12px; font-size: .92rem; display: grid; gap: 4px; min-width: 0; }
+  .quotes q { font-style: italic; }
+  .quotes .who { font-size: .8rem; color: var(--muted); }
+
+  /* Controls */
+  .controls {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center;
+  }
+  @media (max-width: 860px) { .controls { position: static; } }
+  .group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+  .group > .label, .group > label { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .seg { display: inline-flex; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button {
+    font: 700 .9rem/1.1 var(--body); color: var(--muted); background: transparent; border: 0;
+    padding: 9px 14px; border-radius: 999px; cursor: pointer; text-align: center;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px var(--shadow); }
+  .seg.mode button[aria-pressed="true"][data-mode="fix"] { background: var(--accent); color: var(--surface); }
+  .seg button small { font-weight: 400; font-size: .78rem; }
+  select {
+    font: 700 .95rem/1.2 var(--body); color: var(--ink); background: var(--sunk); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 12px; max-width: 100%;
+  }
+  button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .btn {
+    font: 700 .95rem/1 var(--body); border: 0; border-radius: 10px; padding: 11px 16px; cursor: pointer;
+    background: var(--ink); color: var(--surface);
+  }
+  .btn.ghost { background: var(--sunk); color: var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip { font: 700 .85rem/1 var(--body); background: var(--sunk); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; cursor: pointer; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .chip span { font-weight: 400; color: var(--muted); }
+
+  .banner { border-radius: 12px; padding: 12px 16px; font-size: .95rem; }
+  .banner.today { background: var(--warn-soft); color: var(--ink); border-left: 5px solid var(--warn); }
+  .banner.fix { background: var(--accent-soft); color: var(--ink); border-left: 5px solid var(--accent); }
+
+  /* Stage */
+  .stage { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+  .panel > * { min-width: 0; }
+  .panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+
+  /* Console */
+  .console-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--sunk); border-radius: 10px; padding: 8px 12px; font-size: .85rem; color: var(--muted); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .rcard { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; align-content: start; background: var(--surface); min-width: 0; }
+  .rcard.sel { border: 2px solid var(--accent); padding: 13px; }
+  .rcard .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: .85rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--good-soft); color: var(--good); white-space: nowrap; }
+  .badge.mid { background: var(--amber-soft); color: var(--amber); }
+  .badge.bad { background: var(--warn-soft); color: var(--warn); }
+  .stat { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .stat .n { font: 800 2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .note { border-radius: 10px; padding: 10px 12px; font-size: .92rem; }
+  .note.bad { background: var(--warn-soft); }
+  .note.mid { background: var(--amber-soft); }
+  .note.ok { background: var(--good-soft); }
+  .note b { font-weight: 700; }
+  .msgbox { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .msgbox label { font-weight: 700; }
+  .msgbox textarea {
+    width: 100%; min-height: 128px; resize: vertical; font: .95rem/1.45 var(--body); color: var(--ink);
+    background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  }
+  .copyrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .copy-status { font-size: .88rem; font-weight: 700; color: var(--good); }
+  .copy-status.hint { color: var(--muted); font-weight: 400; }
+
+  /* Phone */
+  .phone-wrap { display: grid; justify-items: center; gap: 10px; min-width: 0; }
+  .phone {
+    width: min(340px, 100%); background: var(--phone); border-radius: 36px; padding: 14px;
+    box-shadow: 0 10px 30px var(--shadow);
+  }
+  .screen { background: var(--phone-screen); border-radius: 26px; min-height: 560px; padding: 18px 14px; display: grid; gap: 12px; align-content: start; }
+  .screen > * { min-width: 0; }
+  .notch { width: 90px; height: 6px; border-radius: 99px; background: var(--line); justify-self: center; }
+  .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 6px; font-size: .92rem; }
+  .pcard.head-bad { border-left: 5px solid var(--warn); }
+  .pcard.head-mid { border-left: 5px solid var(--amber); }
+  .pcard.head-ok { border-left: 5px solid var(--good); }
+  .meter { height: 10px; background: var(--sunk); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .5s ease; }
+  .meter i.bad { background: var(--warn); }
+  .meter i.mid { background: var(--amber); }
+  .preview-tag { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+  .pill { display: inline-block; font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--amber-soft); color: var(--amber); margin-left: 6px; vertical-align: middle; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: .9rem; }
+  .checks li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 6px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .checks .mk { font-weight: 800; font-size: 1.05rem; line-height: 1.3; }
+  .checks .ok { color: var(--good); }
+  .checks .mid { color: var(--amber); }
+  .checks .bad { color: var(--warn); }
+  .ex { font-size: .78rem; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .notbroken { text-align: center; font-weight: 700; color: var(--good); }
+
+  /* Bars */
+  .barsarea { position: relative; height: 104px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; align-items: end; margin-top: 4px; }
+  .bcol { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; min-width: 0; }
+  .bv { font-size: .78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bar { width: 70%; max-width: 30px; background: var(--amber-soft); border: 1px solid var(--amber); border-radius: 4px 4px 0 0; position: relative; overflow: hidden; min-height: 2px; }
+  .bar i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--accent); }
+  .bar.cur { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .bar.future { background: transparent; border: 1px dashed var(--line); }
+  .usual { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--muted); pointer-events: none; }
+  .usual span { position: absolute; right: 0; top: -18px; font-size: .72rem; color: var(--muted); background: var(--surface); padding: 0 3px; }
+  .blabels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; font-size: .72rem; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .76rem; color: var(--muted); }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .sw.tk { background: var(--accent); }
+  .sw.ms { background: var(--amber-soft); border: 1px solid var(--amber); }
+
+  [hidden] { display: none !important; }
+  .pbanner { background: var(--amber-soft); border-left: 5px solid var(--amber); border-radius: 12px; padding: 10px 12px; font-size: .88rem; display: grid; gap: 2px; }
+  .checks li.soon { background: var(--sunk); color: var(--muted); }
+  .checks .soonmk { color: var(--muted); }
+  .flagbox { display: grid; gap: 8px; }
+  .flag-btn { width: 100%; border: 1px solid var(--line); line-height: 1.25; }
+  .flag-done:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .linkbtn { font: 700 .82rem/1.2 var(--body); background: transparent; border: 0; padding: 4px 0; color: var(--accent); text-decoration: underline; cursor: pointer; justify-self: start; }
+  .flagnote { border-radius: 10px; padding: 8px 12px; font-size: .88rem; background: var(--warn-soft); border-left: 4px solid var(--warn); }
+  .setfoot { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; border-top: 1px solid var(--line); padding-top: 14px; font-size: .9rem; }
+  .setfoot .label { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .setfoot a { color: var(--accent); font-weight: 700; }
+  a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  .footnotes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .fn { border-top: 3px solid var(--line); padding-top: 10px; display: grid; gap: 6px; font-size: .92rem; align-content: start; min-width: 0; }
+  .fn.accent { border-color: var(--accent); }
+  .fn ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  @media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+</style>
+<style id="comic-skin">
+/* COMIC SKIN for the Rook Dispatch prototypes.
+   Layout concept: a comic-book page. Newsprint with halftone dots, ink-outlined panels with hard
+   shadows, yellow caption boxes, speech-bubble notes, a cover strip with an issue number.
+   Applied after each page's own styles; it only re-skins, it never changes behaviour.
+   Prototype styles, not Rook's design system. */
+
+:root {
+  --ground: #F3E9CF; --surface: #FFFBEF; --sunk: #EADFC2; --ink: #141414; --muted: #4B4134; --line: #141414;
+  --accent: #1D5BB8; --accent-soft: #D6E5FA; --warn: #C81E26; --warn-soft: #FBDADB;
+  --amber: #A35F00; --amber-soft: #FFE9A3; --good: #17803C; --good-soft: #D8F0DF;
+  --today: #7A6F5E; --fresh: #B8156F; --fresh-soft: #F9D6EA;
+  --phone: #141414; --phone-screen: #FFFBEF; --shadow: rgba(20, 20, 20, .9); --on-strong: #FFFBEF;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(29, 91, 184, .14); --hard: #141414; --kapow: #E0262E;
+  --display: "Bangers", "Impact", "Arial Black", system-ui, sans-serif;
+  --body: "Comic Neue", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+    --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+    --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+    --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+    --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+    --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+  --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+  --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+  --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+  --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+  color-scheme: dark;
+}
+
+/* Newsprint ground with halftone dots */
+body {
+  background-color: var(--ground);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.7px);
+  background-size: 11px 11px;
+  font-family: var(--body);
+  font-size: 17px;
+}
+
+/* Cover strip, inserted at the top of each page */
+.cover-strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px;
+  background: var(--kapow); color: var(--pop);
+  border: 3px solid var(--hard); box-shadow: 6px 6px 0 var(--hard);
+  padding: 8px 14px; font: 400 1.15rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase;
+}
+.cover-strip .price {
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 8px; transform: rotate(4deg); font-size: 1rem;
+}
+
+/* Headline lettering */
+.wrap h1 {
+  font-family: var(--display); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(2.4rem, 7.5vw, 4.2rem); letter-spacing: .03em; line-height: .95;
+  color: var(--pop); -webkit-text-stroke: 2px var(--hard); paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--hard);
+}
+.wrap h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .05em; font-size: 1.55rem; }
+.wrap h3 { font-family: var(--display); font-weight: 400; letter-spacing: .04em; font-size: 1.25rem; }
+.wrap header .lede, .wrap .lede { font-size: 1.05rem; color: var(--ink); }
+
+/* Caption boxes */
+.wrap .eyebrow {
+  display: inline-block; width: fit-content; justify-self: start;
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 9px; font: 400 .95rem/1.1 var(--display); letter-spacing: .08em;
+  box-shadow: 3px 3px 0 var(--hard); transform: rotate(-1deg);
+}
+.wrap .banner, .wrap .pbanner {
+  border: 3px solid var(--hard); border-radius: 2px; box-shadow: 5px 5px 0 var(--hard);
+  font-weight: 700; transform: rotate(-.35deg);
+}
+
+/* Panels */
+.wrap .panel, .wrap .controls, .wrap .rcard, .wrap .tile, .wrap .msgbox {
+  border: 3px solid var(--line); border-radius: 4px; box-shadow: 6px 6px 0 var(--hard); background: var(--surface);
+}
+.wrap .pcard { border: 2.5px solid var(--line); border-radius: 4px; box-shadow: 3px 3px 0 var(--hard); }
+.wrap .console-bar { border: 2px solid var(--line); border-radius: 2px; font-weight: 700; color: var(--ink); }
+
+/* Speech bubbles */
+.wrap .note {
+  position: relative; border: 2.5px solid var(--line); border-radius: 18px; margin-bottom: 12px; font-weight: 700;
+}
+.wrap .note::after {
+  content: ""; position: absolute; left: 26px; bottom: -11px; width: 18px; height: 18px;
+  background: inherit; border-right: 2.5px solid var(--line); border-bottom: 2.5px solid var(--line);
+  transform: rotate(45deg);
+}
+.wrap .thought {
+  border: 2.5px dashed var(--line); border-radius: 999px; padding: 8px 14px; background: var(--surface); font-weight: 700;
+}
+
+/* Buttons: chunky ink outline, press-down feel (backgrounds stay the page's own) */
+.wrap button:not(.dot) {
+  border: 2.5px solid var(--line); border-radius: 6px; box-shadow: 3px 3px 0 var(--hard);
+  font-family: var(--body); font-weight: 700; transition: transform .08s ease, box-shadow .08s ease;
+}
+.wrap button:not(.dot):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.wrap .seg { border: 2.5px solid var(--line); border-radius: 6px; background: var(--surface); box-shadow: 3px 3px 0 var(--hard); }
+.wrap .seg button { border-color: transparent; box-shadow: none; }
+.wrap .seg button:active { transform: none; box-shadow: none; }
+.wrap .seg button[aria-pressed="true"] { background: var(--pop); color: var(--on-pop); border-color: var(--hard); }
+
+/* Phone: comic-panel frame */
+.wrap .phone { border: 3px solid var(--line); box-shadow: 8px 8px 0 var(--kapow); }
+.wrap .screen { border: 2px solid var(--line); }
+
+/* Badges, pills, chips */
+.wrap .badge, .wrap .pill, .wrap .chip, .wrap .src {
+  border: 2px solid var(--line); border-radius: 4px; font-family: var(--display); font-weight: 400; letter-spacing: .06em;
+}
+
+/* Meters: inked with screen-tone stripes */
+.wrap .meter { border: 2px solid var(--line); height: 14px; border-radius: 3px; }
+.wrap .meter i { border-radius: 0; background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, .28) 0 5px, transparent 5px 10px); }
+
+/* Big numbers in display lettering */
+.wrap .stat .n, .wrap .count, .wrap .weeklabel, .wrap .big { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.wrap th { font-family: var(--display); font-weight: 400; letter-spacing: .08em; font-size: .9rem; }
+.wrap table { border: 2.5px solid var(--line); }
+
+/* Footnotes as end-of-issue letters column */
+.wrap .fn { border-top: 3px solid var(--line); }
+.wrap .setfoot, .wrap .set { border-top: 3px dashed var(--line); }
+.wrap a { color: var(--accent); font-weight: 700; }
+
+/* Sound effects: one signature moment per page */
+.wrap .freshnote, .wrap .notif, .wrap .flagdone, .wrap .flag-done { position: relative; overflow: visible; }
+.wrap .freshnote::before, .wrap .notif::before, .wrap .flagdone::before, .wrap .flag-done::before {
+  position: absolute; top: -16px; right: 8px; z-index: 2;
+  font: 400 1.25rem/1 var(--display); letter-spacing: .06em;
+  background: var(--pop); color: var(--kapow); -webkit-text-stroke: 1px var(--hard); paint-order: stroke fill;
+  border: 2.5px solid var(--hard); padding: 3px 9px; transform: rotate(7deg); box-shadow: 2px 2px 0 var(--hard);
+}
+.wrap .freshnote::before { content: "KA-POW!"; }
+.wrap .notif::before { content: "BZZT!"; }
+.wrap .flagdone::before, .wrap .flag-done::before { content: "ZAP!"; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap button:not(.dot) { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <div class="cover-strip" aria-hidden="true"><span>Rook Comics presents</span><span>Issue #2 · Why no offers?</span><span class="price">10¢</span></div>
+
+  <header>
+    <div class="eyebrow">Rook Dispatch · clickable prototype 2 for Helen · draft</div>
+    <h1>"Why haven't I had offers?"</h1>
+    <p class="lede">A self-check screen on the responder's phone, and the same answer on the handler's console. It is for the question in 10 of our 25 support tickets: "is my account broken?"</p>
+    <p class="lede">Pick a responder and a week. Flip between <b>Today</b> (the new screen showing their real situation) and <b>With the fix</b>.</p>
+    <ul class="quotes" aria-label="What people told us">
+      <li><q>nothing again this week. starting to wonder if im still even in the system</q><span class="who">The Undertow, ticket T-013</span></li>
+      <li><q>is my account broken. nothing in like 10 days</q><span class="who">Nightwell, ticket T-009</span></li>
+      <li><q>I'd like something more to tell her than 'I don't know.'</q><span class="who">Linda Pruitt, handler, ticket T-018</span></li>
+      <li><q>Mite thinks Mite's been forgotten. Gale's exhausted.</q><span class="who">Kip, handler, interview</span></li>
+      <li>Ironvale <q>asked if there was a way to see her own history and I had to tell her there isn't</q><span class="who">Teresa Alvarez, handler, ticket T-008</span></li>
+    </ul>
+  </header>
+
+  <section class="controls" aria-label="Prototype controls">
+    <div class="group">
+      <label for="who">Responder</label>
+      <select id="who"></select>
+    </div>
+    <div class="group">
+      <span class="label">Week of</span>
+      <div class="seg" role="group" aria-label="Week" id="weeks"></div>
+    </div>
+    <div class="group">
+      <span class="label">Show</span>
+      <div class="seg mode" role="group" aria-label="Mode">
+        <button id="mode-today" data-mode="today" aria-pressed="true">Today <small>(preview with their real situation)</small></button>
+        <button id="mode-fix" data-mode="fix" aria-pressed="false">With the fix</button>
+      </div>
+    </div>
+    <div class="group chips" aria-label="Good ones to try">
+      <span class="label">Try</span>
+      <button class="chip" data-pick="Meteor Mite">Meteor Mite <span>stuck</span></button>
+      <button class="chip" data-pick="The Gale">The Gale <span>busy</span></button>
+      <button class="chip" data-pick="Halfmoon">Halfmoon <span>slipping</span></button>
+      <button class="chip" data-pick="Nightwell">Nightwell <span>data check</span></button>
+    </div>
+  </section>
+
+  <div id="banner" class="banner today" role="status" aria-live="polite"></div>
+
+  <section class="stage">
+
+    <!-- Handler console -->
+    <div class="panel" id="console" aria-label="Handler console">
+      <div class="panel-head">
+        <h2 id="console-title">Kip's console</h2>
+        <span class="muted small" id="console-sub"></span>
+      </div>
+      <div class="console-bar"><span>Your responders</span><span id="console-week"></span></div>
+      <div class="cards" id="cards"></div>
+      <div class="msgbox">
+        <label for="msg" id="msg-label">Message for Meteor Mite</label>
+        <p class="muted small">Ready to send. You can change it first.</p>
+        <textarea id="msg" spellcheck="true"></textarea>
+        <div class="copyrow">
+          <button class="btn" id="copy">Copy message</button>
+          <span id="copy-status" class="copy-status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Responder phone -->
+    <div class="phone-wrap">
+      <h2 id="phone-title">Meteor Mite's phone</h2>
+      <div class="phone">
+        <div class="screen" id="screen" aria-live="polite"></div>
+      </div>
+      <p class="muted small" style="text-align:center;max-width:340px">The screen shows only this responder's own record. Nothing about anyone else.</p>
+    </div>
+  </section>
+
+  <section class="footnotes" aria-label="Notes">
+    <div class="fn accent">
+      <h3>Why this also helps us</h3>
+      <p>For 7 responders, our data file and the tickets disagree: Nightwell, Stormwrack, Ironvale, Cindermark, Sgt. Falkirk, The Drift and The Longcast. The file shows <b>more</b> offers than they say they get.</p>
+      <p>If responders could see the same record we see, they would tell us fast when it is wrong. From 10 Aug on, their phones say we are checking their record. We don't call them "busy" or tell them to cut their hours until the check is done.</p>
+      <p>The <b>"This doesn't match what I see"</b> button lets them tell us. In this prototype it sends nothing.</p>
+    </div>
+    <div class="fn">
+      <h3>Where the numbers come from</h3>
+      <ul>
+        <li><b>Offers and jobs taken:</b> <code>callout-history.csv</code>, an unverified sample of 16 responders. Not Ravi's official data.</li>
+        <li><b>Standing:</b> worked out from today's rule. +0.08 for each job taken, −0.12 for each offer not taken, kept between 0 and 1. Shown as a word: In the rotation, Fewer offers, or Stuck.</li>
+        <li><b>Coming soon:</b> "You're available" and "Your skills were in demand" are greyed out. We have no real data for them yet.</li>
+        <li><b>Estimate:</b> the days since the last offer is worked out from weekly counts.</li>
+        <li><b>Reached your phone:</b> unknown until we have Wen's delivery log.</li>
+      </ul>
+    </div>
+    <div class="fn">
+      <h3>"With the fix" is an illustration</h3>
+      <ul>
+        <li>It is not a forecast. The four stuck responders (Farlight, Meteor Mite, The Undertow, Vesper) get a fresh start after the 10 Aug week and about their usual offers.</li>
+        <li>The 60 seconds start when the offer reaches the phone. This still needs Wen to confirm.</li>
+        <li>Everyone else is shown unchanged.</li>
+        <li><b>Privacy:</b> cover names only. No locations. A handler sees only their own responders.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="setfoot" aria-label="Part of a set">
+    <span class="label">Part of a set</span>
+    <a href="https://claude.ai/artifact/TTn1NduJL7gS54qt67tjbP" target="_blank" rel="noopener">The Way Back</a>
+    <span class="muted" aria-hidden="true">·</span>
+    <a href="https://claude.ai/artifact/RfzgQRiEdnZvh5Zk6FXiv8" target="_blank" rel="noopener">The I'm Coming Button</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var WEEKS = ['3 Aug', '10 Aug', '17 Aug', '24 Aug', '31 Aug'];
+  var RELEASE = 1;
+
+  // name, handler, offers sent per week, offers taken per week, usual offers per week before 4.2
+  var R = [
+    ['Captain Vantage', 'Ambrose', [12, 13, 15, 17, 18], [9, 8, 11, 13, 13], 12],
+    ['Cindermark', 'Farid Haddad', [9, 10, 11, 12, 12], [8, 6, 8, 8, 9], 9],
+    ['Corporal Ashgrove', 'Yusuf Demir', [10, 10, 8, 7, 7], [8, 6, 5, 5, 5], 10],
+    ['Farlight', 'Linda Pruitt', [12, 10, 3, 1, 0], [8, 4, 0, 0, 0], 12],
+    ['Halfmoon', 'Simone Fischer', [11, 11, 9, 8, 8], [8, 6, 5, 5, 7], 11],
+    ['Ironvale', 'Teresa Alvarez', [8, 9, 10, 11, 12], [7, 5, 6, 8, 9], 8],
+    ['Meteor Mite', 'Kip', [11, 10, 4, 2, 1], [8, 4, 1, 0, 0], 11],
+    ['Nightwell', 'Marjorie Sung', [15, 16, 18, 20, 21], [12, 9, 14, 13, 15], 15],
+    ['Sgt. Bulwark', 'Halloran', [9, 10, 10, 11, 11], [7, 5, 8, 7, 8], 9],
+    ['Sgt. Falkirk', 'Owen Bramwell', [10, 11, 13, 15, 16], [8, 7, 9, 11, 11], 10],
+    ['Stormwrack', 'Renata Kovač', [13, 14, 16, 18, 19], [10, 8, 12, 13, 15], 13],
+    ['The Drift', 'Beatrice Calloway', [6, 7, 7, 8, 8], [5, 4, 5, 6, 5], 6],
+    ['The Gale', 'Kip', [13, 15, 17, 20, 21], [10, 9, 12, 14, 16], 13],
+    ['The Longcast', 'Graham Petrov', [7, 8, 8, 9, 9], [5, 5, 6, 5, 7], 7],
+    ['The Undertow', 'Desmond Okafor', [12, 11, 4, 1, 1], [9, 4, 1, 0, 0], 12],
+    ['Vesper', 'Dorothy Pell', [14, 12, 5, 2, 1], [12, 6, 1, 0, 0], 14]
+  ];
+  // Standing at the end of each week under today's rule. Anyone not listed stays at 1.00.
+  var STAND = {
+    'The Undertow': [1, 0.48, 0.20, 0.08, 0.00],
+    'Farlight': [1, 0.60, 0.24, 0.12, 0.12],
+    'Meteor Mite': [1, 0.60, 0.32, 0.08, 0.00],
+    'Vesper': [1, 0.76, 0.36, 0.12, 0.00],
+    'Sgt. Bulwark': [1, 0.80, 1, 1, 1],
+    'Halfmoon': [1, 0.88, 0.80, 0.84, 1],
+    'Nightwell': [1, 0.88, 1, 1, 1],
+    'Ironvale': [1, 0.92, 0.92, 1, 1],
+    'Stormwrack': [1, 0.92, 1, 1, 1],
+    'The Drift': [1, 0.96, 1, 1, 1],
+    'The Longcast': [1, 1, 1, 0.92, 1]
+  };
+  // "With the fix": illustration only. Fresh start after the 10 Aug week, then about their usual offers.
+  var FIX = {
+    'Farlight': { sent: [12, 10, 12, 12, 12], taken: [8, 4, 9, 9, 9] },
+    'Meteor Mite': { sent: [11, 10, 11, 11, 11], taken: [8, 4, 8, 8, 8] },
+    'The Undertow': { sent: [12, 11, 12, 12, 12], taken: [9, 4, 9, 9, 9] },
+    'Vesper': { sent: [14, 12, 14, 14, 14], taken: [12, 6, 10, 10, 10] }
+  };
+  var MISMATCH = ['Nightwell', 'Stormwrack', 'Ironvale', 'Cindermark', 'Sgt. Falkirk', 'The Drift', 'The Longcast'];
+
+  // flagged: responders who tapped "This doesn't match what I see". Prototype only, kept in memory, sends nothing.
+  var state = { who: 'Meteor Mite', week: 4, mode: 'today', flagged: {} };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function row(name) {
+    for (var i = 0; i < R.length; i++) if (R[i][0] === name) return R[i];
+    return R[0];
+  }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+  // Everything the screens need for one responder in one week.
+  function model(name, w, mode) {
+    var r = row(name);
+    var fx = mode === 'fix' && FIX[name] ? FIX[name] : null;
+    var sent = fx ? fx.sent : r[2];
+    var taken = fx ? fx.taken : r[3];
+    var base = STAND[name] || [1, 1, 1, 1, 1];
+    var stand = fx ? [1, base[1], 1, 1, 1] : base;
+    var s = sent[w], t = taken[w], miss = s - t, usual = r[4], st = stand[w];
+    var rs = sent[RELEASE], rm = rs - taken[RELEASE];
+    var mis = MISMATCH.indexOf(name) >= 0 && w >= RELEASE;
+    var kind;
+    if (fx && w > RELEASE) kind = 'fresh';
+    else if (st < 0.6) kind = 'stuck';
+    else if (st < 0.8) kind = 'fewer';
+    else if (mis) kind = 'check';
+    else if (s > usual * 1.2) kind = 'busy';
+    else if (w >= RELEASE && s < usual * 0.8) kind = 'slipping';
+    else kind = 'normal';
+    return {
+      name: name, handler: r[1], sent: sent, taken: taken, usual: usual, w: w, mode: mode,
+      s: s, t: t, miss: miss, st: st, rs: rs, rm: rm,
+      kind: kind, fixed: !!fx, mismatch: mis, flagged: !!state.flagged[name], days: daysSince(sent, w)
+    };
+  }
+
+  // Estimated days since the last offer, from weekly counts only.
+  function daysSince(sent, w) {
+    function within(n) { return n >= 3 ? 1 : n === 2 ? 3 : 5; }
+    if (sent[w] > 0) return within(sent[w]);
+    for (var j = w - 1; j >= 0; j--) if (sent[j] > 0) return 7 * (w - j) + within(sent[j]);
+    return 7 * (w + 1);
+  }
+
+  function statusWord(st) { return st >= 0.8 ? 'In the rotation' : st >= 0.6 ? 'Fewer offers' : 'Stuck'; }
+  function tone(st) { return st >= 0.8 ? 'ok' : st >= 0.6 ? 'mid' : 'bad'; }
+  function kindTone(k) { return k === 'stuck' ? 'bad' : (k === 'fewer' || k === 'busy' || k === 'slipping' || k === 'check') ? 'mid' : 'ok'; }
+  // Console badge: busy and "checking" are amber, everyone else shows their standing word.
+  function badgeFor(c) {
+    if (c.kind === 'busy') return ['Busy', 'mid'];
+    if (c.kind === 'check') return ['Checking record', 'mid'];
+    return [statusWord(c.st), tone(c.st)];
+  }
+  var ON_US = "Offers ran out before you could answer. That's on us, not you.";
+
+  function headline(m) {
+    switch (m.kind) {
+      case 'stuck': return "You're rarely being asked right now";
+      case 'fresh': return "You're back in the rotation";
+      case 'fewer': return "You're being asked a bit less";
+      case 'busy': return "You've had more offers than usual";
+      case 'check': return "We're checking your record";
+      case 'slipping': return "You're getting fewer offers than usual";
+      default: return 'Everything looks normal';
+    }
+  }
+
+  function whyText(m) {
+    switch (m.kind) {
+      case 'stuck':
+        if (m.w === RELEASE) return m.miss + ' of ' + m.s + ' offers were not taken this week. On 12 Aug the time to answer dropped from 90 to 60 seconds. ' + ON_US + ' Each one lowered your standing, so you are now near the bottom of the list.';
+        return 'In the week of 10 Aug, ' + m.rm + ' of ' + m.rs + ' offers were not taken. The time to answer had just dropped from 90 to 60 seconds. ' + ON_US + ' Each one lowered your standing, so now you are rarely asked.';
+      case 'fresh':
+        return 'The week of 10 Aug was rough: ' + m.rm + ' of ' + m.rs + ' offers were not taken. That week has been cleared with a fresh start.';
+      case 'fewer':
+        return m.miss + ' of ' + m.s + ' offers were not taken this week.' + (m.w === RELEASE ? ' On 12 Aug the time to answer dropped from 90 to 60 seconds.' : '') + ' That lowered your standing, so you will be asked less for a while.';
+      case 'busy':
+        return m.s + ' offers this week. Your usual is ' + m.usual + '. Since 12 Aug, offers have been shared out less evenly.';
+      case 'check':
+        return 'Our data file shows ' + plural(m.s, 'offer', 'offers') + ' sent to you this week. Your tickets say your phone has gone quiet. Both can\'t be right, so we are checking.';
+      case 'slipping':
+        return "You're getting fewer offers than usual: " + m.s + ' this week, and your usual is about ' + m.usual + '. Your standing is fine. This may be distance from recent jobs. We are checking.';
+      default:
+        if (m.s > 0 && m.miss / m.s > 0.4) return m.miss + ' of ' + m.s + ' offers were not taken this week. Your standing dipped a little, but you are still in the rotation.';
+        return "You've had " + m.s + ' offers this week. That is about your usual ' + m.usual + '.';
+    }
+  }
+
+  function nextText(m) {
+    var today = m.mode === 'today';
+    switch (m.kind) {
+      case 'stuck':
+        return today
+          ? "Today there's no way back on your own. The fix gives you a fresh start. Your handler can see this too."
+          : 'With the fix, you get a fresh start after this week, and your standing recovers.';
+      case 'fresh':
+        return 'Fresh start applied. Your standing is full again. You should get about your usual offers.';
+      case 'fewer':
+        if (!today && m.fixed) return 'With the fix, you get a fresh start after this week, so you stay in the rotation.';
+        return 'Taking your next offers brings your standing back up.';
+      case 'busy':
+        return "Tell your handler if it's too much. We're watching how work is shared." +
+          (today ? '' : ' As stuck responders come back, work should spread out again (illustration).');
+      case 'check':
+        return 'Nothing to do. We will tell you and your handler what we find. If this screen looks wrong to you, tap the button below.';
+      case 'slipping':
+        return 'Nothing to do for now. Your handler sees the same thing, and we will tell you what we find.';
+      default:
+        return 'Nothing to do.';
+    }
+  }
+
+  function consoleLine(m) {
+    switch (m.kind) {
+      case 'stuck': return '<b>Stuck, rarely asked.</b> ' + m.rm + ' of ' + m.rs + ' offers not taken in the 10 Aug week. Offers ran out before they could answer.';
+      case 'fresh': return '<b>Fresh start applied.</b> Back in the rotation after a rough 10 Aug week.';
+      case 'fewer': return '<b>Fewer offers for now.</b> ' + m.miss + ' of ' + m.s + ' not taken this week.';
+      case 'busy': return '<b>Busy.</b> ' + m.s + ' offers this week. Usual is ' + m.usual + '.';
+      case 'check': return '<b>Checking record.</b> Our data file shows ' + m.s + ' offers sent. Tickets say it has gone quiet. Rook is checking delivery with Wen.';
+      case 'slipping': return '<b>Fewer offers than usual.</b> ' + m.s + ' this week, usual about ' + m.usual + '. Standing is fine. Rook is checking distance.';
+      default: return '<b>Normal.</b> ' + m.s + ' offers this week, about usual.';
+    }
+  }
+
+  function message(m) {
+    var hi = 'Hi ' + m.name + ',\n\n';
+    var end = '\n\n' + m.handler;
+    if (m.flagged) {
+      return hi + "You told us your record looks wrong. We're checking it now. I'll let you know what we find." + end;
+    }
+    switch (m.kind) {
+      case 'stuck':
+        return hi + "I checked. Your account isn't broken. In the week of 10 Aug, " + m.rm + ' of ' + m.rs + ' offers ran out before you could answer, just after the time to answer dropped to 60 seconds. That pushed your standing down, so you have been asked much less since. That is on Rook, not you. I have raised it with them.' + end;
+      case 'fresh':
+        return hi + 'Good news. Your account was never broken. Rook has given you a fresh start, so your standing is back to full and offers should pick up again.' + end;
+      case 'fewer':
+        return hi + 'Your account is fine. ' + m.miss + ' of ' + m.s + ' offers were not taken this week, so you will get a few less for a while. Taking the next ones brings you back up.' + end;
+      case 'busy':
+        return hi + 'You have had a lot of offers lately: ' + m.s + ' this week, when your usual is ' + m.usual + ". If it's too much, tell me. Rook is watching how work is shared." + end;
+      case 'check':
+        return hi + "We're checking your record. Rook's data and your tickets don't match, so they are looking into it. Until that check is done, I won't change anything about your hours. I'll let you know what we find." + end;
+      case 'slipping':
+        return hi + 'Your account is fine and your standing is good. You have had fewer offers than usual (' + m.s + ', usually about ' + m.usual + '). Rook is checking if it is about distance from recent jobs. I will let you know.' + end;
+      default:
+        return hi + 'I checked. Everything looks normal. You have had ' + m.s + ' offers this week, about your usual.' + end;
+    }
+  }
+
+  function check(mark, cls, html, liCls) {
+    return '<li' + (liCls ? ' class="' + liCls + '"' : '') + '><span class="mk ' + cls + '" aria-hidden="true">' + mark + '</span><span>' + html + '</span></li>';
+  }
+  function soon(html) {
+    return check('–', 'soonmk', html + '<br><span class="ex">Coming soon: needs real data</span>', 'soon');
+  }
+
+  function missedItem(m) {
+    var W = WEEKS[m.w];
+    if (m.kind === 'stuck' && m.w > RELEASE) {
+      var now = m.s === 0 ? 'This week: no offers.' : 'This week: ' + m.miss + ' of ' + m.s + ' not taken.';
+      return check('✗', 'bad', '<b>Offers not taken.</b> It started in the week of 10 Aug: ' + m.rm + ' of ' + m.rs + '. ' + ON_US + ' ' + now);
+    }
+    if (m.kind === 'stuck') {
+      return check('✗', 'bad', '<b>Offers not taken.</b> ' + m.miss + ' of ' + m.s + ' in the week of ' + W + '. ' + ON_US);
+    }
+    if (m.kind === 'fresh') {
+      return check('✓', 'ok', '<b>Offers not taken.</b> This week: ' + m.miss + ' of ' + m.s + '. Your 10 Aug week (' + m.rm + ' of ' + m.rs + ') was cleared by a fresh start.');
+    }
+    if (m.miss === 0) return check('✓', 'ok', '<b>Offers not taken.</b> None in the week of ' + W + '.');
+    var bad = m.s > 0 && m.miss / m.s > 0.4;
+    return check(bad ? '✗' : '✓', bad ? 'bad' : 'ok', '<b>Offers not taken.</b> ' + m.miss + ' of ' + m.s + ' in the week of ' + W + '.');
+  }
+
+  function bars(m) {
+    var max = Math.max.apply(null, m.sent.concat([m.usual])) || 1;
+    var scale = function (v) { return (v / max) * 78; };
+    var cols = '', labels = '';
+    for (var i = 0; i < 5; i++) {
+      var future = i > m.w;
+      var s = m.sent[i], t = m.taken[i];
+      var h = future ? 6 : Math.max(scale(s), 2);
+      var inner = future || s === 0 ? 0 : (t / s) * 100;
+      cols += '<div class="bcol"><span class="bv">' + (future ? '' : s) + '</span>' +
+        '<div class="bar' + (future ? ' future' : '') + (i === m.w ? ' cur' : '') + '" style="height:' + h.toFixed(1) + '%"><i style="height:' + inner.toFixed(1) + '%"></i></div></div>';
+      labels += '<span>' + WEEKS[i] + (i === RELEASE ? '*' : '') + '</span>';
+    }
+    var aria = 'Your offers per week: ' + m.sent.slice(0, m.w + 1).map(function (v, i) { return WEEKS[i] + ' ' + v + ' sent, ' + m.taken[i] + ' taken'; }).join('; ') + '. Usual about ' + m.usual + '.';
+    return '<div class="barsarea" role="img" aria-label="' + esc(aria) + '">' +
+      '<div class="usual" style="bottom:' + scale(m.usual).toFixed(1) + '%"><span>usual ' + m.usual + '</span></div>' + cols + '</div>' +
+      '<div class="blabels" aria-hidden="true">' + labels + '</div>' +
+      '<div class="legend"><span><i class="sw tk"></i>taken</span><span><i class="sw ms"></i>not taken</span><span>* 4.2 week</span></div>';
+  }
+
+  function renderPhone(m) {
+    var t = tone(m.st);
+    var stMark = t === 'ok' ? '✓' : t === 'mid' ? '!' : '✗';
+    var lastOk = m.days <= 3;
+    var tag = m.mode === 'today' ? 'Preview · new screen, with their real situation today' : 'With the fix · illustration, not a forecast';
+    var busy = m.kind === 'busy';
+    var title = busy ? 'Why so many offers?' : 'Why haven\'t I had offers?';
+    var sub;
+    if (busy) sub = 'Week of ' + WEEKS[m.w] + ' · ' + m.s + ' offers this week. Your usual is ' + m.usual + '.';
+    else if (m.mismatch) sub = 'Week of ' + WEEKS[m.w] + ' · Offers sent: ' + m.s + ' · reached your phone: checking (needs Wen\'s delivery log)';
+    else sub = 'Week of ' + WEEKS[m.w] + ' · ' + plural(m.s, 'offer', 'offers') + ', ' + m.t + ' taken';
+    $('screen').innerHTML =
+      '<div class="notch" aria-hidden="true"></div>' +
+      '<span class="preview-tag">' + tag + '</span>' +
+      '<div><span class="eyebrow">Rook · ' + esc(m.name) + '</span><h3 style="font-size:1.25rem;margin-top:2px">' + title + '</h3></div>' +
+      (m.mismatch ? '<div class="pbanner"><b>We\'re checking your record.</b><span>Your tickets and our data don\'t match.</span></div>' : '') +
+      '<div class="pcard head-' + kindTone(m.kind) + '"><b>' + headline(m) + '</b>' +
+        '<span class="muted small">' + sub + '</span></div>' +
+      (m.mode === 'fix' ? '<div class="pcard head-ok"><span>You\'ll have 60 seconds from when an offer reaches your phone (pending Wen).</span></div>' : '') +
+      '<ul class="checks">' +
+        soon("<b>You're available.</b>") +
+        soon('<b>Your skills were in demand.</b>') +
+        missedItem(m) +
+        check(stMark, t, '<b>Your standing:</b> ' + statusWord(m.st) + '.' +
+          '<div class="meter" role="img" aria-label="Standing: ' + statusWord(m.st) + '"><i class="' + t + '" style="width:' + Math.round(m.st * 100) + '%"></i></div>') +
+        check(lastOk ? '✓' : '✗', lastOk ? 'ok' : 'bad', '<b>Last offer:</b> <span class="num">' + plural(m.days, 'day', 'days') + '</span> ago.<br><span class="ex">Estimated from weekly counts.</span>') +
+      '</ul>' +
+      '<div class="pcard"><span class="eyebrow">Why</span><p>' + whyText(m) + '</p></div>' +
+      '<div class="pcard"><span class="eyebrow">What happens next</span><p>' + nextText(m) + '</p></div>' +
+      '<div class="pcard"><span class="eyebrow">Your offers each week</span>' + bars(m) + '</div>' +
+      (busy || m.kind === 'check' ? '' : '<p class="notbroken">Your account isn\'t broken.</p>') +
+      '<div class="flagbox">' +
+        '<button class="btn ghost flag-btn" id="flag-btn"' + (m.flagged ? ' hidden' : '') + '>This doesn\'t match what I see</button>' +
+        '<div class="pcard head-ok flag-done" id="flag-done" tabindex="-1" role="status"' + (m.flagged ? '' : ' hidden') + '>' +
+          '<b>Thanks. Your handler and Rook have been told. We\'ll check your record.</b>' +
+          '<span class="ex">Prototype only. Nothing is actually sent.</span>' +
+          '<button class="linkbtn" id="flag-reset">Undo (reset the prototype)</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderConsole(m) {
+    var h = m.handler, mine = R.filter(function (r) { return r[1] === h; });
+    var poss = h + (/s$/.test(h) ? "'" : "'s");
+    $('console-title').textContent = poss + ' console';
+    $('console-sub').textContent = 'Handler for ' + mine.map(function (r) { return r[0]; }).join(' and ');
+    $('console-week').textContent = 'Week of ' + WEEKS[m.w] + (m.mode === 'fix' ? ' · with the fix' : '');
+    $('cards').innerHTML = mine.map(function (r) {
+      var c = model(r[0], m.w, m.mode), sel = r[0] === m.name;
+      var bg = badgeFor(c);
+      return '<article class="rcard' + (sel ? ' sel' : '') + '" aria-label="' + esc(r[0]) + '">' +
+        '<div class="top"><h3>' + esc(r[0]) + '</h3><span class="badge' + (bg[1] === 'ok' ? '' : ' ' + bg[1]) + '">' + bg[0] + '</span></div>' +
+        (c.flagged ? '<div class="flagnote"><b>Flagged by responder.</b> They say this record doesn\'t match what they see.</div>' : '') +
+        '<div class="stat"><span class="n">' + c.s + '</span><span class="muted">offers this week · ' + c.t + ' taken · usual ' + c.usual + '</span></div>' +
+        '<div class="note ' + kindTone(c.kind) + '">' + consoleLine(c) + '</div>' +
+        (sel ? '<span class="muted small">Showing on the phone and in the message below.</span>'
+             : '<button class="btn ghost" data-pick="' + esc(r[0]) + '">Show ' + esc(r[0]) + '</button>') +
+        '</article>';
+    }).join('');
+    $('msg-label').textContent = 'Message for ' + m.name;
+    $('msg').value = message(m);
+  }
+
+  function renderBanner(m) {
+    var b = $('banner');
+    if (state.mode === 'today') {
+      b.className = 'banner today';
+      b.innerHTML = '<b>Today, week of ' + WEEKS[m.w] + ':</b> this new screen shows ' + esc(m.name) + "'s real situation. " +
+        (m.w === RELEASE ? '4.2 ships on 12 Aug. The time to answer drops from 90 to 60 seconds.' : m.w === 0 ? 'A normal week before 4.2.' : 'Today nobody can see any of this. They can only guess.');
+    } else {
+      b.className = 'banner fix';
+      b.innerHTML = '<b>With the fix (illustration, not a forecast):</b> Farlight, Meteor Mite, The Undertow and Vesper get a fresh start after the 10 Aug week and about their usual offers. The 60 seconds start when an offer reaches the phone (pending Wen). Everyone else is shown unchanged.';
+    }
+  }
+
+  function render() {
+    var m = model(state.who, state.week, state.mode);
+    $('who').value = state.who;
+    Array.prototype.forEach.call($('weeks').children, function (b, i) { b.setAttribute('aria-pressed', String(i === state.week)); });
+    $('mode-today').setAttribute('aria-pressed', String(state.mode === 'today'));
+    $('mode-fix').setAttribute('aria-pressed', String(state.mode === 'fix'));
+    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-pick') === state.who)); });
+    $('phone-title').textContent = m.name + "'s phone";
+    renderBanner(m);
+    renderConsole(m);
+    renderPhone(m);
+    setStatus('', false);
+  }
+
+  var statusTimer = null;
+  function setStatus(text, hint) {
+    var st = $('copy-status');
+    st.textContent = text;
+    st.className = 'copy-status' + (hint ? ' hint' : '');
+    $('copy').textContent = text === 'Copied' ? 'Copied' : 'Copy message';
+    if (statusTimer) { clearTimeout(statusTimer); statusTimer = null; }
+    if (text === 'Copied') statusTimer = setTimeout(function () { setStatus('', false); }, 2500);
+  }
+
+  function copyMsg() {
+    var ta = $('msg');
+    var text = ta.value;
+    function fallback() {
+      ta.focus();
+      ta.select();
+      setStatus('Text selected. Press Ctrl+C (or Cmd+C) to copy.', true);
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { setStatus('Copied', false); }, fallback);
+      } else {
+        fallback();
+      }
+    } catch (e) {
+      fallback();
+    }
+  }
+
+  function pick(name) { state.who = name; render(); }
+
+  // Build controls
+  R.forEach(function (r) {
+    var o = document.createElement('option');
+    o.value = r[0];
+    o.textContent = r[0] + ' · handler ' + r[1];
+    $('who').appendChild(o);
+  });
+  WEEKS.forEach(function (wk, i) {
+    var b = document.createElement('button');
+    b.id = 'week-' + i;
+    b.textContent = wk + (i === RELEASE ? ' · 4.2' : '');
+    b.addEventListener('click', function () { state.week = i; render(); });
+    $('weeks').appendChild(b);
+  });
+  $('who').addEventListener('change', function () { pick(this.value); });
+  $('mode-today').addEventListener('click', function () { state.mode = 'today'; render(); });
+  $('mode-fix').addEventListener('click', function () { state.mode = 'fix'; render(); });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#flag-btn')) {
+      state.flagged[state.who] = true;
+      render();
+      $('flag-done').focus();
+      return;
+    }
+    if (e.target.closest('#flag-reset')) {
+      delete state.flagged[state.who];
+      render();
+      $('flag-btn').focus();
+      return;
+    }
+    var p = e.target.closest('[data-pick]');
+    if (p) pick(p.getAttribute('data-pick'));
+  });
+  $('copy').addEventListener('click', copyMsg);
+
+  render();
+})();
+</script>
