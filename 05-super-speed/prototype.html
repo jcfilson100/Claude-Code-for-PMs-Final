@@ -1,0 +1,441 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Way Back</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  :root {
+    --ground: #F3F5F7;
+    --surface: #FFFFFF;
+    --sunk: #EAEEF2;
+    --ink: #17222E;
+    --muted: #55626F;
+    --line: #D9DFE5;
+    --accent: #0E6E6B;
+    --accent-soft: #E1F1F0;
+    --warn: #C2410C;
+    --warn-soft: #FDEBDD;
+    --amber: #A16207;
+    --amber-soft: #FBF1D6;
+    --good: #15803D;
+    --good-soft: #E3F4E8;
+    --phone: #0F1720;
+    --phone-screen: #FAFBFC;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC;
+      --line: #2C3844; --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217;
+      --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F;
+      --phone: #05080B; --phone-screen: #18212B;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC;
+    --line: #2C3844; --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217;
+    --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F;
+    --phone: #05080B; --phone-screen: #18212B;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--body); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 24px; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
+  h2 { font-size: 1.25rem; font-weight: 800; }
+  h3 { font-size: 1.05rem; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  header { display: grid; gap: 8px; }
+  header .lede { color: var(--muted); max-width: 70ch; }
+
+  /* Controls */
+  .controls {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center;
+  }
+  .group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .group > .label { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .seg { display: inline-flex; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .seg button {
+    font: 700 .9rem/1 var(--body); color: var(--muted); background: transparent; border: 0;
+    padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .seg.rules button[aria-pressed="true"][data-rules="proposed"] { background: var(--accent); color: var(--surface); }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .btn {
+    font: 700 .95rem/1 var(--body); border: 0; border-radius: 10px; padding: 11px 16px; cursor: pointer;
+    background: var(--ink); color: var(--surface);
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.ghost { background: var(--sunk); color: var(--ink); }
+
+  .banner { border-radius: 12px; padding: 12px 16px; font-size: .95rem; }
+  .banner.today { background: var(--warn-soft); color: var(--ink); border-left: 5px solid var(--warn); }
+  .banner.proposed { background: var(--accent-soft); color: var(--ink); border-left: 5px solid var(--accent); }
+
+  /* Stage */
+  .stage { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; }
+  .panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+
+  /* Console */
+  .console-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--sunk); border-radius: 10px; padding: 8px 12px; font-size: .85rem; color: var(--muted); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .rcard { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; align-content: start; background: var(--surface); }
+  .rcard .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .badge { font-size: .95rem; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: var(--good-soft); color: var(--good); }
+  .badge.offer { background: var(--amber-soft); color: var(--amber); }
+  .stat { display: flex; align-items: baseline; gap: 8px; }
+  .stat .n { font: 800 2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .spark { width: 100%; height: 44px; display: block; }
+  .note { border-radius: 10px; padding: 10px 12px; font-size: .92rem; display: grid; gap: 2px; }
+  .note.quiet { background: var(--warn-soft); }
+  .note.busy { background: var(--amber-soft); }
+  .note.ok { background: var(--good-soft); }
+  .note.none { background: var(--sunk); color: var(--muted); font-style: italic; }
+  .note b { font-weight: 700; }
+  .alert {
+    border: 2px solid var(--amber); background: var(--amber-soft); border-radius: 12px; padding: 12px 14px;
+    display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap;
+  }
+  .alert .t { font: 800 1.4rem/1 var(--display); font-variant-numeric: tabular-nums; color: var(--amber); }
+
+  /* Phone */
+  .phone-wrap { display: grid; justify-items: center; gap: 10px; }
+  .phone {
+    width: min(320px, 100%); background: var(--phone); border-radius: 36px; padding: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+  .screen { background: var(--phone-screen); border-radius: 26px; min-height: 540px; padding: 18px 16px; display: grid; gap: 12px; align-content: start; position: relative; overflow: hidden; }
+  .notch { width: 90px; height: 6px; border-radius: 99px; background: var(--line); justify-self: center; }
+  .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 6px; }
+  .meter { height: 10px; background: var(--sunk); border-radius: 99px; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .5s ease; }
+  .hist { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: .9rem; }
+  .hist li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 4px; }
+  .tag { font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .tag.yes { background: var(--good-soft); color: var(--good); }
+  .tag.late { background: var(--amber-soft); color: var(--amber); }
+  .tag.no { background: var(--warn-soft); color: var(--warn); }
+  .incoming {
+    position: absolute; inset: 0; background: var(--phone-screen); padding: 22px 16px; display: grid; gap: 14px; align-content: center; text-align: center;
+  }
+  .incoming .count { font: 800 4rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .incoming .count.low { color: var(--warn); }
+  .incoming .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .incoming .accept { background: var(--good); color: #fff; }
+  .incoming .decline { background: var(--sunk); color: var(--ink); }
+  .pending { font-size: .78rem; font-weight: 700; color: var(--amber); }
+  .thought { font-style: italic; color: var(--muted); text-align: center; font-size: .92rem; }
+
+  /* Behind the scenes */
+  .bts { display: grid; gap: 10px; }
+  .bts table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .bts th, .bts td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .bts th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .last { padding: 10px 12px; border-radius: 10px; background: var(--sunk); font-size: .92rem; }
+
+  .footnotes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .fn { border-top: 3px solid var(--line); padding-top: 10px; display: grid; gap: 6px; font-size: .92rem; }
+  .fn.accent { border-color: var(--accent); }
+  .fn ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  @media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Rook Dispatch · clickable prototype for Helen · draft</div>
+    <h1>A way back for quiet responders</h1>
+    <p class="lede">Flip between <b>today's rules</b> and the <b>proposed fix</b>, step through August, and send Meteor Mite a test offer. On the left is what Kip sees on his console. On the right is what Mite sees on his phone.</p>
+  </header>
+
+  <section class="controls" aria-label="Simulation controls">
+    <div class="group">
+      <span class="label">Rules</span>
+      <div class="seg rules" role="group" aria-label="Rules">
+        <button id="rules-today" data-rules="today" aria-pressed="true">Today</button>
+        <button id="rules-proposed" data-rules="proposed" aria-pressed="false">Proposed fix</button>
+      </div>
+    </div>
+    <div class="group">
+      <span class="label">Week of</span>
+      <div class="seg" role="group" aria-label="Week" id="weeks"></div>
+    </div>
+    <div class="group">
+      <button class="btn" id="send">Send Mite a test offer</button>
+    </div>
+  </section>
+
+  <div id="banner" class="banner today" role="status"></div>
+
+  <section class="stage">
+
+    <!-- Handler console -->
+    <div class="panel" aria-label="Kip's console">
+      <div class="panel-head">
+        <h2>Kip's console</h2>
+        <span class="muted">Handler for Meteor Mite and The Gale</span>
+      </div>
+      <div class="console-bar"><span>Coverage view</span><span id="console-week"></span></div>
+      <div id="alert-slot"></div>
+      <div class="cards">
+        <article class="rcard" id="card-mite"></article>
+        <article class="rcard" id="card-gale"></article>
+      </div>
+    </div>
+
+    <!-- Responder phone -->
+    <div class="phone-wrap" aria-label="Meteor Mite's phone">
+      <h2>Meteor Mite's phone</h2>
+      <div class="phone">
+        <div class="screen" id="screen">
+          <div class="notch" aria-hidden="true"></div>
+          <div id="phone-body" style="display:grid;gap:12px"></div>
+          <div class="incoming" id="incoming" hidden>
+            <div class="eyebrow" style="color:var(--amber)">New callout</div>
+            <h3>Water rescue · 9 min away</h3>
+            <div class="count" id="count">60</div>
+            <p class="muted" id="count-sub">seconds to answer</p>
+            <p class="pending" id="count-pending"></p>
+            <div class="row">
+              <button class="btn decline" id="decline">Decline</button>
+              <button class="btn accept" id="accept">Accept</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="font-size:.85rem;text-align:center">Test offers run 4× faster than real time.</p>
+    </div>
+  </section>
+
+  <!-- Behind the scenes -->
+  <section class="panel bts" aria-label="Behind the scenes">
+    <div class="panel-head">
+      <h2>Behind the scenes</h2>
+      <span class="muted">Not something Kip or Mite would see. Here so you can see what changes underneath.</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>When Mite…</th><th>Today</th><th>Proposed</th></tr></thead>
+        <tbody>
+          <tr><td>takes the job</td><td class="num">+0.08</td><td class="num">+0.08</td></tr>
+          <tr><td>says no</td><td class="num">−0.12</td><td class="num">−0.12</td></tr>
+          <tr><td>runs out of time</td><td class="num">−0.12 <span class="muted">(same as no)</span></td><td class="num">−0.04</td></tr>
+          <tr><td>has a low standing</td><td>Stays low until he says yes, which he rarely gets the chance to do.</td><td>Climbs back a little each week, up to the middle and no higher.</td></tr>
+          <tr><td>is stuck since 12 Aug</td><td>Stays stuck</td><td>One-time fresh start</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="last" id="last-outcome">Send Mite a test offer to see what happens to his standing.</div>
+  </section>
+
+  <section class="footnotes" aria-label="Notes">
+    <div class="fn accent">
+      <h3>Answering Wen's 2019 question</h3>
+      <p>Wen asked whether a score should "ease back" over time. <i>For:</i> "somebody who had a bad month shouldn't still be carrying it in the spring." <i>Against:</i> "if somebody has stopped taking work, we probably want that to stick."</p>
+      <p>The proposal does both. A low standing climbs back, but <b>only to the middle</b>, so a bad month fades without putting someone who has stopped working at the front of the queue.</p>
+    </div>
+    <div class="fn">
+      <h3>Where the numbers come from</h3>
+      <ul>
+        <li><b>Today:</b> real weekly offers for Meteor Mite and The Gale from <code>callout-history.csv</code> (an unverified sample). Standing is estimated from the code's rules.</li>
+        <li><b>Proposed:</b> an <b>illustration</b>, not a forecast. It assumes most of Mite's release-week misses were "ran out of time".</li>
+      </ul>
+    </div>
+    <div class="fn">
+      <h3>Still to confirm</h3>
+      <ul>
+        <li><b>Clock from arrival:</b> waiting on Wen. Today's late-delivery example (45s) is a hypothesis, not a measurement.</li>
+        <li><b>Privacy:</b> screens show offer counts and status only, never anything that could identify a responder.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var WEEKS = ['3 Aug', '10 Aug', '17 Aug', '24 Aug', '31 Aug'];
+  var RELEASE = 1;
+  var DATA = {
+    today: {
+      mite: { offers: [11, 10, 4, 2, 1], taken: [8, 4, 1, 0, 0], late: [2, 5, 2, 2, 1], standing: [1.00, 0.60, 0.32, 0.08, 0.00], quietDays: [0, 0, 3, 5, 6] },
+      gale: { offers: [13, 15, 17, 20, 21], taken: [10, 9, 12, 14, 16] }
+    },
+    proposed: {
+      mite: { offers: [11, 10, 10, 11, 11], taken: [8, 4, 7, 8, 8], late: [2, 5, 2, 2, 2], standing: [1.00, 1.00, 1.00, 1.00, 1.00], quietDays: [0, 0, 0, 0, 0] },
+      gale: { offers: [13, 15, 14, 13, 13], taken: [10, 9, 11, 10, 10] }
+    }
+  };
+  var USUAL = { mite: 11, gale: 13 };
+
+  var state = { rules: 'today', week: 4, timer: null, left: 0, test: null };
+  try { var saved = JSON.parse(localStorage.getItem('wayback') || '{}'); if (saved.rules) state.rules = saved.rules; if (typeof saved.week === 'number') state.week = saved.week; } catch (e) {}
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function save() { try { localStorage.setItem('wayback', JSON.stringify({ rules: state.rules, week: state.week })); } catch (e) {} }
+
+  function spark(values, hi) {
+    var w = 200, h = 44, pad = 4, max = Math.max.apply(null, values.concat([USUAL.gale + 8]));
+    var step = (w - pad * 2) / (values.length - 1);
+    var pts = values.map(function (v, i) { return [pad + i * step, h - pad - (v / max) * (h - pad * 2)]; });
+    var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    var area = d + ' L' + pts[pts.length - 1][0].toFixed(1) + ' ' + (h - pad) + ' L' + pad + ' ' + (h - pad) + ' Z';
+    var dot = pts[hi];
+    return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" role="img" aria-label="Offers per week">' +
+      '<path d="' + area + '" fill="var(--accent-soft)"/>' +
+      '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="2"/>' +
+      '<circle cx="' + dot[0].toFixed(1) + '" cy="' + dot[1].toFixed(1) + '" r="4" fill="var(--accent)"/></svg>';
+  }
+
+  function miteNote(r, w) {
+    var m = DATA[r].mite;
+    if (r === 'today') return '<div class="note none">No explanation shown. Kip can only guess why Mite has gone quiet.</div>';
+    var no = m.offers[w] - m.taken[w] - m.late[w];
+    if (w === RELEASE) return '<div class="note busy"><b>Rough week:</b> missed ' + (m.offers[w] - m.taken[w]) + ' of ' + m.offers[w] + ' offers, ' + m.late[w] + ' ran out of time. <span>Standing holding: missing costs less than saying no.</span></div>';
+    return '<div class="note ok"><b>In the rotation:</b> ' + m.offers[w] + ' offers, ' + m.taken[w] + ' taken. ' + (w > RELEASE ? 'Back to normal after the 10 Aug week.' : 'Normal week.') + '</div>';
+  }
+  function galeNote(r, w) {
+    var g = DATA[r].gale;
+    if (r === 'today') return '<div class="note none">No workload warning. Kip only hears The Gale is "exhausted" when he says so.</div>';
+    var over = g.offers[w] > USUAL.gale * 1.2;
+    return over
+      ? '<div class="note busy"><b>Busy week:</b> ' + g.offers[w] + ' offers, above his usual ' + USUAL.gale + '.</div>'
+      : '<div class="note ok"><b>Normal load:</b> ' + g.offers[w] + ' offers (usual ' + USUAL.gale + ').</div>';
+  }
+
+  function card(name, key) {
+    var r = state.rules, w = state.week, d = DATA[r][key];
+    var offerLive = state.test && key === 'mite';
+    var quiet = key === 'mite' && r === 'today' && d.offers[w] <= 2;
+    return '<div class="top"><h3>' + name + '</h3><span class="badge' + (offerLive ? ' offer' : '') + '">' + (offerLive ? 'Offer live' : 'Available') + '</span></div>' +
+      '<div class="stat"><span class="n">' + d.offers[w] + '</span><span class="muted">offers this week · ' + d.taken[w] + ' taken</span></div>' +
+      spark(d.offers, w) +
+      (key === 'mite' ? miteNote(r, w) : galeNote(r, w)) +
+      (quiet ? '<p class="muted" style="font-size:.85rem">Mite has texted Kip asking if something is broken.</p>' : '');
+  }
+
+  function phoneHome() {
+    var r = state.rules, w = state.week, m = DATA[r].mite;
+    if (r === 'today') {
+      var last = m.quietDays[w] ? m.quietDays[w] + ' days ago' : 'today';
+      return '<div class="pcard"><span class="eyebrow">Status</span><h3>Available ✓</h3><p class="muted">Last offer: ' + last + '</p></div>' +
+        '<div class="pcard"><span class="eyebrow">Your history</span><p class="muted">Not available. Responders can\'t see their own offers today.</p></div>' +
+        (m.offers[w] <= 2 ? '<p class="thought">"is my account broken?"</p>' : '');
+    }
+    var no = Math.max(0, m.offers[w] - m.taken[w] - m.late[w]);
+    var pct = Math.round(m.standing[w] * 100);
+    var label = m.standing[w] >= 0.75 ? 'Good: you\'re in the rotation' : m.standing[w] >= 0.5 ? 'Recovering' : 'Low, climbing back each week';
+    var items = [];
+    for (var i = 0; i < Math.min(3, m.taken[w]); i++) items.push(['Took it', 'yes']);
+    for (i = 0; i < Math.min(2, m.late[w]); i++) items.push(['Ran out of time', 'late']);
+    if (no > 0) items.push(['Said no', 'no']);
+    var hist = items.slice(0, 5).map(function (it, i) {
+      return '<li><span>Callout ' + (i + 1) + '</span><span class="tag ' + it[1] + '">' + it[0] + '</span></li>';
+    }).join('');
+    return '<div class="pcard"><span class="eyebrow">This week</span><h3>' + m.offers[w] + ' offers · ' + m.taken[w] + ' taken</h3>' +
+      '<p class="muted" style="font-size:.88rem">' + m.late[w] + ' ran out of time · ' + no + ' said no</p></div>' +
+      '<div class="pcard"><span class="eyebrow">Your standing</span><div class="meter" aria-label="Standing ' + pct + '%"><i style="width:' + pct + '%"></i></div><p style="font-size:.9rem">' + label + '</p>' +
+      '<p class="muted" style="font-size:.82rem">A slow week fades. Running out of time costs less than saying no.</p></div>' +
+      '<div class="pcard"><span class="eyebrow">Recent offers</span><ul class="hist">' + hist + '</ul></div>';
+  }
+
+  function banner() {
+    var b = $('banner');
+    if (state.rules === 'today') {
+      b.className = 'banner today';
+      b.innerHTML = state.week >= 2
+        ? '<b>Today\'s rules, week of ' + WEEKS[state.week] + ':</b> Mite gets ' + DATA.today.mite.offers[state.week] + ' offer(s) and The Gale gets ' + DATA.today.gale.offers[state.week] + '. Nobody can see why.'
+        : '<b>Today\'s rules, week of ' + WEEKS[state.week] + ':</b> ' + (state.week === RELEASE ? '4.2 ships on Wednesday. The answer window drops from 90s to 60s, and Mite misses 6 of 10.' : 'A normal week. Both responders are busy.');
+    } else {
+      b.className = 'banner proposed';
+      b.innerHTML = '<b>Proposed fix, week of ' + WEEKS[state.week] + ':</b> ' + (state.week === RELEASE ? 'Mite still has a rough week, but running out of time costs less, so his standing holds.' : state.week > RELEASE ? 'Mite stays in the rotation and The Gale\'s load evens out.' : 'A normal week. Nothing changes for responders who are doing fine.');
+    }
+  }
+
+  function render() {
+    $('rules-today').setAttribute('aria-pressed', state.rules === 'today');
+    $('rules-proposed').setAttribute('aria-pressed', state.rules === 'proposed');
+    Array.prototype.forEach.call($('weeks').children, function (b, i) { b.setAttribute('aria-pressed', i === state.week); });
+    $('console-week').textContent = 'Week of ' + WEEKS[state.week];
+    $('card-mite').innerHTML = card('Meteor Mite', 'mite');
+    $('card-gale').innerHTML = card('The Gale', 'gale');
+    $('phone-body').innerHTML = phoneHome();
+    banner();
+    renderAlert();
+    $('send').disabled = !!state.test;
+  }
+
+  function renderAlert() {
+    var slot = $('alert-slot');
+    if (!state.test) { slot.innerHTML = ''; return; }
+    if (state.rules === 'today') {
+      slot.innerHTML = '<div class="note none">Kip gets no alert. He finds out afterwards, if at all.</div>';
+      return;
+    }
+    slot.innerHTML = '<div class="alert" role="alert"><div><b>Offer live for Meteor Mite</b><br><span class="muted">Water rescue · help him catch it</span></div><span class="t" id="alert-t">' + state.left + 's</span></div>';
+  }
+
+  function startOffer() {
+    if (state.test) return;
+    var today = state.rules === 'today';
+    state.test = { today: today };
+    state.left = today ? 15 : 60;
+    $('count').textContent = state.left;
+    $('count').classList.toggle('low', today);
+    $('count-sub').textContent = today ? 'seconds left. This offer reached the phone 45s after it was sent.' : 'seconds to answer, counted from when it reached the phone';
+    $('count-pending').textContent = today ? 'Example of late delivery: unconfirmed (H2)' : 'Pending: Wen to confirm delivery timing';
+    $('incoming').hidden = false;
+    render();
+    state.timer = setInterval(function () {
+      state.left -= 1;
+      $('count').textContent = state.left;
+      $('count').classList.toggle('low', state.left <= 15);
+      var at = document.getElementById('alert-t'); if (at) at.textContent = state.left + 's';
+      if (state.left <= 0) finish('late');
+    }, 250);
+  }
+
+  function finish(outcome) {
+    clearInterval(state.timer); state.timer = null;
+    var today = state.test.today;
+    $('incoming').hidden = true;
+    var msg;
+    if (outcome === 'yes') msg = '<b>Mite took it.</b> Standing +0.08 under both rules.';
+    else if (outcome === 'no') msg = '<b>Mite said no.</b> Standing −0.12 under both rules.';
+    else msg = today
+      ? '<b>Mite ran out of time.</b> Today that costs −0.12, exactly the same as saying no, and pushes him further down the list.'
+      : '<b>Mite ran out of time.</b> Under the proposal that costs −0.04, a third of a "no", and his standing keeps climbing back each week.';
+    $('last-outcome').innerHTML = msg + (today ? ' <span class="muted">He can\'t see any of this on his phone.</span>' : ' <span class="muted">This would show up in "Recent offers" on his phone.</span>');
+    state.test = null;
+    render();
+  }
+
+  WEEKS.forEach(function (wk, i) {
+    var b = document.createElement('button');
+    b.textContent = wk + (i === RELEASE ? ' · 4.2' : '');
+    b.addEventListener('click', function () { state.week = i; save(); render(); });
+    $('weeks').appendChild(b);
+  });
+  $('rules-today').addEventListener('click', function () { if (state.test) return; state.rules = 'today'; save(); render(); });
+  $('rules-proposed').addEventListener('click', function () { if (state.test) return; state.rules = 'proposed'; save(); render(); });
+  $('send').addEventListener('click', startOffer);
+  $('accept').addEventListener('click', function () { finish('yes'); });
+  $('decline').addEventListener('click', function () { finish('no'); });
+
+  render();
+})();
+</script>
