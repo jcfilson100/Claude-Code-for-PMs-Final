@@ -137,6 +137,15 @@
   .incoming .accept { background: var(--good); color: #fff; }
   .incoming .decline { background: var(--sunk); color: var(--ink); }
   .pending { font-size: .78rem; font-weight: 700; color: var(--amber); }
+  .coming { background: var(--amber-soft); color: var(--amber); border: 2px solid var(--amber); }
+  .coming:disabled { opacity: 1; background: var(--good-soft); color: var(--good); border-color: var(--good); cursor: default; }
+  .linkbtn { font: 700 .92rem/1.2 var(--body); background: var(--accent-soft); color: var(--accent); border: 0; border-radius: 12px; padding: 12px; cursor: pointer; text-align: left; }
+  .preview-tag { font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+  .whyscreen { position: absolute; inset: 0; background: var(--phone-screen); padding: 22px 16px; display: grid; gap: 12px; align-content: start; overflow-y: auto; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: .92rem; }
+  .checks li { display: grid; grid-template-columns: 26px 1fr; gap: 6px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .checks .ok { color: var(--good); font-weight: 800; }
+  .checks .bad { color: var(--warn); font-weight: 800; }
   .thought { font-style: italic; color: var(--muted); text-align: center; font-size: .92rem; }
 
   /* Behind the scenes */
@@ -160,6 +169,7 @@
     <div class="eyebrow">Rook Dispatch · clickable prototype for Helen · draft</div>
     <h1>A way back for quiet responders</h1>
     <p class="lede">Flip between <b>today's rules</b> and the <b>proposed fix</b>, step through August, and send Meteor Mite a test offer. On the left is what Kip sees on his console. On the right is what Mite sees on his phone.</p>
+    <p class="lede"><b>Also try:</b> tap <b>"I'm coming"</b> during a test offer (proposed fix), and <b>"Why haven't I had offers?"</b> on Mite's phone (both modes; under today's rules it previews the new screen with his real situation).</p>
   </header>
 
   <section class="controls" aria-label="Simulation controls">
@@ -210,11 +220,14 @@
             <div class="count" id="count">60</div>
             <p class="muted" id="count-sub">seconds to answer</p>
             <p class="pending" id="count-pending"></p>
+            <button class="btn coming" id="coming">I'm coming · +30s</button>
+            <p class="muted" id="coming-none" style="font-size:.85rem" hidden>No way to ask for more time today.</p>
             <div class="row">
               <button class="btn decline" id="decline">Decline</button>
               <button class="btn accept" id="accept">Accept</button>
             </div>
           </div>
+          <div class="whyscreen" id="why" hidden></div>
         </div>
       </div>
       <p class="muted" style="font-size:.85rem;text-align:center">Test offers run 4× faster than real time.</p>
@@ -334,7 +347,8 @@
       var last = m.quietDays[w] ? m.quietDays[w] + ' days ago' : 'today';
       return '<div class="pcard"><span class="eyebrow">Status</span><h3>Available ✓</h3><p class="muted">Last offer: ' + last + '</p></div>' +
         '<div class="pcard"><span class="eyebrow">Your history</span><p class="muted">Not available. Responders can\'t see their own offers today.</p></div>' +
-        (m.offers[w] <= 2 ? '<p class="thought">"is my account broken?"</p>' : '');
+        (m.offers[w] <= 2 ? '<p class="thought">"is my account broken?"</p>' : '') +
+        '<button class="linkbtn" id="whybtn"><span class="preview-tag">Preview · new screen</span><br>Why haven\'t I had offers?</button>';
     }
     var no = Math.max(0, m.offers[w] - m.taken[w] - m.late[w]);
     var pct = Math.round(m.standing[w] * 100);
@@ -350,7 +364,38 @@
       '<p class="muted" style="font-size:.88rem">' + m.late[w] + ' ran out of time · ' + no + ' said no</p></div>' +
       '<div class="pcard"><span class="eyebrow">Your standing</span><div class="meter" aria-label="Standing ' + pct + '%"><i style="width:' + pct + '%"></i></div><p style="font-size:.9rem">' + label + '</p>' +
       '<p class="muted" style="font-size:.82rem">A slow week fades. Running out of time costs less than saying no.</p></div>' +
-      '<div class="pcard"><span class="eyebrow">Recent offers</span><ul class="hist">' + hist + '</ul></div>';
+      '<div class="pcard"><span class="eyebrow">Recent offers</span><ul class="hist">' + hist + '</ul></div>' +
+      '<button class="linkbtn" id="whybtn"><span class="preview-tag">New</span><br>Why haven\'t I had offers?</button>';
+  }
+
+  // "Why haven't I had offers?" self-check. Shows only Mite's own record.
+  function renderWhy() {
+    var r = state.rules, w = state.week, m = DATA[r].mite;
+    var pct = Math.round(m.standing[w] * 100);
+    var hadBadWeek = w >= RELEASE;
+    var rel = DATA[r].mite, relMissed = rel.offers[RELEASE] - rel.taken[RELEASE], relLate = rel.late[RELEASE];
+    var missItem;
+    if (!hadBadWeek) missItem = '<li><span class="ok">✓</span><span>No recent missed offers.</span></li>';
+    else if (r === 'today') missItem = '<li><span class="bad">✗</span><span><b>Missed offers on the week of 10 Aug:</b> ' + relMissed + ' of ' + rel.offers[RELEASE] + ' (example split: ' + relLate + ' ran out of time, ' + (relMissed - relLate) + ' said no). That lowered your standing, so you\'ve been asked less since, and missed the few that came.</span></li>';
+    else missItem = '<li><span class="ok">✓</span><span><b>A rough week on 10 Aug:</b> ' + relMissed + ' of ' + rel.offers[RELEASE] + ' missed, ' + relLate + ' ran out of time. Running out of time costs less, so your standing held.</span></li>';
+    var next = r === 'today'
+      ? (m.standing[w] < 0.8
+          ? '<b>What happens next:</b> today, the only way back is to take offers, and you rarely get one. <b>With the fix</b>, you\'d get a fresh start and your standing would recover each week.'
+          : '<b>What happens next:</b> nothing to do. You\'re getting offers normally.')
+      : '<b>What happens next:</b> nothing to do. You\'re in the rotation.';
+    $('why').innerHTML =
+      '<span class="preview-tag">' + (r === 'today' ? 'Preview · new screen, with today\'s real situation' : 'New screen') + '</span>' +
+      '<h3>Why haven\'t I had offers?</h3>' +
+      '<ul class="checks">' +
+        '<li><span class="ok">✓</span><span>You\'re marked <b>available</b>.</span></li>' +
+        '<li><span class="ok">✓</span><span>Your <b>skills are in demand</b>: there were jobs that needed them this week.</span></li>' +
+        missItem +
+        '<li><span class="' + (m.standing[w] >= 0.8 ? 'ok">✓' : 'bad">✗') + '</span><span><b>Your standing:</b> ' + pct + '%<div class="meter" style="margin-top:6px"><i style="width:' + pct + '%"></i></div></span></li>' +
+      '</ul>' +
+      '<div class="pcard" style="font-size:.92rem">' + next + '</div>' +
+      '<p class="muted" style="font-size:.82rem">Your account isn\'t broken. Kip sees the same explanation on his console.</p>' +
+      '<button class="btn ghost" id="whyback">Back</button>';
+    $('why').hidden = false;
   }
 
   function banner() {
@@ -386,7 +431,19 @@
       slot.innerHTML = '<div class="note none">Kip gets no alert. He finds out afterwards, if at all.</div>';
       return;
     }
-    slot.innerHTML = '<div class="alert" role="alert"><div><b>Offer live for Meteor Mite</b><br><span class="muted">Water rescue · help him catch it</span></div><span class="t" id="alert-t">' + state.left + 's</span></div>';
+    slot.innerHTML = '<div class="alert" role="alert"><div><b>Offer live for Meteor Mite</b><br><span class="muted" id="alert-sub">' +
+      (state.test.extended ? 'Mite tapped "I\'m coming" · +30s' : 'Water rescue · help him catch it') +
+      '</span></div><span class="t" id="alert-t">' + state.left + 's</span></div>';
+  }
+
+  function imComing() {
+    if (!state.test || state.test.today || state.test.extended) return;
+    state.test.extended = true;
+    state.left += 30;
+    $('count').textContent = state.left;
+    $('coming').disabled = true;
+    $('coming').textContent = 'On your way ✓ +30s added';
+    renderAlert();
   }
 
   function startOffer() {
@@ -398,6 +455,11 @@
     $('count').classList.toggle('low', today);
     $('count-sub').textContent = today ? 'seconds left. This offer reached the phone 45s after it was sent.' : 'seconds to answer, counted from when it reached the phone';
     $('count-pending').textContent = today ? 'Example of late delivery: unconfirmed (H2)' : 'Pending: Wen to confirm delivery timing';
+    $('coming').hidden = today;
+    $('coming').disabled = false;
+    $('coming').textContent = 'I\'m coming · +30s';
+    $('coming-none').hidden = !today;
+    $('why').hidden = true;
     $('incoming').hidden = false;
     render();
     state.timer = setInterval(function () {
@@ -419,6 +481,7 @@
     else msg = today
       ? '<b>Mite ran out of time.</b> Today that costs −0.12, exactly the same as saying no, and pushes him further down the list.'
       : '<b>Mite ran out of time.</b> Under the proposal that costs −0.04, a third of a "no", and his standing keeps climbing back each week.';
+    if (state.test.extended) msg += ' He tapped <b>"I\'m coming"</b> and got 30 more seconds. Kip saw it too.';
     $('last-outcome').innerHTML = msg + (today ? ' <span class="muted">He can\'t see any of this on his phone.</span>' : ' <span class="muted">This would show up in "Recent offers" on his phone.</span>');
     state.test = null;
     render();
@@ -433,6 +496,11 @@
   $('rules-today').addEventListener('click', function () { if (state.test) return; state.rules = 'today'; save(); render(); });
   $('rules-proposed').addEventListener('click', function () { if (state.test) return; state.rules = 'proposed'; save(); render(); });
   $('send').addEventListener('click', startOffer);
+  $('coming').addEventListener('click', imComing);
+  $('screen').addEventListener('click', function (e) {
+    if (e.target.closest('#whybtn')) renderWhy();
+    if (e.target.closest('#whyback')) $('why').hidden = true;
+  });
   $('accept').addEventListener('click', function () { finish('yes'); });
   $('decline').addEventListener('click', function () { finish('no'); });
 

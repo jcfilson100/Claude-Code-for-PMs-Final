@@ -633,6 +633,96 @@ misses on top.
 > (old vs new weights at 90s) to confirm the "softened" part for decliners. Our sample can't show
 > it, because nobody had a low score before 12 Aug.
 
+## What we'd build, and testing it in a simulator (5 Oct)
+
+*In plain words.* Helen asked what we'd actually build, from the point of view of the people it
+happens to, not a setting change (`05-super-speed/director-request.txt`). We made three things,
+all in `05-super-speed/`.
+
+| File | What it is |
+|---|---|
+| `brief.md` | One page for Helen: what a quiet responder would feel, and what a handler like Kip would notice |
+| `prototype.html` | Clickable before and after: Kip's console and Meteor Mite's phone, under today's rules vs the fix, with a test offer |
+| `recovery-simulator.html` | Change the scoring rules and replay all 16 heroes from 3 Aug to 28 Sep, to see who gets stuck and who comes back |
+
+### The proposed fix
+
+| Part | What it does |
+|---|---|
+| **Gentler penalty for "ran out of time"** | −0.04 instead of −0.12. Saying no still costs −0.12. |
+| **A way back** | A low standing climbs 0.05 a week, but **only up to the middle (0.5)**. This answers both sides of Wen's 2019 question: a bad month fades, but someone who has stopped working doesn't jump to the front. |
+| **A fresh start** | A one-time fresh start, **back to a full standing**, for heroes stuck since 12 Aug |
+| **Clock starts on arrival** | The answer clock starts when the phone receives the offer *(pending Wen)* |
+| **People can see what's happening** | Heroes see their own offers and standing. Helpers see why someone has gone quiet, and get an alert when an offer is live. |
+
+### Checking the simulator against reality
+
+With **today's rules**, the simulator gets exactly the same four heroes stuck as the real chart
+(Farlight, Meteor Mite, The Undertow, Vesper), and Mite's offers fall 10 → 4 → 2 → 1, as in the
+real data. That gives us some trust in it. But it's **an illustration, not a forecast**:
+- The "fewer offers when your standing drops" steps were tuned to match the chart.
+- It doesn't move work between heroes, model distance, or change the 60-second answer time.
+
+### What it showed
+
+| Rules (switched on 7 Sep) | Stuck on 28 Sep | Stuck four back? | Someone who stopped working (Wen's test) |
+|---|---|---|---|
+| Today | 4 of 16 | 0 of 4 | Stays low ✓ |
+| Recovery only | **Still 4 of 16** | **0 of 4** | Stays low ✓ |
+| Fresh start only to the middle (0.5) | **Still 4 of 16** | **0 of 4** | Stays low ✓ |
+| **Proposed** (all parts, fresh start to full) | **0 of 16** | **4 of 4, from 7 Sep** | Stays low ✓ |
+
+**Three lessons:**
+1. **Recovery alone doesn't free heroes who are already stuck.** They get so few offers that they
+   keep missing them, and the misses cancel out the weekly recovery. The obvious fix to Wen's note
+   isn't enough on its own.
+2. **The fresh start has to be a full one.** At the middle, heroes still get too few offers and
+   slide back.
+3. **The proposed rules pass both of Wen's tests:** nobody stays stuck after a bad week, and
+   someone who has stopped working stays low.
+
+### Stress test: does it depend on why heroes missed?
+
+We don't know how many misses were "ran out of time" vs a deliberate "no" (H4). So we ran the
+proposed rules with every guess:
+
+| Share of misses that were "ran out of time" | Switched on now (7 Sep), with a fresh start | If the rules had been live from 12 Aug |
+|---|---|---|
+| 0% | 0 stuck ✓ | **4 stuck** ✗ |
+| 30% | 0 stuck ✓ | **3 stuck** ✗ |
+| 50% | 0 stuck ✓ | **1 stuck** ✗ |
+| 80% | 0 stuck ✓ | 0 stuck ✓ |
+| 100% | 0 stuck ✓ | 0 stuck ✓ |
+
+**What this means:**
+- **The fresh start rescues today's stuck heroes every time,** whatever the reason they missed.
+- **Stopping it happening *again* depends on why heroes missed.** If they were mostly too slow,
+  the gentler penalty protects them. If they mostly said no, the same thing would happen at the
+  next bad week.
+- **The scoring fix treats the symptom. The answer-time fix treats the cause.** To prevent the
+  next freeze-out, we still need to fix why heroes missed: the 60-second window, or late
+  delivery (H1 and H2).
+- **H4 just became more important.** Wen's split of "ran out of time" vs "said no" now decides
+  whether the scoring change prevents future freeze-outs. Ask for it alongside H1 and H2.
+
+### Confidence
+
+| | Score | Why |
+|---|---|---|
+| **Freeing the four stuck heroes now** | **85** | Works under every guess we tried |
+| **Stopping it happening again** | **60** | Depends on H4 and on fixing the answer time (H1, H2) |
+| The one-pager answers Helen's ask | 85 | Add the simulator's lessons to make it stronger |
+| The prototype was the right thing to build | 85 | The simulator caught two design mistakes we'd otherwise have shipped |
+| **Overall** | **78** | Up from 75 before the simulator |
+
+**What still caps it:** the simulator is our own model, tuned to match an unverified chart. It
+can show which designs fail, but not prove which one works. Wen's real replay of August is still
+the real test.
+
+**One line for the brief:** "We tested the fix in a simulator. A fresh start frees everyone stuck
+today, but stopping it happening again also needs the answer-time fix, not just scoring
+changes."
+
 ## Open questions (for Ravi and Wen)
 
 *See the table "Information needed to settle it" above for the fuller list from the
