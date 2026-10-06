@@ -1,0 +1,344 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recovery Rule Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  :root {
+    --ground: #F3F5F7; --surface: #FFFFFF; --sunk: #EAEEF2; --ink: #17222E; --muted: #55626F; --line: #D9DFE5;
+    --accent: #0E6E6B; --accent-soft: #E1F1F0; --warn: #C2410C; --warn-soft: #FDEBDD; --amber: #A16207;
+    --amber-soft: #FBF1D6; --good: #15803D; --good-soft: #E3F4E8; --faint: #B8C2CC; --today: #8A96A3;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC; --line: #2C3844;
+      --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217; --amber: #E8B64A;
+      --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F; --faint: #3E4C59; --today: #7C8996;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC; --line: #2C3844;
+    --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217; --amber: #E8B64A;
+    --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F; --faint: #3E4C59; --today: #7C8996;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--body); }
+  .wrap { max-width: 1160px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 22px; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
+  h2 { font-size: 1.2rem; font-weight: 800; }
+  h3 { font-size: 1rem; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  .lede { color: var(--muted); max-width: 72ch; }
+  .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; }
+  .controls { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+  @media (max-width: 900px) { .controls { position: static; } }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; }
+  .presets button, .seg button {
+    font: 700 .85rem/1 var(--body); border: 1px solid var(--line); background: var(--sunk); color: var(--ink);
+    padding: 9px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .presets button[aria-pressed="true"], .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .field { display: grid; gap: 4px; }
+  .field .row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .field label { font-weight: 700; font-size: .92rem; }
+  .field output { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); }
+  .field small { color: var(--muted); font-size: .8rem; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .check { display: flex; gap: 8px; align-items: center; font-weight: 700; font-size: .92rem; }
+  .divider { border-top: 1px solid var(--line); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+  .tile .big { font: 800 2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .tile .cmp { font-size: .85rem; color: var(--muted); }
+  .pill { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.bad { background: var(--warn-soft); color: var(--warn); }
+  .pill.mid { background: var(--amber-soft); color: var(--amber); }
+  .chart-wrap { overflow-x: auto; }
+  svg.chart { width: 100%; min-width: 560px; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--muted); align-items: center; }
+  .legend i { display: inline-block; width: 22px; height: 3px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+  .pick { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pick button { font: 700 .8rem/1 var(--body); border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 10px; border-radius: 999px; cursor: pointer; }
+  .pick button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  td.n { font-variant-numeric: tabular-nums; text-align: right; }
+  th.n { text-align: right; }
+  .finding { border-left: 5px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+  .finding.bad { border-color: var(--warn); background: var(--warn-soft); }
+  .notes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); font-size: .92rem; }
+  .notes > div { border-top: 3px solid var(--line); padding-top: 10px; display: grid; gap: 6px; }
+  .notes ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <div class="eyebrow">Rook Dispatch · prototype · illustrative model</div>
+    <h1>Recovery rule simulator</h1>
+    <p class="lede">Change the scoring rules and replay the 16 heroes in our sample from 3 Aug to 28 Sep. See who gets stuck, who comes back, and whether someone who has stopped working stays low, as Wen wanted.</p>
+  </header>
+
+  <div class="layout">
+    <aside class="panel controls" aria-label="Rules">
+      <div style="display:grid;gap:8px">
+        <h2>Rules</h2>
+        <div class="presets" role="group" aria-label="Presets">
+          <button data-preset="today">Today</button>
+          <button data-preset="recovery">Recovery only</button>
+          <button data-preset="proposed">Proposed</button>
+        </div>
+      </div>
+      <div class="field"><div class="row"><label for="yes">Points for a yes</label><output id="yes-o"></output></div><input id="yes" type="range" min="0.02" max="0.2" step="0.01"></div>
+      <div class="field"><div class="row"><label for="no">Points off for a "no"</label><output id="no-o"></output></div><input id="no" type="range" min="0" max="0.2" step="0.01"></div>
+      <div class="field"><div class="row"><label for="late">Points off for running out of time</label><output id="late-o"></output></div><input id="late" type="range" min="0" max="0.2" step="0.01"><small>Today this is the same as a "no".</small></div>
+      <div class="field"><div class="row"><label for="rec">Weekly recovery for a low standing</label><output id="rec-o"></output></div><input id="rec" type="range" min="0" max="0.2" step="0.01"><small>Added each week while standing is below the cap.</small></div>
+      <div class="field"><div class="row"><label>Recovery stops at</label></div>
+        <div class="seg" role="group" aria-label="Recovery cap" id="cap">
+          <button data-v="0.5">0.5 (middle)</button><button data-v="0.75">0.75</button><button data-v="1">1.0 (top)</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="field"><div class="row"><label>New rules start</label></div>
+        <div class="seg" role="group" aria-label="Start" id="start">
+          <button data-v="1">12 Aug (what if)</button><button data-v="5">7 Sep (switch on now)</button>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="fresh"> One-time fresh start for anyone stuck</label>
+      <div class="field" id="fresh-level-f"><div class="row"><label>Fresh start puts them back at</label></div>
+        <div class="seg" role="group" aria-label="Fresh start level" id="freshlvl">
+          <button data-v="0.5">0.5 (middle)</button><button data-v="1">1.0 (top)</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="field"><div class="row"><label for="share">Assumption: misses that were "ran out of time"</label><output id="share-o"></output></div><input id="share" type="range" min="0" max="1" step="0.05"><small>Unknown until Wen's offer log (H4). The rest count as a "no".</small></div>
+    </aside>
+
+    <main style="display:grid;gap:18px;min-width:0">
+      <section class="tiles" aria-label="Results" id="tiles"></section>
+      <div id="finding"></div>
+
+      <section class="panel" aria-label="Standing over time">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+          <h2>Standing over time</h2>
+          <div class="legend">
+            <span><i style="background:var(--accent)"></i>with these rules</span>
+            <span><i style="background:var(--today);height:2px"></i>today's rules</span>
+            <span><i style="background:var(--warn)"></i>stopped working (Wen's test)</span>
+          </div>
+        </div>
+        <div class="pick" role="group" aria-label="Pick a hero" id="pick"></div>
+        <div class="chart-wrap"><svg class="chart" id="chart" viewBox="0 0 720 300" role="img" aria-label="Standing over time"></svg></div>
+        <p class="muted" style="font-size:.85rem">Faint lines show the other 15 heroes. Above the green line means full rotation; below the orange line means stuck.</p>
+      </section>
+
+      <section class="panel" aria-label="All heroes">
+        <h2>All 16 heroes on 28 Sep</h2>
+        <div style="overflow-x:auto"><table id="table"></table></div>
+      </section>
+
+      <section class="notes" aria-label="How the model works">
+        <div>
+          <h3>How it works</h3>
+          <ul>
+            <li><b>Before 4.2</b> everyone said yes 60%+ of the time, so all heroes start at 1.0.</li>
+            <li><b>10 Aug week:</b> real offers and yeses from the chart.</li>
+            <li><b>After that</b>, offers depend on standing: 0.8+ full · 0.6–0.8 40% · 0.3–0.6 20% · under 0.3 8%. Heroes in full rotation say yes at about their usual rate; heroes who rarely get offers catch only 15% (they're caught off guard).</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Check against reality</h3>
+          <p>With <b>today's rules</b> this model reproduces what the chart shows. The same four heroes get stuck (Farlight, Meteor Mite, The Undertow, Vesper), and Mite's offers fall 10 → 4 → 2 → 1, as in the real data.</p>
+        </div>
+        <div>
+          <h3>What it isn't</h3>
+          <ul>
+            <li><b>An illustration, not a forecast.</b> The rotation steps are tuned to match the chart, not taken from the code.</li>
+            <li>It doesn't move work between heroes, model distance, or change the 60s answer time.</li>
+            <li>Uses the 16-hero sample (unverified). Wen's replay is the real test.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  var WEEKS = ['3 Aug', '10 Aug', '17 Aug', '24 Aug', '31 Aug', '7 Sep', '14 Sep', '21 Sep', '28 Sep'];
+  // name, usual offers/wk, usual yes rate (pre-4.2), release week [sent, taken]
+  var HEROES = [
+    ['Captain Vantage', 12.0, .74, 13, 8], ['Cindermark', 9.0, .80, 10, 6], ['Corporal Ashgrove', 10.0, .78, 10, 6],
+    ['Farlight', 12.0, .74, 10, 4], ['Halfmoon', 11.0, .73, 11, 6], ['Ironvale', 8.0, .77, 9, 5],
+    ['Meteor Mite', 11.2, .69, 10, 4], ['Nightwell', 15.0, .76, 16, 9], ['Sgt. Bulwark', 9.0, .76, 10, 5],
+    ['Sgt. Falkirk', 10.0, .80, 11, 7], ['Stormwrack', 13.0, .79, 14, 8], ['The Drift', 6.2, .84, 7, 4],
+    ['The Gale', 13.0, .78, 15, 9], ['The Longcast', 7.2, .74, 8, 5], ['The Undertow', 12.0, .78, 11, 4],
+    ['Vesper', 13.8, .82, 12, 6]
+  ];
+  var FOUR = ['Farlight', 'Meteor Mite', 'The Undertow', 'Vesper'];
+  var TODAY = { yes: .08, no: .12, late: .12, rec: 0, cap: .5 };
+  var PRESETS = {
+    today: { yes: .08, no: .12, late: .12, rec: 0, cap: .5, start: 5, fresh: false, freshLvl: 1 },
+    recovery: { yes: .08, no: .12, late: .12, rec: .05, cap: .5, start: 5, fresh: false, freshLvl: 1 },
+    proposed: { yes: .08, no: .12, late: .04, rec: .05, cap: .5, start: 5, fresh: true, freshLvl: 1 }
+  };
+  var S = Object.assign({ share: .8, preset: 'proposed', pick: 'Meteor Mite' }, PRESETS.proposed);
+  try { var sv = JSON.parse(localStorage.getItem('recsim') || 'null'); if (sv) Object.assign(S, sv); } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+
+  function factor(s) { return s >= .8 ? 1 : s >= .6 ? .4 : s >= .3 ? .2 : .08; }
+  // round to 6 places so 0.8000000001 / 0.7999999999 float noise can't flip a threshold
+  function clamp(x) { return Math.round(Math.max(0, Math.min(1, x)) * 1e6) / 1e6; }
+
+  // simulate one hero; rules applied from startIdx, today's rules before
+  function sim(h, R, opts) {
+    var usual = h[1], rate = h[2], s = 1, out = [], offers = [];
+    for (var w = 0; w < WEEKS.length; w++) {
+      var on = w >= R.start, r = on ? R : TODAY;
+      if (on && w === R.start && R.fresh && R.start > 1 && s < .6) s = Math.max(s, R.freshLvl);
+      var sent, taken;
+      if (opts && opts.stopped) { sent = usual * (w === 0 ? 1 : factor(s)); taken = w === 0 ? sent * .75 : 0; }
+      else if (w === 0) { sent = usual; taken = usual * rate; }
+      else if (w === 1) { sent = h[3]; taken = h[4]; }
+      else { sent = usual * factor(s); taken = sent * (s >= .8 ? rate * .92 : .15); }
+      var miss = sent - taken, lateN = (opts && opts.stopped) ? 0 : miss * S.share, noN = miss - lateN;
+      s = clamp(s + r.yes * taken - r.no * noN - r.late * lateN);
+      if (r.rec > 0 && s < r.cap) s = Math.min(r.cap, s + r.rec);
+      out.push(s); offers.push(sent);
+    }
+    return { s: out, offers: offers };
+  }
+
+  function status(s) { return s >= .8 ? ['Full rotation', 'good'] : s >= .6 ? ['Reduced', 'mid'] : ['Stuck', 'bad']; }
+
+  function run() {
+    var R = { yes: S.yes, no: S.no, late: S.late, rec: S.rec, cap: S.cap, start: S.start, fresh: S.fresh, freshLvl: S.freshLvl };
+    var T = Object.assign({}, PRESETS.today);
+    var res = HEROES.map(function (h) { return { h: h, now: sim(h, R), today: sim(h, T) }; });
+    var stoppedH = ['Stopped working', 10, .75, 10, 0];
+    return { R: R, res: res, stopped: sim(stoppedH, R, { stopped: true }), stoppedToday: sim(stoppedH, T, { stopped: true }) };
+  }
+
+  function tiles(r) {
+    var last = WEEKS.length - 1;
+    var stuck = r.res.filter(function (x) { return x.now.s[last] < .6; }).length;
+    var stuckT = r.res.filter(function (x) { return x.today.s[last] < .6; }).length;
+    var back = r.res.filter(function (x) { return FOUR.indexOf(x.h[0]) > -1 && x.now.s[last] >= .8; }).length;
+    var mite = r.res.filter(function (x) { return x.h[0] === 'Meteor Mite'; })[0];
+    var wk = null; for (var w = 2; w <= last; w++) if (mite.now.s[w] >= .8) { wk = WEEKS[w]; break; }
+    var dropped = mite.now.s.slice(1).some(function (v) { return v < .8; });
+    var stop = r.stopped.s[last];
+    var html =
+      tile('Stuck on 28 Sep', stuck + ' of 16', 'Today\'s rules: ' + stuckT + ' of 16', stuck === 0 ? 'good' : stuck < stuckT ? 'mid' : 'bad') +
+      tile('Stuck four back in full rotation', back + ' of 4', 'Farlight, Meteor Mite, The Undertow, Vesper', back === 4 ? 'good' : back > 0 ? 'mid' : 'bad') +
+      tile('Meteor Mite in full rotation', !dropped ? 'Never dropped' : wk ? 'From ' + wk : 'Not by 28 Sep', 'After his bad week of 10 Aug', !dropped || wk ? 'good' : 'bad') +
+      tile('Wen\'s test: someone who stopped working', stop.toFixed(2), stop < .6 ? 'Stays low ✓ The rules don\'t reward stopping.' : 'Climbs back ✗ Stopping work gets rewarded.', stop < .6 ? 'good' : 'bad');
+    $('tiles').innerHTML = html;
+    var f = $('finding');
+    var four = r.res.filter(function (x) { return FOUR.indexOf(x.h[0]) > -1; });
+    var anyStuckNow = four.some(function (x) { return x.now.s[last] < .6; });
+    if (S.start === 5 && !S.fresh && S.rec > 0 && anyStuckNow) {
+      f.innerHTML = '<div class="finding bad"><b>Recovery alone doesn\'t free heroes who are already stuck.</b><p>They rarely get offers, so they keep missing the few they do get. The misses cancel out the weekly recovery. Turn on the fresh start to see the difference.</p></div>';
+    } else if (S.fresh && S.freshLvl === .5 && S.start === 5 && anyStuckNow) {
+      f.innerHTML = '<div class="finding bad"><b>A fresh start at the middle (0.5) isn\'t enough.</b><p>At 0.5 a hero still gets only a fraction of offers, catches few, and slides back down. The fresh start needs to restore a full standing.</p></div>';
+    } else if (stuck === 0 && stop < .6) {
+      f.innerHTML = '<div class="finding"><b>These rules pass both of Wen\'s tests.</b><p>Nobody stays stuck after a bad week, and someone who has stopped working still stays low.</p></div>';
+    } else if (stop >= .6) {
+      f.innerHTML = '<div class="finding bad"><b>These rules reward stopping work.</b><p>Someone who says no to everything climbs back into rotation. Lower the recovery or its cap.</p></div>';
+    } else f.innerHTML = '';
+  }
+  function tile(label, big, cmp, tone) {
+    return '<div class="tile"><span class="pill ' + tone + '">' + label + '</span><span class="big">' + big + '</span><span class="cmp">' + cmp + '</span></div>';
+  }
+
+  function chart(r) {
+    var W = 720, H = 300, L = 44, Rr = 16, T = 16, B = 34;
+    var x = function (i) { return L + i * (W - L - Rr) / (WEEKS.length - 1); };
+    var y = function (v) { return T + (1 - v) * (H - T - B); };
+    var path = function (vals) { return vals.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' '); };
+    var g = '';
+    [0, .25, .5, .75, 1].forEach(function (v) {
+      g += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--line)"/>' +
+        '<text x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)">' + v.toFixed(2) + '</text>';
+    });
+    g += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(.8) + '" y2="' + y(.8) + '" stroke="var(--good)" stroke-dasharray="5 4"/>';
+    g += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(.6) + '" y2="' + y(.6) + '" stroke="var(--warn)" stroke-dasharray="5 4"/>';
+    WEEKS.forEach(function (wk, i) { g += '<text x="' + x(i) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" fill="var(--muted)">' + wk + '</text>'; });
+    g += '<line x1="' + x(1) + '" x2="' + x(1) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--muted)" stroke-dasharray="2 3"/>' +
+      '<text x="' + (x(1) + 4) + '" y="' + (T + 10) + '" font-size="11" fill="var(--muted)">4.2</text>';
+    if (r.R.start > 1) g += '<line x1="' + x(r.R.start) + '" x2="' + x(r.R.start) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--accent)" stroke-dasharray="2 3"/>' +
+      '<text x="' + (x(r.R.start) + 4) + '" y="' + (T + 10) + '" font-size="11" fill="var(--accent)">new rules</text>';
+    r.res.forEach(function (o) { if (o.h[0] !== S.pick) g += '<path d="' + path(o.now.s) + '" fill="none" stroke="var(--faint)" stroke-width="1.2"/>'; });
+    g += '<path d="' + path(r.stopped.s) + '" fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 4"/>';
+    var sel = r.res.filter(function (o) { return o.h[0] === S.pick; })[0];
+    g += '<path d="' + path(sel.today.s) + '" fill="none" stroke="var(--today)" stroke-width="2"/>';
+    g += '<path d="' + path(sel.now.s) + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+    var last = WEEKS.length - 1;
+    g += '<circle cx="' + x(last) + '" cy="' + y(sel.now.s[last]) + '" r="5" fill="var(--accent)"/>';
+    g += '<text x="' + (x(last) - 8) + '" y="' + (y(sel.now.s[last]) - 10) + '" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">' + S.pick + '</text>';
+    $('chart').innerHTML = g;
+  }
+
+  function table(r) {
+    var last = WEEKS.length - 1;
+    var rows = r.res.slice().sort(function (a, b) { return a.now.s[last] - b.now.s[last]; }).map(function (o) {
+      var st = status(o.now.s[last]), stT = status(o.today.s[last]);
+      return '<tr><td>' + (FOUR.indexOf(o.h[0]) > -1 ? '<b>' + o.h[0] + '</b>' : o.h[0]) + '</td>' +
+        '<td class="n">' + o.h[1].toFixed(0) + '</td><td class="n">' + o.h[4] + ' of ' + o.h[3] + '</td>' +
+        '<td class="n">' + o.now.s[1].toFixed(2) + '</td><td class="n">' + o.now.s[last].toFixed(2) + '</td>' +
+        '<td class="n">' + o.now.offers[last].toFixed(0) + '</td>' +
+        '<td><span class="pill ' + st[1] + '">' + st[0] + '</span></td><td><span class="pill ' + stT[1] + '">' + stT[0] + '</span></td></tr>';
+    }).join('');
+    $('table').innerHTML = '<thead><tr><th>Hero</th><th class="n">Offers/wk before</th><th class="n">10 Aug: yes</th><th class="n">Standing after 10 Aug</th><th class="n">Standing 28 Sep</th><th class="n">Offers 28 Sep</th><th>These rules</th><th>Today\'s rules</th></tr></thead><tbody>' + rows + '</tbody>';
+  }
+
+  function syncControls() {
+    ['yes', 'no', 'late', 'rec', 'share'].forEach(function (k) {
+      $(k).value = S[k];
+      $(k + '-o').textContent = k === 'share' ? Math.round(S[k] * 100) + '%' : (k === 'yes' || k === 'rec' ? '+' : '−') + S[k].toFixed(2);
+    });
+    setSeg('cap', S.cap); setSeg('start', S.start); setSeg('freshlvl', S.freshLvl);
+    $('fresh').checked = S.fresh;
+    $('fresh-level-f').style.opacity = S.fresh ? 1 : .45;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-preset]'), function (b) { b.setAttribute('aria-pressed', b.dataset.preset === S.preset); });
+    Array.prototype.forEach.call($('pick').children, function (b) { b.setAttribute('aria-pressed', b.textContent === S.pick); });
+  }
+  function setSeg(id, v) { Array.prototype.forEach.call($(id).children, function (b) { b.setAttribute('aria-pressed', Number(b.dataset.v) === Number(v)); }); }
+
+  function update() {
+    syncControls();
+    var r = run(); tiles(r); chart(r); table(r);
+    try { localStorage.setItem('recsim', JSON.stringify(S)); } catch (e) {}
+  }
+
+  ['yes', 'no', 'late', 'rec', 'share'].forEach(function (k) {
+    $(k).addEventListener('input', function () { S[k] = Number(this.value); if (k !== 'share') S.preset = 'custom'; update(); });
+  });
+  [['cap', 'cap'], ['start', 'start'], ['freshlvl', 'freshLvl']].forEach(function (p) {
+    $(p[0]).addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; S[p[1]] = Number(b.dataset.v); S.preset = 'custom'; update(); });
+  });
+  $('fresh').addEventListener('change', function () { S.fresh = this.checked; S.preset = 'custom'; update(); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-preset]'), function (b) {
+    b.addEventListener('click', function () { Object.assign(S, PRESETS[b.dataset.preset]); S.preset = b.dataset.preset; update(); });
+  });
+  HEROES.forEach(function (h) {
+    var b = document.createElement('button'); b.textContent = h[0];
+    b.addEventListener('click', function () { S.pick = h[0]; update(); });
+    $('pick').appendChild(b);
+  });
+  update();
+})();
+</script>
