@@ -286,4 +286,42 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
     explicit OK each time.
 - **Next module:** Helen's request (`05-super-speed/director-request.txt`) for a one-pager plus a
   clickable prototype, showing the fix from the handler's and responder's point of view.
-- **PR #4** (`module-4-x-ray-vision`) is open, not merged.
+- **PR #4** (`module-4-x-ray-vision`) is open, not merged. *(Update: merged in session 5.)*
+
+### Conclusions so far (session 5: brief and prototypes for Helen)
+- **Helen's ask** (`05-super-speed/director-request.txt`): what we'd build, from the point of view
+  of the people it happens to, not a setting. She also wants something clickable. Keep briefs to
+  her short. She already knows the cause, so cut the analysis, numbers and asks.
+- **`05-super-speed/brief.md`** (posted to Slack, with a thread reply linking the prototypes).
+  "What we're starting with":
+  1. **A way back:**
+     - "ran out of time" costs −0.04
+     - recovery of +0.05 a week, up to the middle (0.5)
+     - a full fresh start for anyone stuck since 12 Aug
+  2. **"Why haven't I had offers?"** screen.
+  3. **"I'm coming"** +30s button.
+- **The recovery simulator** (`recovery-simulator.html`) reproduces the real four stuck under
+  today's rules. Lessons:
+  - recovery alone frees no one
+  - the fresh start must restore a full standing
+  - preventing the *next* freeze-out depends on the miss split (H4) and the clock fix
+  - confidence: 85 for freeing the four now, 60 for preventing it happening again
+- **Three shareable prototypes**, published as private claude.ai Artifacts (version 2). Republish
+  to the same file path to keep each URL:
+
+  | Prototype | File | Link |
+  |---|---|---|
+  | The Way Back | `way-back.html` | claude.ai/artifact/JMN1G6tKVZ3kj15biChSQe |
+  | Why Haven't I Had Offers? | `why-no-offers.html` | claude.ai/artifact/WLcNbCdkq6rQSpyXfUMnm5 |
+  | The I'm Coming Button | `im-coming.html` | claude.ai/artifact/FvC4cjhMW9BSwRYpffo3MW |
+
+  The user made the exception to the folder-only rule for these. Sharing with Helen is done by
+  the user through each page's Share menu.
+- **Simulated hero tests** (role-play, not real research): round 1 and round 2 results and the
+  current **priority chart** are in `synthesis.md`. The next step was to build the round 2 P1s:
+  - an early warning before a hero gets stuck
+  - "checking" instead of "that's on us"
+  - an owner and a date for "we are checking"
+  - slipping heroes (Halfmoon, Ashgrove) in The Way Back
+- **Repo:** PR #5 is merged. **PR #6** (`module-5-prototypes`, the three prototypes plus session 5
+  wrap-up) is open.
