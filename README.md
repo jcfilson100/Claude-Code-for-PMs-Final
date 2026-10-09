@@ -8,6 +8,23 @@ Everything about Rook Industries in here is a **fictional teaching scenario**. I
 
 ---
 
+## Final report
+
+**[The Quiet Heroes: final report (final-report.html)](final-report.html)**
+
+The story of Release 4.2 in 11 slides: what happened, one finding and my exact prompt from each
+module, the fix, and the skill that stops a repeat. Download the file and open it in a browser
+to see the slides; GitHub shows it as code.
+
+| Also in this repo | Where |
+|---|---|
+| Full analysis of 4.2 | [synthesis.md](synthesis.md) |
+| Brief for Helen | [05-super-speed/brief.md](05-super-speed/brief.md) |
+| Prototypes | [The Way Back](05-super-speed/way-back.html) · [Why No Offers](05-super-speed/why-no-offers.html) · [I'm Coming](05-super-speed/im-coming.html) · [Recovery simulator](05-super-speed/recovery-simulator.html) |
+| Skills | [investigate-and-prototype](.claude/skills/investigate-and-prototype/SKILL.md) · [review-checklist](.claude/skills/review-checklist/SKILL.md) · [shareable copy](06-sidekicks/share/review-checklist/) |
+
+---
+
 ## What you build, module by module
 
 | # | Module | Superpower | What lands here | Status |
