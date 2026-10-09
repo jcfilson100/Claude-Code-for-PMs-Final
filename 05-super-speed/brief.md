@@ -1,6 +1,6 @@
 # A way back for quiet responders
 
-**For:** Helen · **From:** Dispatch PM · **5 Oct 2026**
+**For:** Helen · **From and owner:** Dispatch PM · **5 Oct 2026, updated 8 Oct**
 
 Today, one bad week can silence a responder for good, and nobody can see it happening. Here's what
 we'd build instead, so Wen's 2019 question finally gets a real answer.
@@ -31,11 +31,16 @@ has nothing to tell either of them.
 
 ## What we're starting with
 
-| Order | What | Why first |
-|---|---|---|
-| **1** | **A way back:** a gentler penalty for running out of time, recovery up to the middle, and a full fresh start for everyone stuck since 12 August | Frees the responders stuck today |
-| **2** | **"Why haven't I had offers?"** for responders, with a matching note for handlers | Ends "is my account broken?" (10 of 25 tickets), and works whatever the data shows |
-| **3** | **"I'm coming" button** | Tackles why responders miss offers, so this doesn't happen again |
+| Order | What | Why first | Who builds it (proposed) |
+|---|---|---|---|
+| **1** | **A way back:** a gentler penalty for running out of time, recovery up to the middle, and a full fresh start for everyone stuck since 12 August | Frees the responders stuck today | Marcus's team, with Wen on the scoring |
+| **2** | **"Why haven't I had offers?"** for responders, with a matching note for handlers | Ends "is my account broken?" (10 of 25 tickets), and works whatever the data shows | Sofia (design) and Marcus's team |
+| **3** | **"I'm coming" button** | Tackles why responders miss offers, so this doesn't happen again | Sofia (design) and Marcus's team (mobile) |
+
+**We'll know it worked when,** within 4 weeks of shipping:
+- **no responder is stuck.** Today it's 4 of 16 in our sample.
+- **"Is my account broken?" tickets are near zero.** Today it's 10 in 3 weeks.
+- **jobs don't wait longer to get a responder** than before. This is the safety check.
 
 **We tested it in a simulator.** A full fresh start frees everyone stuck today. But stopping it
 happening again also needs item 3, or the answer-time fix, not just scoring changes. Recovery on

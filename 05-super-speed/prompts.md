@@ -84,3 +84,11 @@ Yes, iterate the products based on the P1 and p2 products and then republish the
 ### 17.
 
 Re-evaluate the three applications using a different set of heroes. Have each hero simulate a set of critical questions to ask while using and create an update chart of what priority items would need to be developed
+
+### 18.
+
+Is there any design system for our app in the repo?
+
+### 19.
+
+Can you design the applications thinking creatively. Let's base the designs off of comic books for super heros.

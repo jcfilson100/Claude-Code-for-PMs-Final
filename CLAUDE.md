@@ -325,3 +325,41 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
   - slipping heroes (Halfmoon, Ashgrove) in The Way Back
 - **Repo:** PR #5 is merged. **PR #6** (`module-5-prototypes`, the three prototypes plus session 5
   wrap-up) is open.
+
+### Conclusions so far (session 6: skills)
+- **Two project skills** live in `.claude/skills/`. They work in this folder only.
+  - **`investigate-and-prototype`:** the 7-stage playbook (orient, listen, count, trace,
+    hypothesize, brief, prototype and test), with a **Stage 0 confidence gate**. It scores the
+    ask, who you are, your goal and my role. All four must be 95+; the gate is the lowest score.
+    It re-checks at every stage and before anything leaves the folder. It has a "Blocked"
+    outcome (never invent data), process tracing, a "decision-critical?" column, an audience
+    check before the brief, and tests every role in the flow.
+  - **`review-checklist`:** a read-only check of any brief for four things: owner named, success
+    measure, scope stays bounded, problem before fix. Matches the course's expected result on
+    `06-sidekicks/briefs/`. Trigger it with `/review-checklist` or "review/check/vet <brief>".
+- **Skill test run:** `06-sidekicks/skill-test-supply/` holds a full 7-stage run on Rook Supply's
+  slow approvals (synthesis, brief for Helen, `urgent-lane.html` local prototype).
+  - **Finding:** the committed 4.3 second approval would add a wait at the slowest step.
+  - **Proposal:**
+    - an urgent lane for safety gear
+    - 48-hour backup approvers
+    - "where's my request?" for handlers
+    - a failure report automatically marking the replacement urgent
+  - **Two cheap checks first:** a priority-vs-no-priority data split (Ravi) and 2–3 quartermaster
+    talks.
+- **Both briefs fixed** to pass review-checklist: owner and proposed builders, plus "we'll know it
+  worked when". The Slack copy of Helen's brief is the older version.
+- **Shareable skill:** `06-sidekicks/share/review-checklist/` (generic examples, README) and
+  `review-checklist.zip` (git ignores zips). Posted to Slack `C0B8LTV13EJ` as text, because the
+  connector can't attach files (p1791506130915789, with the skill in the thread).
+- **Scheduled-run lesson:** a pasted Monday run was wrong. It listed bulk-callout twice (by file
+  name and by title), missed `handler-phone-app.txt`, and still printed "4 checked". Proposed fix,
+  **not yet added**: a self-check before the summary (one block per file name, file count must
+  match, no duplicates, full format).
+- **Weekly schedule not created.** The scheduled-task tool stores tasks in
+  `C:\Users\jcfil\.claude\scheduled-tasks\`, outside this folder, which the session scope forbids.
+  It needs the user's explicit exception. (Tasks run only while the app is open; a missed run
+  fires at next launch.)
+- **Comic editions** of the three prototypes (`*-comic.html`, `comic-skin.css`) are published
+  separately; the originals are unchanged. There is no Rook design system in the repo. Sofia
+  would own the real one.
