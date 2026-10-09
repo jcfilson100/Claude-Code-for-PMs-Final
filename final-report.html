@@ -1,0 +1,478 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Quiet Heroes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+  /* Layout: a deck of full-screen "episode" slides, styled after a 90s Saturday-morning superhero cartoon:
+     cel-shaded colour, thick ink, angled title cards, a blue grid "training room" for data.
+     Deliberately one look (night-sky dark) so colours are set explicitly. */
+  :root {
+    color-scheme: dark;
+    --night: #0B1230; --night-2: #121D4A; --panel: #16245C; --ink: #05070F;
+    --paper: #F7F3E8; --dim: #B9C2E6; --sun: #FFD21F; --sun-2: #FF9A1F; --blaze: #E5262E;
+    --sky: #2E7DF6; --cyan: #3FE0FF; --mint: #5BE39A; --grid: rgba(63, 224, 255, .14);
+    --title: "Anton", "Impact", "Arial Narrow", sans-serif;
+    --label: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+  @media (max-width: 760px), (max-height: 560px) { html { scroll-snap-type: none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--night); color: var(--paper); font: 17px/1.5 var(--body); }
+
+  .slide {
+    min-height: 100svh; scroll-snap-align: start; position: relative; overflow: hidden;
+    padding-inline: 16px; padding-block: 56px 96px; display: grid; align-content: center;
+    background:
+      radial-gradient(ellipse at 80% 10%, rgba(46, 125, 246, .35), transparent 55%),
+      linear-gradient(160deg, var(--night-2), var(--night) 60%);
+    border-bottom: 6px solid var(--ink);
+  }
+  .slide.grid {
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 34px 34px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 34px 34px,
+      radial-gradient(ellipse at 50% 0%, rgba(63, 224, 255, .18), transparent 60%),
+      var(--night);
+  }
+  .inner { max-width: 1120px; width: 100%; margin: 0 auto; display: grid; gap: 22px; position: relative; z-index: 1; min-width: 0; }
+
+  /* Speed stripes behind title cards */
+  .stripes::before {
+    content: ""; position: absolute; inset: -20% -10%; z-index: 0; opacity: .5;
+    background: repeating-linear-gradient(115deg, transparent 0 46px, rgba(255, 210, 31, .07) 46px 58px, transparent 58px 110px);
+  }
+
+  /* Episode tag */
+  .ep {
+    justify-self: start; display: inline-flex; gap: 10px; align-items: center;
+    font: 800 1rem/1 var(--label); letter-spacing: .14em; text-transform: uppercase;
+    background: var(--blaze); color: var(--paper); padding: 8px 14px; border: 3px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink); transform: skew(-12deg);
+  }
+  .ep span { display: inline-block; transform: skew(12deg); }
+
+  /* Cel-shaded title lettering */
+  .title {
+    font: 400 clamp(2.6rem, 9vw, 6.6rem)/.9 var(--title); text-transform: uppercase; letter-spacing: .01em; margin: 0;
+    background: linear-gradient(180deg, var(--sun) 0 55%, var(--sun-2) 55% 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill;
+    filter: drop-shadow(6px 6px 0 var(--ink)) drop-shadow(10px 10px 0 var(--sky));
+    transform: skew(-6deg); text-wrap: balance;
+  }
+  .title.mid { font-size: clamp(2.1rem, 6vw, 4.2rem); }
+  .kicker { font: 800 clamp(1.1rem, 2.6vw, 1.5rem)/1.2 var(--label); letter-spacing: .1em; text-transform: uppercase; color: var(--cyan); }
+  .lede { font-size: clamp(1.05rem, 2.2vw, 1.3rem); max-width: 62ch; color: var(--paper); }
+  .dim { color: var(--dim); }
+
+  /* Panels */
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .row > * { min-width: 0; }
+  .panel {
+    background: var(--panel); border: 4px solid var(--ink); border-radius: 6px; padding: 18px;
+    box-shadow: 8px 8px 0 var(--ink); display: grid; gap: 10px; align-content: start; min-width: 0;
+  }
+  .panel h3 { margin: 0; font: 400 1.6rem/1 var(--title); letter-spacing: .02em; color: var(--sun); text-transform: uppercase; }
+  .stat { font: 400 clamp(2.4rem, 6vw, 3.6rem)/1 var(--title); color: var(--paper); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; text-shadow: 4px 4px 0 var(--blaze); }
+  .stat small { font: 800 1rem/1 var(--label); color: var(--dim); letter-spacing: .08em; text-shadow: none; -webkit-text-stroke: 0; }
+
+  /* Prompt "transmission" */
+  .comm {
+    position: relative; background: var(--paper); color: var(--ink); border: 4px solid var(--ink); border-radius: 18px;
+    padding: 18px 20px; box-shadow: 8px 8px 0 var(--sky); display: grid; gap: 8px;
+  }
+  .comm::after { content: ""; position: absolute; left: 34px; bottom: -22px; width: 28px; height: 28px; background: var(--paper);
+    border-right: 4px solid var(--ink); border-bottom: 4px solid var(--ink); transform: rotate(45deg); }
+  .comm .who { font: 800 .9rem/1 var(--label); letter-spacing: .14em; text-transform: uppercase; color: var(--blaze); }
+  .comm q { font: 700 1.08rem/1.45 var(--body); quotes: "\201C" "\201D"; }
+  .comm .src { font-size: .82rem; color: #3A4466; }
+
+  .finding { font: 400 clamp(1.5rem, 3.6vw, 2.2rem)/1.08 var(--title); text-transform: uppercase; color: var(--paper); letter-spacing: .01em; text-wrap: balance; }
+  .finding em { font-style: normal; color: var(--sun); }
+  .two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 26px; align-items: start; }
+  @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+
+  /* Charts */
+  .chart { width: 100%; height: auto; display: block; }
+  .chart-wrap { overflow-x: auto; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 800 .95rem/1 var(--label); letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+  .legend i { display: inline-block; width: 18px; height: 12px; margin-right: 6px; vertical-align: middle; border: 2px solid var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 2px solid rgba(185, 194, 230, .25); vertical-align: top; }
+  th { font: 800 .85rem/1.1 var(--label); letter-spacing: .1em; text-transform: uppercase; color: var(--cyan); }
+  td.n { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+  .pill { display: inline-block; font: 800 .8rem/1 var(--label); letter-spacing: .08em; text-transform: uppercase; padding: 5px 9px; border: 2px solid var(--ink); border-radius: 4px; }
+  .pill.bad { background: var(--blaze); color: var(--paper); }
+  .pill.good { background: var(--mint); color: var(--ink); }
+  .pill.sun { background: var(--sun); color: var(--ink); }
+
+  .cards3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card3 { background: var(--panel); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: 6px; padding: 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .card3 .num { font: 400 2.4rem/1 var(--title); color: var(--sun); }
+  .card3 a { color: var(--cyan); font-weight: 700; overflow-wrap: anywhere; }
+  .card3 a:focus-visible, .nav button:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+  .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
+  .stage { border: 3px solid var(--ink); border-radius: 4px; padding: 10px; background: var(--night-2); display: grid; gap: 4px; }
+  .stage b { font: 400 1.4rem/1 var(--title); color: var(--sun); }
+  .stage span { font: 800 .85rem/1.1 var(--label); letter-spacing: .06em; text-transform: uppercase; color: var(--paper); }
+  .stage.gate { background: var(--blaze); }
+  .stage.gate b { color: var(--paper); }
+
+  .meter { display: grid; grid-template-columns: 120px 1fr 44px; gap: 10px; align-items: center; font: 800 .95rem/1 var(--label); letter-spacing: .06em; text-transform: uppercase; }
+  .meter .bar { height: 16px; border: 3px solid var(--ink); background: var(--night); border-radius: 3px; overflow: hidden; }
+  .meter .bar i { display: block; height: 100%; background: repeating-linear-gradient(135deg, var(--mint) 0 8px, #43C983 8px 16px); }
+  .meter .bar i.low { background: repeating-linear-gradient(135deg, var(--sun) 0 8px, #E9BC12 8px 16px); }
+
+  .burst { position: absolute; z-index: 0; right: -40px; top: 40px; width: 360px; max-width: 70vw; aspect-ratio: 1; opacity: .9; }
+  .credits { columns: 2 220px; gap: 24px; font: 800 1.05rem/1.7 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .credits b { color: var(--sun); font-weight: 800; }
+
+  /* Navigation */
+  .nav {
+    position: fixed; z-index: 10; left: 50%; transform: translateX(-50%);
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 8px; align-items: center; background: var(--ink); border: 3px solid var(--sun);
+    padding: 6px; border-radius: 999px; box-shadow: 4px 4px 0 var(--blaze);
+  }
+  .nav button { font: 800 1rem/1 var(--label); letter-spacing: .08em; text-transform: uppercase; background: var(--sun); color: var(--ink); border: 0; border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+  .nav output { font: 800 1rem/1 var(--label); letter-spacing: .1em; color: var(--paper); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: no-preference) {
+    .title { animation: slam .7s cubic-bezier(.2, 1.6, .4, 1) both; }
+    @keyframes slam { from { transform: skew(-6deg) scale(1.25); opacity: .2; } to { transform: skew(-6deg) scale(1); opacity: 1; } }
+  }
+</style>
+
+<!-- 1 · Cold open -->
+<section class="slide stripes" id="s1" aria-label="Title">
+  <svg class="burst" viewBox="0 0 200 200" aria-hidden="true">
+    <polygon fill="#E5262E" stroke="#05070F" stroke-width="5" points="100,6 116,62 170,30 140,82 196,96 142,116 176,166 120,140 104,196 88,140 34,172 60,118 4,104 58,84 26,34 84,62"/>
+    <text x="100" y="118" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="52" fill="#FFD21F" stroke="#05070F" stroke-width="3" paint-order="stroke">4.2</text>
+  </svg>
+  <div class="inner">
+    <div class="ep"><span>Rook Dispatch · Season 1 · Episode 4.2</span></div>
+    <h1 class="title">The Quiet<br>Heroes</h1>
+    <p class="kicker">A product manager's final report</p>
+    <p class="lede">One release. Four heroes who stopped getting called. Six sessions of digging, a fix you can click, and a skill so it doesn't happen again.</p>
+    <p class="dim small">Use the arrows below, your keyboard, or scroll. Fictional course scenario: Rook Industries is not a real company.</p>
+  </div>
+</section>
+
+<!-- 2 · What happened -->
+<section class="slide" id="s2" aria-label="What happened">
+  <div class="inner">
+    <div class="ep"><span>Previously, on Rook Dispatch</span></div>
+    <h2 class="title mid">What happened with 4.2</h2>
+    <p class="lede"><b>On 12 August, release 4.2 cut the time to answer a job offer from 90 seconds to 60.</b> Heroes missed far more offers. An old scoring rule counted every miss like a "no" and never let anyone climb back. Four heroes sank to the bottom of the list and stopped being asked. Everyone else got their work. Nobody could see why.</p>
+    <div class="row">
+      <div class="panel"><h3>The trigger</h3><div class="stat">90s → 60s</div><p class="dim">Time to answer, cut in one release, alongside a second change.</p></div>
+      <div class="panel"><h3>The surge</h3><div class="stat">22% → 46%</div><p class="dim">Share of offers missed in release week. All 16 heroes in our sample missed more.</p></div>
+      <div class="panel"><h3>The trap</h3><div class="stat">1 in 4</div><p class="dim">Heroes effectively cut off: about 12 offers a week down to 0–1.</p></div>
+      <div class="panel"><h3>The pile-up</h3><div class="stat">32% → 48%</div><p class="dim">Share of all offers going to the four busiest heroes.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · Module 1 -->
+<section class="slide grid" id="s3" aria-label="Module 1">
+  <div class="inner">
+    <div class="ep"><span>Chapter 1 · Origin Story</span></div>
+    <div class="two">
+      <div style="display:grid;gap:16px">
+        <p class="finding">The rulebook said scores <em>recover</em>. The code says they <em>never do</em>.</p>
+        <p class="lede">Reading every company file side by side surfaced the contradictions nobody had joined up.</p>
+        <table aria-label="Contradictions found">
+          <thead><tr><th>The documents said</th><th>What was really true</th></tr></thead>
+          <tbody>
+            <tr><td>A missed offer and a "no" are different</td><td>The code charges both the same: −0.12</td></tr>
+            <tr><td>A low score "recovers"</td><td>No recovery. A note asking about it has sat in the code since 2019</td></tr>
+            <tr><td>"August is always soft"</td><td>Flat at 75–78% for six weeks, then a drop in release week</td></tr>
+            <tr><td>Availability Confidence: committed for 4.2</td><td>Never shipped, and never formally dropped</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="comm">
+        <span class="who">My prompt · 01-origin-story #3</span>
+        <q>What's contradictory or missing, not just in the company documents, but across everything in 00-rook?</q>
+        <span class="src">Artifact: the working context in CLAUDE.md</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · Module 2 -->
+<section class="slide grid" id="s4" aria-label="Module 2">
+  <div class="inner">
+    <div class="ep"><span>Chapter 2 · Super-Hearing</span></div>
+    <div class="two">
+      <div style="display:grid;gap:14px">
+        <p class="finding">The tickets were about <em>silence</em>. The loudest pain was the one nobody filed.</p>
+        <div class="chart-wrap">
+          <svg class="chart" viewBox="0 0 560 250" role="img" aria-label="Of 25 tickets: 16 quiet only, 4 offer vanished only, 5 both. Console complaints: 3 of 4 interviews, 0 of 25 tickets.">
+            <g font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="15" fill="#F7F3E8">
+              <text x="0" y="30">PHONE WENT QUIET</text>
+              <rect x="190" y="14" width="320" height="24" fill="#E5262E" stroke="#05070F" stroke-width="3"/>
+              <text x="518" y="32">16</text>
+              <text x="0" y="72">OFFER VANISHED</text>
+              <rect x="190" y="56" width="80" height="24" fill="#FFD21F" stroke="#05070F" stroke-width="3"/>
+              <text x="278" y="74">4</text>
+              <text x="0" y="114">BOTH</text>
+              <rect x="190" y="98" width="100" height="24" fill="#FF9A1F" stroke="#05070F" stroke-width="3"/>
+              <text x="298" y="116">5</text>
+              <line x1="190" y1="140" x2="510" y2="140" stroke="#B9C2E6" stroke-width="2" stroke-dasharray="4 4"/>
+              <text x="0" y="176">CONSOLE GRIPES · INTERVIEWS</text>
+              <rect x="190" y="160" width="240" height="24" fill="#3FE0FF" stroke="#05070F" stroke-width="3"/>
+              <text x="438" y="178">3 OF 4</text>
+              <text x="0" y="218">CONSOLE GRIPES · TICKETS</text>
+              <rect x="190" y="202" width="4" height="24" fill="#3FE0FF" stroke="#05070F" stroke-width="2"/>
+              <text x="204" y="220">0 OF 25</text>
+            </g>
+          </svg>
+        </div>
+        <p class="dim">Two of the four frozen-out heroes, Vesper and Meteor Mite, never filed a ticket. Overloaded heroes never file at all. Each source hears only part of the story.</p>
+      </div>
+      <div class="comm">
+        <span class="who">My prompt · 02-super-hearing #5</span>
+        <q>You've now read both folders. Where do they disagree? What's loud in the interviews but rare in the tickets, and what's all over the tickets that nobody brought up in the interviews?</q>
+        <span class="src">Artifact: interview-signals.html</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · Module 3 -->
+<section class="slide grid" id="s5" aria-label="Module 3">
+  <div class="inner">
+    <div class="ep"><span>Chapter 3 · Rewind</span></div>
+    <div class="two">
+      <div style="display:grid;gap:14px">
+        <p class="finding">The rate came back to <em>73%</em>. The jobs <em>didn't</em>.</p>
+        <div class="chart-wrap">
+          <svg class="chart" viewBox="0 0 560 280" role="img" aria-label="Offers taken per week: 132 before 4.2, then 96, 104, 108 and 120. The baseline of 132 is never reached again. Acceptance rate 77% before, 54%, 66%, 67%, 73%.">
+            <g font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" fill="#F7F3E8">
+              <!-- scale: 0..140 taken -> y 240..30 ; bar w 70 -->
+              <line x1="40" y1="240" x2="540" y2="240" stroke="#B9C2E6" stroke-width="2"/>
+              <line x1="40" y1="42" x2="540" y2="42" stroke="#5BE39A" stroke-width="3" stroke-dasharray="8 6"/>
+              <text x="540" y="34" text-anchor="end" font-size="14" fill="#5BE39A">BEFORE 4.2: 132 TAKEN A WEEK</text>
+              <rect x="60" y="42" width="70" height="198" fill="#2E7DF6" stroke="#05070F" stroke-width="3"/>
+              <rect x="160" y="96" width="70" height="144" fill="#E5262E" stroke="#05070F" stroke-width="3"/>
+              <rect x="260" y="84" width="70" height="156" fill="#FF9A1F" stroke="#05070F" stroke-width="3"/>
+              <rect x="360" y="78" width="70" height="162" fill="#FF9A1F" stroke="#05070F" stroke-width="3"/>
+              <rect x="460" y="60" width="70" height="180" fill="#FFD21F" stroke="#05070F" stroke-width="3"/>
+              <g font-size="20" text-anchor="middle">
+                <text x="95" y="72">132</text><text x="195" y="126">96</text><text x="295" y="114">104</text><text x="395" y="108">108</text><text x="495" y="90" fill="#05070F">120</text>
+              </g>
+              <g font-size="14" text-anchor="middle" fill="#B9C2E6">
+                <text x="95" y="260">BEFORE</text><text x="195" y="260">10 AUG · 4.2</text><text x="295" y="260">17 AUG</text><text x="395" y="260">24 AUG</text><text x="495" y="260">31 AUG</text>
+              </g>
+              <g font-size="15" text-anchor="middle" fill="#3FE0FF">
+                <text x="95" y="276">77%</text><text x="195" y="276">54%</text><text x="295" y="276">66%</text><text x="395" y="276">67%</text><text x="495" y="276">73%</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="legend"><span><i style="background:#FFD21F"></i>Offers taken (bars)</span><span style="color:#3FE0FF">Acceptance rate (blue figures)</span></div>
+        <p class="dim">The rate looked fine partly because stuck heroes stopped being asked, so their misses dropped out of the maths. Taken offers stayed down 9%. One hero's story makes it real: The Undertow went from 12 offers to 4, then 1, then 1.</p>
+      </div>
+      <div class="comm">
+        <span class="who">My prompt · 03-rewind #2</span>
+        <q>Coming back to the weekly totals, post August 10th, it looks like there was a noticeable drop in Sent and Taken. While it looks like the percentages are recovering, the raw counts may say otherwise</q>
+        <span class="src">Artifact: synthesis.md · "1 in 4 responders effectively cut off"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · Module 4 -->
+<section class="slide grid" id="s6" aria-label="Module 4">
+  <div class="inner">
+    <div class="ep"><span>Chapter 4 · X-Ray Vision</span></div>
+    <div class="two">
+      <div style="display:grid;gap:14px">
+        <p class="finding">A miss costs <em>−0.12</em>. A yes earns <em>+0.08</em>. Nothing else gives points back.</p>
+        <div class="chart-wrap">
+          <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="The trap loop: miss an offer, lose 0.12, drop down the list, get fewer offers, get caught off guard, miss again. The only way out is saying yes, which earns 0.08.">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#FFD21F"/></marker></defs>
+            <circle cx="260" cy="150" r="112" fill="none" stroke="#FFD21F" stroke-width="4" stroke-dasharray="14 10"/>
+            <g font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="16" text-anchor="middle">
+              <rect x="190" y="14" width="140" height="44" rx="6" fill="#E5262E" stroke="#05070F" stroke-width="3"/><text x="260" y="34" fill="#F7F3E8">MISS AN OFFER</text><text x="260" y="51" fill="#FFD21F">−0.12</text>
+              <rect x="356" y="128" width="150" height="44" rx="6" fill="#16245C" stroke="#05070F" stroke-width="3"/><text x="431" y="148" fill="#F7F3E8">DROP DOWN</text><text x="431" y="165" fill="#B9C2E6">THE LIST</text>
+              <rect x="190" y="242" width="140" height="44" rx="6" fill="#16245C" stroke="#05070F" stroke-width="3"/><text x="260" y="262" fill="#F7F3E8">FEWER OFFERS</text><text x="260" y="279" fill="#B9C2E6">ASKED LAST</text>
+              <rect x="14" y="128" width="150" height="44" rx="6" fill="#16245C" stroke="#05070F" stroke-width="3"/><text x="89" y="148" fill="#F7F3E8">CAUGHT OFF</text><text x="89" y="165" fill="#B9C2E6">GUARD</text>
+              <text x="260" y="140" fill="#5BE39A" font-size="18">ONLY WAY OUT</text>
+              <text x="260" y="162" fill="#5BE39A" font-size="18">SAY YES · +0.08</text>
+              <text x="260" y="184" fill="#B9C2E6" font-size="14">7 YESES IN A ROW TO REACH 0.5</text>
+            </g>
+          </svg>
+        </div>
+        <p class="dim">It takes three yeses to cover two misses, so a hero has to accept 60% of offers just to stay level. A hero at the bottom gets about one offer a week and rarely catches it. The 60-second clock also starts when the offer is <i>sent</i>, not when it reaches the phone.</p>
+      </div>
+      <div class="comm">
+        <span class="who">My prompt · 04-x-ray-vision #20</span>
+        <q>Find me the part of this code that takes points off somebody when they miss a ping or turn one down. Show it to me and explain it in plain English. Then find me every single thing in this code that puts points back on.</q>
+        <span class="src">Artifact: history.py traced in synthesis.md · "Points off, and points back on"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · The root cause, in one line -->
+<section class="slide stripes" id="s7" aria-label="Root cause">
+  <div class="inner">
+    <div class="ep"><span>The reveal</span></div>
+    <h2 class="title mid">The root cause</h2>
+    <p class="lede" style="font-size:clamp(1.2rem,2.8vw,1.6rem)"><b>4.2 made heroes miss more offers. A scoring rule from 2019 turned those misses into a trap with no way out.</b> It got worse because two changes shipped at once, with no gradual rollout, no fairness check and no kill switch.</p>
+    <div class="row">
+      <div class="panel"><h3>Five investigators agreed</h3><p>Parallel agents tested five explanations, debated, and aligned at medium confidence.</p></div>
+      <div class="panel"><h3>Ruled out</h3><p>"August is always soft", availability settings, and the "closer heroes first" change as the trigger.</p></div>
+      <div class="panel"><h3>Still to prove</h3><p>Late phone delivery and the "no" vs "too late" split. Both need Wen's offer-by-offer log.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · Module 5: the fix -->
+<section class="slide grid" id="s8" aria-label="Module 5">
+  <div class="inner">
+    <div class="ep"><span>Chapter 5 · Super-Speed</span></div>
+    <p class="finding">The fix, as heroes would feel it: <em>a way back</em>, <em>an answer</em>, and <em>more time</em>.</p>
+    <div class="cards3">
+      <div class="card3"><span class="num">01</span><h3 style="margin:0;font:400 1.5rem/1 var(--title);text-transform:uppercase">The Way Back</h3><p>A fresh start for everyone stuck since 12 Aug. "Running out of time" costs less than a "no", and a low score climbs back, but only to the middle.</p><a href="https://claude.ai/artifact/JMN1G6tKVZ3kj15biChSQe">Open the prototype</a></div>
+      <div class="card3"><span class="num">02</span><h3 style="margin:0;font:400 1.5rem/1 var(--title);text-transform:uppercase">Why No Offers?</h3><p>A self-check on the hero's phone and the same answer on the handler's console. "Your account isn't broken", plus a button for "this doesn't match what I see".</p><a href="https://claude.ai/artifact/WLcNbCdkq6rQSpyXfUMnm5">Open the prototype</a></div>
+      <div class="card3"><span class="num">03</span><h3 style="margin:0;font:400 1.5rem/1 var(--title);text-transform:uppercase">I'm Coming!</h3><p>One tap adds 30 seconds to that hero's offer only, and the handler sees "On the way". Paired with starting the clock when the offer reaches the phone.</p><a href="https://claude.ai/artifact/FvC4cjhMW9BSwRYpffo3MW">Open the prototype</a></div>
+    </div>
+    <div class="two">
+      <div class="panel">
+        <h3>Tested in a simulator</h3>
+        <table aria-label="Simulator results">
+          <thead><tr><th>Rules</th><th>Stuck on 28 Sep</th><th>Stuck four back</th></tr></thead>
+          <tbody>
+            <tr><td>Today</td><td class="n">4 of 16</td><td><span class="pill bad">0 of 4</span></td></tr>
+            <tr><td>Recovery only</td><td class="n">4 of 16</td><td><span class="pill bad">0 of 4</span></td></tr>
+            <tr><td>Proposed fix</td><td class="n">0 of 16</td><td><span class="pill good">4 of 4</span></td></tr>
+          </tbody>
+        </table>
+        <p class="dim small">Illustration, not a forecast. Simulated hero tests (role-play, not research) drove two rounds of fixes.</p>
+      </div>
+      <div class="comm">
+        <span class="who">My prompt · 05-super-speed #14</span>
+        <q>Let's create multiple prototypes. Let's focus on the top 3 we identified. Save it under the 05-super-speed/ folder. The prototypes need to be shareable artifacts and interactive. Spawn multiple agents so that we can build in parallel.</q>
+        <span class="src">Artifacts: way-back.html · why-no-offers.html · im-coming.html, plus comic editions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · Module 6: the skill -->
+<section class="slide grid" id="s9" aria-label="Module 6">
+  <div class="inner">
+    <div class="ep"><span>Chapter 6 · Sidekicks</span></div>
+    <div class="two">
+      <div style="display:grid;gap:16px">
+        <p class="finding">A skill that won't start until it's <em>95% sure</em> what you need.</p>
+        <div class="stages" aria-label="The skill's stages">
+          <div class="stage gate"><b>0</b><span>Confidence gate</span></div>
+          <div class="stage"><b>1</b><span>Orient</span></div>
+          <div class="stage"><b>2</b><span>Listen</span></div>
+          <div class="stage"><b>3</b><span>Count</span></div>
+          <div class="stage"><b>4</b><span>Trace</span></div>
+          <div class="stage"><b>5</b><span>Hypothesize</span></div>
+          <div class="stage"><b>6</b><span>Brief</span></div>
+          <div class="stage"><b>7</b><span>Prototype + test</span></div>
+        </div>
+        <div class="panel" aria-label="Confidence gate from the Supply test run">
+          <h3>The gate, in a real test run</h3>
+          <div class="meter"><span>The ask</span><span class="bar"><i class="low" style="width:70%"></i></span><span>70</span></div>
+          <div class="meter"><span>Who you are</span><span class="bar"><i class="low" style="width:75%"></i></span><span>75</span></div>
+          <div class="meter"><span>Your goal</span><span class="bar"><i class="low" style="width:60%"></i></span><span>60</span></div>
+          <div class="meter"><span>My role</span><span class="bar"><i class="low" style="width:85%"></i></span><span>85</span></div>
+          <p class="dim small">Gate: 60, not passed. Three questions later every bar read 95+ and the run began. It caught a second gap before the brief: who it was for.</p>
+        </div>
+      </div>
+      <div class="comm">
+        <span class="who">My prompt · 06-sidekicks #3</span>
+        <q>Yes , and with the skill I want to make sure we have a confidence gate (e.g. you are 95% confident in my ask, who I am, what I am trying to achieve, and your role in helping me achieve it)</q>
+        <span class="src">Artifacts: .claude/skills/investigate-and-prototype · .claude/skills/review-checklist</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · How it keeps 4.2 from happening again -->
+<section class="slide stripes" id="s10" aria-label="How the skill prevents a repeat">
+  <div class="inner">
+    <div class="ep"><span>Never again</span></div>
+    <h2 class="title mid">How the skill stops a repeat</h2>
+    <div class="chart-wrap">
+      <table aria-label="What went wrong in 4.2 and what catches it now">
+        <thead><tr><th>What went wrong in 4.2</th><th>What catches it now</th></tr></thead>
+        <tbody>
+          <tr><td>Two changes shipped with no decision record, owner or success measure</td><td><span class="pill sun">review-checklist</span> flags any brief without an owner or "how we'll know it worked"</td></tr>
+          <tr><td>The headline rate hid four heroes</td><td><span class="pill sun">Stage 3 · Count</span> must show the rows, raw counts and who gained or lost</td></tr>
+          <tr><td>"It's seasonal" was accepted without checking</td><td><span class="pill sun">Stages 2–3</span> compare sources and before vs after, and flag every disagreement</td></tr>
+          <tr><td>A 2019 rule with no way back went unnoticed</td><td><span class="pill sun">Stage 4 · Trace</span> walks the code or process step by step and names what can't be explained</td></tr>
+          <tr><td>Silent heroes (Vesper, Meteor Mite) were invisible</td><td><span class="pill sun">Stage 2</span> asks "who never speaks?" <span class="pill sun">Stage 7</span> tests every role in the flow</td></tr>
+          <tr><td>Building the wrong thing for the wrong audience</td><td><span class="pill sun">Stage 0 · Gate</span> 95% on the ask, the person, the goal and my role before any work</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede">And it travels: it already ran end to end on a different product, Rook Supply's slow approvals, and found that the committed 4.3 fix would have slowed safety gear.</p>
+  </div>
+</section>
+
+<!-- 11 · Next episode -->
+<section class="slide" id="s11" aria-label="Next episode">
+  <div class="inner">
+    <div class="ep"><span>Next time, on Rook Dispatch</span></div>
+    <h2 class="title mid">To be continued…</h2>
+    <div class="row">
+      <div class="panel"><h3>Wen</h3><p>Offer-by-offer log: sent, reached the phone, answered. Settles late delivery and the "no" vs "too late" split.</p></div>
+      <div class="panel"><h3>Ravi</h3><p>Official per-hero numbers, to confirm "1 in 4" and the seven heroes whose data and tickets disagree.</p></div>
+      <div class="panel"><h3>Helen</h3><p>Approve the point release: a way back, "Why no offers?" first, and the "I'm coming" button with the clock fix.</p></div>
+    </div>
+    <div class="panel">
+      <h3>Featuring</h3>
+      <div class="credits">
+        <div><b>The stuck four</b> · Farlight · Meteor Mite · The Undertow · Vesper</div>
+        <div><b>Overloaded</b> · The Gale · Sgt. Falkirk · Captain Vantage</div>
+        <div><b>Handlers</b> · Kip · Dorothy Pell · Ambrose · Halloran</div>
+        <div><b>Team</b> · Helen · Marcus · Wen · Sofia · Nadia · Ravi</div>
+      </div>
+    </div>
+    <p class="dim small">Sources: CLAUDE.md, synthesis.md and the six prompts.md files in this repo. Numbers from an unverified 16-responder sample unless stated. A fictional course scenario for Product School's Claude Code for PMs.</p>
+  </div>
+</section>
+
+<nav class="nav" aria-label="Slide navigation">
+  <button id="prev" aria-label="Previous slide">‹ Back</button>
+  <output id="count" aria-live="polite">1 / 11</output>
+  <button id="next" aria-label="Next slide">Next ›</button>
+</nav>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var cur = 0;
+  function go(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides[cur].scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) { cur = slides.indexOf(e.target); document.getElementById('count').textContent = (cur + 1) + ' / ' + slides.length; }
+    });
+  }, { threshold: 0.55 });
+  slides.forEach(function (s) { obs.observe(s); });
+  document.getElementById('prev').addEventListener('click', function () { go(cur - 1); });
+  document.getElementById('next').addEventListener('click', function () { go(cur + 1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+  });
+})();
+</script>

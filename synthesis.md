@@ -723,6 +723,78 @@ the real test.
 today, but stopping it happening again also needs the answer-time fix, not just scoring
 changes."
 
+## Three shareable prototypes and simulated hero tests (5 Oct)
+
+*In plain words. The hero feedback is role-play based on our data and tickets, not real research.*
+
+**The three prototypes** (in `05-super-speed/`, published as private claude.ai Artifacts):
+
+| Prototype | File | Link |
+|---|---|---|
+| The Way Back | `way-back.html` | https://claude.ai/artifact/JMN1G6tKVZ3kj15biChSQe |
+| Why Haven't I Had Offers? | `why-no-offers.html` | https://claude.ai/artifact/WLcNbCdkq6rQSpyXfUMnm5 |
+| The I'm Coming Button | `im-coming.html` | https://claude.ai/artifact/FvC4cjhMW9BSwRYpffo3MW |
+
+### Round 1: The Undertow, The Gale, Ironvale
+
+Each score is the average of four ratings out of 5: clear, useful, trusted, and "ship it."
+
+| | The Way Back | Why No Offers | The I'm Coming Button |
+|---|---|---|---|
+| The Undertow (stuck) | 3.8 | 3.8 | 2.8 |
+| The Gale (overloaded) | 2.8 | 2.8 | 2.8 |
+| Ironvale (data mismatch) | 2.3 | 2.0 | 3.5 |
+
+**What they taught us:**
+- The three only work together.
+- Guessed data shown as fact breaks trust.
+- Overloaded heroes were left out.
+- Some wording blamed the hero.
+- The clock fix is still needed.
+
+**Fixed in version 2:**
+- a "This doesn't match what I see" button
+- guessed data hidden
+- "We're checking your record" for the mismatch heroes
+- a clock-starts-on-arrival mode
+- Accept and Decline buttons
+- a workload view
+- wording that owns the mistake
+- real handler names
+- links between the three pages
+
+### Round 2: Vesper, Halfmoon, Sgt. Bulwark (critical questions)
+
+| | Questions answered |
+|---|---|
+| The Way Back | 25% |
+| Why No Offers | 17% |
+| The I'm Coming Button | 50% |
+
+The round 1 fixes held. Round 2 found new gaps:
+- **Heroes who never complain are never told.** Vesper would only find out by chance.
+- **Slipping with good standing has no owner, date or action.** Halfmoon and Ashgrove are in this group.
+- **Steady heroes get extra noise.** Bulwark gets a busy alarm at 122% of usual, an internal "near miss" label, and no way to pause without losing points.
+- **"That's on us" states an unconfirmed reason as fact.**
+
+### Priority chart (after round 2)
+
+| Priority | Item | Product | Size |
+|---|---|---|---|
+| P1 | Warn the hero and handler when standing starts falling, before they're stuck | All | M |
+| P1 | Say "We're checking whether these offers timed out", not "That's on us", until Wen's log exists | Why No Offers | S |
+| P1 | Give "we are checking" an owner and a date, visible on the phone and console | Why No Offers, Way Back | S |
+| P1 | Cover slipping heroes (Halfmoon, Ashgrove) with a distance-check path, in minutes only | Way Back | M |
+| P1 (needs data) | Clock starts on arrival (Wen, H2), real miss split (Wen, H4), confirm mismatch data (Ravi) | All | — |
+| P2 | "What you can do" tips | Why No Offers | S |
+| P2 | "On a job" status that pauses offers without losing points | I'm Coming, Why No Offers | M |
+| P2 | Busy alert only above 130% of usual for 2 weeks | Why No Offers | S |
+| P2 | Remove internal labels ("near miss", "Model") from what heroes and handlers see | Way Back | S |
+| P2 | Show the small cost of a tapped-but-missed offer on the phone | I'm Coming | S |
+| P2 (needs data) | Real travel times to confirm the distance explanation (Wen, H6) | Way Back | — |
+| P3 | "Will I lose work?" line for every steady hero | Way Back | S |
+| P3 | "My reports" list with status | Why No Offers | S |
+
 ## Open questions (for Ravi and Wen)
 
 *See the table "Information needed to settle it" above for the fuller list from the

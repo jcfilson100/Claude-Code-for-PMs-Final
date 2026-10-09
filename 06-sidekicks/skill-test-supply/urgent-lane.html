@@ -1,0 +1,295 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Urgent Lane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  /* Layout: two working views side by side (handler request, quartermaster queue) under a day scrubber.
+     Prototype styles, not Rook's design system. */
+  :root {
+    --ground: #F2F4F3; --surface: #FFFFFF; --sunk: #E7ECEA; --ink: #16211D; --muted: #52615B; --line: #D5DDD9;
+    --accent: #2F6B4F; --accent-soft: #E0EFE7; --urgent: #B4321F; --urgent-soft: #FBE3DE;
+    --amber: #9A6400; --amber-soft: #FAF0D3; --good: #15803D; --good-soft: #E3F4E8; --on-strong: #FFFFFF;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0F1513; --surface: #18211E; --sunk: #212C28; --ink: #E6EEEA; --muted: #A1B1AA; --line: #2B3833;
+      --accent: #6FCB9C; --accent-soft: #1B3328; --urgent: #FF8A73; --urgent-soft: #3A1E18;
+      --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F; --on-strong: #0F1513;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F1513; --surface: #18211E; --sunk: #212C28; --ink: #E6EEEA; --muted: #A1B1AA; --line: #2B3833;
+    --accent: #6FCB9C; --accent-soft: #1B3328; --urgent: #FF8A73; --urgent-soft: #3A1E18;
+    --amber: #E8B64A; --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F; --on-strong: #0F1513;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--body); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 20px; }
+  .wrap > * { min-width: 0; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; }
+  h2 { font-size: 1.2rem; font-weight: 800; }
+  h3 { font-size: 1rem; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  .small { font-size: .86rem; }
+  .controls { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
+  .group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; }
+  .label { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--sunk); border-radius: 999px; }
+  .seg button { font: 700 .9rem/1 var(--body); border: 0; background: transparent; color: var(--muted); padding: 9px 13px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .day { display: flex; align-items: center; gap: 10px; flex: 1 1 260px; min-width: 0; }
+  .day input { flex: 1; min-width: 0; accent-color: var(--accent); }
+  .day output { font: 800 1.1rem/1 var(--display); min-width: 64px; font-variant-numeric: tabular-nums; }
+  .banner { border-radius: 12px; padding: 12px 16px; border-left: 5px solid var(--amber); background: var(--amber-soft); }
+  .banner.new { border-color: var(--accent); background: var(--accent-soft); }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 18px; align-items: start; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+  .head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
+  .card.urgent { border: 2px solid var(--urgent); }
+  .tag { display: inline-block; font-size: .76rem; font-weight: 700; padding: 3px 9px; border-radius: 99px; background: var(--sunk); color: var(--ink); white-space: nowrap; }
+  .tag.urgent { background: var(--urgent-soft); color: var(--urgent); }
+  .tag.good { background: var(--good-soft); color: var(--good); }
+  .tag.amber { background: var(--amber-soft); color: var(--amber); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .steps li { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: start; font-size: .92rem; }
+  .steps .dot { width: 14px; height: 14px; border-radius: 99px; margin-top: 4px; background: var(--line); }
+  .steps .done .dot { background: var(--good); }
+  .steps .now .dot { background: var(--amber); }
+  .steps .wait { color: var(--muted); }
+  .queue { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .queue li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .queue li.urgent { border: 2px solid var(--urgent); background: var(--urgent-soft); }
+  .queue li.approved { opacity: .6; }
+  .lane { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .lane.urgent { color: var(--urgent); }
+  .alert { border-radius: 10px; padding: 10px 12px; background: var(--amber-soft); border-left: 4px solid var(--amber); font-size: .92rem; }
+  .ok { border-radius: 10px; padding: 10px 12px; background: var(--good-soft); border-left: 4px solid var(--good); font-size: .92rem; }
+  .none { border-radius: 10px; padding: 10px 12px; background: var(--sunk); color: var(--muted); font-style: italic; font-size: .92rem; }
+  .search { display: grid; gap: 6px; }
+  .search .box { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--sunk); font-size: .92rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .notes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); font-size: .92rem; }
+  .notes > div { border-top: 3px solid var(--line); padding-top: 10px; display: grid; gap: 6px; }
+  .notes ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  .num { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <div class="eyebrow">Rook Supply · skill test prototype · not shared</div>
+    <h1>The urgent lane</h1>
+    <p class="muted">A cracked vest plate is reported and replaced. Flip between <b>today</b> and the <b>reshaped 4.3</b>, then move the day slider to see what Halloran and the quartermaster each see.</p>
+  </header>
+
+  <section class="controls" aria-label="Controls">
+    <div class="group"><span class="label">Rules</span>
+      <div class="seg" role="group" aria-label="Rules">
+        <button id="m-today" aria-pressed="true">Today</button>
+        <button id="m-new" aria-pressed="false">Reshaped 4.3</button>
+      </div>
+    </div>
+    <div class="day"><span class="label">Day</span><input id="day" type="range" min="0" max="12" step="1" value="0" aria-label="Day since the plate cracked"><output id="day-o">Day 0</output></div>
+  </section>
+
+  <div class="banner" id="banner" role="status"></div>
+
+  <section class="stage">
+    <div class="panel" aria-label="Halloran's view">
+      <div class="head"><h2>Halloran's view</h2><span class="muted small">Handler, runs the gear cage</span></div>
+      <div class="card" id="report"></div>
+      <div class="search" id="search"></div>
+      <div class="card" id="request"></div>
+      <div class="card" id="responder"></div>
+    </div>
+    <div class="panel" aria-label="Quartermaster's queue">
+      <div class="head"><h2>Quartermaster's queue</h2><span class="muted small">Example quartermaster, Site 2</span></div>
+      <div id="qalert"></div>
+      <ul class="queue" id="queue"></ul>
+    </div>
+  </section>
+
+  <section class="notes" aria-label="Notes">
+    <div>
+      <h3>What changes in the reshaped 4.3</h3>
+      <ul>
+        <li>Safety gear gets an <b>urgent lane</b>: one signature, same-day target.</li>
+        <li>A <b>safety failure report</b> marks the replacement urgent automatically.</li>
+        <li>After <b>48 hours</b> unseen, a request goes to the next approver.</li>
+        <li>Halloran sees <b>where his request is</b> and who has it.</li>
+        <li>The second sign-off over $2,000 stays, for non-urgent items.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Illustration, not data</h3>
+      <ul>
+        <li>The 11-day wait is Halloran's one example. We don't know if it's typical.</li>
+        <li>The plate's cost ($2,400), the queue items and the timings are made up to show the flow.</li>
+        <li>Rook has no Supply data in this repo yet.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var S = { mode: 'today', day: 0 };
+  var PLATE = { name: 'Vest plate, Level III', cost: 2400 };
+  // Other items already waiting in the quartermaster's queue (illustrative), with the day they were raised (negative = before day 0).
+  // waitToday / waitNew = days until approved (illustrative). In the reshaped flow, anything unseen for 48h goes to a backup approver.
+  var OTHERS = [
+    { name: 'Boot laces, pack of 10', cost: 18, raised: -3, waitToday: 10, waitNew: 2 },
+    { name: 'Gloves, cold-weather', cost: 140, raised: -2, waitToday: 9, waitNew: 1 },
+    { name: 'Grapple line, 30 m', cost: 2600, raised: -1, waitToday: 12, waitNew: 3 },
+    { name: 'Radio battery', cost: 90, raised: 1, waitToday: 8, waitNew: 1 },
+    { name: 'Rebreather filters', cost: 310, raised: 2, waitToday: 11, waitNew: 2 }
+  ];
+
+  // Timeline of the plate request in each mode (days since the plate cracked).
+  var T = {
+    today:  { report: 0, request: 1, seen: 9, approve: 12, manager: null, issue: null },
+    newer:  { report: 0, request: 0, seen: 0, approve: 0, manager: 3, issue: 1 }
+  };
+
+  function plateStatus() {
+    var t = S.mode === 'today' ? T.today : T.newer, d = S.day;
+    return {
+      reported: d >= t.report, requested: d >= t.request, seen: d >= t.seen,
+      approved: d >= t.approve, issued: t.issue !== null && d >= t.issue,
+      managerDone: t.manager !== null && d >= t.manager, t: t
+    };
+  }
+
+  function renderReport() {
+    var p = plateStatus(), isNew = S.mode !== 'today';
+    var html = '<div class="head"><h3>Field failure report</h3><span class="tag urgent">Safety gear</span></div>' +
+      '<p>Sgt. Bulwark\'s vest plate cracked in use. Filed with 3 fields and a photo.</p>';
+    if (!isNew) html += '<div class="none">Saved to the item\'s history. Nothing tells Halloran what happens next.</div>';
+    else html += '<div class="ok"><b>Replacement started and marked urgent.</b> Because this is safety gear, the request skipped the normal queue.</div>';
+    $('report').innerHTML = html;
+  }
+
+  function renderSearch() {
+    var isNew = S.mode !== 'today';
+    $('search').innerHTML = '<span class="label">Find the item</span><div class="box">plate</div>' +
+      (isNew
+        ? '<div class="chips"><span class="tag good">Category: Body armour</span><span class="tag">3 results</span></div>'
+        : '<div class="chips"><span class="tag amber">40 results, half unrelated</span></div>') +
+      (isNew ? '<p class="small muted">Started from the failure report, so the item was already filled in.</p>' : '');
+  }
+
+  function step(cls, text, when) { return '<li class="' + cls + '"><span class="dot"></span><span>' + text + '</span><span class="small muted num">' + when + '</span></li>'; }
+
+  function renderRequest() {
+    var p = plateStatus(), isNew = S.mode !== 'today', t = p.t, d = S.day;
+    var html = '<div class="head"><h3>' + PLATE.name + '</h3><span class="muted small num">$' + PLATE.cost.toLocaleString() + '</span></div>';
+    if (!p.requested) {
+      $('request').innerHTML = html + '<div class="none">Not requested yet.</div>';
+      $('responder').innerHTML = '<div class="head"><h3>Sgt. Bulwark\'s phone</h3><span class="muted small">Responder</span></div><div class="none">No update. He\'s still carrying the cracked plate.</div>';
+      return;
+    }
+    html += '<div class="chips">' + (isNew ? '<span class="tag urgent">Urgent lane</span>' : '<span class="tag">Priority: set</span>') + '</div>';
+    if (!isNew) {
+      html += '<p class="small muted">Status shown to Halloran:</p>' +
+        '<div class="' + (p.approved ? 'ok' : 'none') + '">' + (p.approved ? 'Approved on day ' + t.approve + '.' : 'Pending.') + '</div>' +
+        (!p.approved ? '<p class="small">"Takes too long and nobody can tell me why."</p>' : '');
+    } else {
+      html += '<p class="small muted">Where\'s my request?</p><ul class="steps">' +
+        step('done', 'Requested (from failure report)', 'Day ' + t.request) +
+        step(p.approved ? 'done' : 'now', 'Quartermaster approved. Same-day target', 'Day ' + t.approve) +
+        step(p.issued ? 'done' : (p.approved ? 'now' : 'wait'), 'Issued to Sgt. Bulwark', 'Day ' + t.issue) +
+        step(p.managerDone ? 'done' : (p.issued ? 'now' : 'wait'), 'Manager review of the spend (after issue)', 'Day ' + t.manager) +
+        '</ul>' +
+        '<p class="small"><b>Why it\'s urgent:</b> body armour is on the safety list, and a failure report was filed. You can also ask for urgent with a reason. The quartermaster can move it back to the normal queue and must say why.</p>' +
+        '<p class="small muted">If the manager questions the spend, the plate stays with Sgt. Bulwark. The question goes to budget, not to him.</p>';
+    }
+    $('request').innerHTML = html;
+    // Responder view
+    var r;
+    if (!isNew) r = p.approved ? '<div class="ok">"Your replacement is approved." (Only if Halloran tells him.)</div>' : '<div class="none">No update. Sgt. Bulwark only knows what Halloran tells him.</div>';
+    else r = p.issued ? '<div class="ok"><b>Your new vest plate is with you.</b> Thanks for reporting the crack.</div>' : '<div class="ok"><b>Your replacement vest plate is approved.</b> Expected with you on Day ' + t.issue + '.</div>';
+    $('responder').innerHTML = '<div class="head"><h3>Sgt. Bulwark\'s phone</h3><span class="muted small">Responder</span></div>' + r +
+      (isNew ? '<p class="small muted">Open question for Dispatch: should damaged safety gear limit which callouts he gets until it\'s replaced?</p>' : '');
+  }
+
+  function renderQueue() {
+    var p = plateStatus(), isNew = S.mode !== 'today', d = S.day;
+    var approvedCount = 0;
+    var items = OTHERS.filter(function (o) { return o.raised <= d; }).filter(function (o) {
+      var done = d >= o.raised + (isNew ? o.waitNew : o.waitToday);
+      if (done) approvedCount++;
+      return !done;
+    }).map(function (o) {
+      var age = d - o.raised;
+      return { name: o.name, cost: o.cost, age: age, plate: false, backup: isNew && age >= 2 };
+    });
+    if (p.requested && !(isNew && p.approved && d > T.newer.approve) && !(!isNew && p.approved && d > T.today.approve)) items.push({ name: PLATE.name, cost: PLATE.cost, age: d - p.t.request, plate: true, approved: p.approved });
+    var alert = '';
+    var moved = items.filter(function (i) { return i.backup; });
+    if (isNew && moved.length) alert = '<div class="alert"><b>' + moved.length + ' request(s) unseen for 48 hours</b> were sent to the backup approver (example: Site 1 quartermaster). They\'re marked "With backup" below.</div>';
+    else if (isNew) alert = '<div class="ok">Nothing waiting over 48 hours.</div>';
+    else alert = '<div class="none">No alerts. Requests are shown oldest first, and "priority" doesn\'t change the order.</div>';
+    alert += '<p class="small muted num">Approved so far from the normal queue: ' + approvedCount + '</p>';
+    $('qalert').innerHTML = alert;
+
+    var html = '';
+    if (isNew) {
+      var urgent = items.filter(function (i) { return i.plate; });
+      var normal = items.filter(function (i) { return !i.plate; }).sort(function (a, b) { return b.age - a.age; });
+      html += '<li class="lane urgent" style="border:0;padding:0">Urgent lane · same-day target</li>' +
+        (urgent.length ? urgent.map(row).join('') : '<li class="none" style="border:0">Nothing urgent.</li>') +
+        '<li class="lane" style="border:0;padding:0">Normal queue · oldest first</li>' + normal.map(row).join('');
+    } else {
+      items.sort(function (a, b) { return b.age - a.age; });
+      html += items.map(row).join('');
+    }
+    $('queue').innerHTML = html;
+  }
+
+  function row(i) {
+    var tags = '';
+    if (i.plate && S.mode !== 'today') tags += '<span class="tag urgent">Safety · failure report</span> <span class="tag good">In stock: 4</span> ';
+    if (S.mode !== 'today' && i.cost > 2000 && !i.plate) tags += '<span class="tag">2nd sign-off</span> ';
+    if (i.backup) tags += '<span class="tag amber">With backup</span> ';
+    var ageTag = i.age >= 2 ? '<span class="tag amber num">' + i.age + ' days</span>' : '<span class="tag num">' + i.age + ' d</span>';
+    var cls = (i.plate && S.mode !== 'today' ? 'urgent' : '') + (i.approved ? ' approved' : '');
+    return '<li class="' + cls + '"><span>' + i.name + ' <span class="muted small num">$' + i.cost.toLocaleString() + '</span></span><span>' + tags + ageTag + '</span></li>';
+  }
+
+  function banner() {
+    var b = $('banner'), p = plateStatus();
+    if (S.mode === 'today') {
+      b.className = 'banner';
+      b.textContent = p.approved ? 'Day ' + S.day + ': the plate is finally approved, after 11 days in a queue behind boot laces.' : 'Day ' + S.day + ': the plate is waiting. Sgt. Bulwark is in the field with a cracked plate.';
+    } else {
+      b.className = 'banner new';
+      b.textContent = p.issued ? 'Day ' + S.day + ': the new plate is with Sgt. Bulwark. The spend is still checked by a manager.' : 'Day ' + S.day + ': the failure report started an urgent replacement.';
+    }
+  }
+
+  function render() {
+    $('m-today').setAttribute('aria-pressed', S.mode === 'today');
+    $('m-new').setAttribute('aria-pressed', S.mode !== 'today');
+    $('day').value = S.day; $('day-o').textContent = 'Day ' + S.day;
+    renderReport(); renderSearch(); renderRequest(); renderQueue(); banner();
+  }
+
+  $('m-today').addEventListener('click', function () { S.mode = 'today'; render(); });
+  $('m-new').addEventListener('click', function () { S.mode = 'new'; render(); });
+  $('day').addEventListener('input', function () { S.day = Number(this.value); render(); });
+  render();
+})();
+</script>

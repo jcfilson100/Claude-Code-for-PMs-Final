@@ -286,4 +286,80 @@ See `kill-switch-kpis.md` for the proposed guardrails on any fix.
     explicit OK each time.
 - **Next module:** Helen's request (`05-super-speed/director-request.txt`) for a one-pager plus a
   clickable prototype, showing the fix from the handler's and responder's point of view.
-- **PR #4** (`module-4-x-ray-vision`) is open, not merged.
+- **PR #4** (`module-4-x-ray-vision`) is open, not merged. *(Update: merged in session 5.)*
+
+### Conclusions so far (session 5: brief and prototypes for Helen)
+- **Helen's ask** (`05-super-speed/director-request.txt`): what we'd build, from the point of view
+  of the people it happens to, not a setting. She also wants something clickable. Keep briefs to
+  her short. She already knows the cause, so cut the analysis, numbers and asks.
+- **`05-super-speed/brief.md`** (posted to Slack, with a thread reply linking the prototypes).
+  "What we're starting with":
+  1. **A way back:**
+     - "ran out of time" costs −0.04
+     - recovery of +0.05 a week, up to the middle (0.5)
+     - a full fresh start for anyone stuck since 12 Aug
+  2. **"Why haven't I had offers?"** screen.
+  3. **"I'm coming"** +30s button.
+- **The recovery simulator** (`recovery-simulator.html`) reproduces the real four stuck under
+  today's rules. Lessons:
+  - recovery alone frees no one
+  - the fresh start must restore a full standing
+  - preventing the *next* freeze-out depends on the miss split (H4) and the clock fix
+  - confidence: 85 for freeing the four now, 60 for preventing it happening again
+- **Three shareable prototypes**, published as private claude.ai Artifacts (version 2). Republish
+  to the same file path to keep each URL:
+
+  | Prototype | File | Link |
+  |---|---|---|
+  | The Way Back | `way-back.html` | claude.ai/artifact/JMN1G6tKVZ3kj15biChSQe |
+  | Why Haven't I Had Offers? | `why-no-offers.html` | claude.ai/artifact/WLcNbCdkq6rQSpyXfUMnm5 |
+  | The I'm Coming Button | `im-coming.html` | claude.ai/artifact/FvC4cjhMW9BSwRYpffo3MW |
+
+  The user made the exception to the folder-only rule for these. Sharing with Helen is done by
+  the user through each page's Share menu.
+- **Simulated hero tests** (role-play, not real research): round 1 and round 2 results and the
+  current **priority chart** are in `synthesis.md`. The next step was to build the round 2 P1s:
+  - an early warning before a hero gets stuck
+  - "checking" instead of "that's on us"
+  - an owner and a date for "we are checking"
+  - slipping heroes (Halfmoon, Ashgrove) in The Way Back
+- **Repo:** PR #5 is merged. **PR #6** (`module-5-prototypes`, the three prototypes plus session 5
+  wrap-up) is open.
+
+### Conclusions so far (session 6: skills)
+- **Two project skills** live in `.claude/skills/`. They work in this folder only.
+  - **`investigate-and-prototype`:** the 7-stage playbook (orient, listen, count, trace,
+    hypothesize, brief, prototype and test), with a **Stage 0 confidence gate**. It scores the
+    ask, who you are, your goal and my role. All four must be 95+; the gate is the lowest score.
+    It re-checks at every stage and before anything leaves the folder. It has a "Blocked"
+    outcome (never invent data), process tracing, a "decision-critical?" column, an audience
+    check before the brief, and tests every role in the flow.
+  - **`review-checklist`:** a read-only check of any brief for four things: owner named, success
+    measure, scope stays bounded, problem before fix. Matches the course's expected result on
+    `06-sidekicks/briefs/`. Trigger it with `/review-checklist` or "review/check/vet <brief>".
+- **Skill test run:** `06-sidekicks/skill-test-supply/` holds a full 7-stage run on Rook Supply's
+  slow approvals (synthesis, brief for Helen, `urgent-lane.html` local prototype).
+  - **Finding:** the committed 4.3 second approval would add a wait at the slowest step.
+  - **Proposal:**
+    - an urgent lane for safety gear
+    - 48-hour backup approvers
+    - "where's my request?" for handlers
+    - a failure report automatically marking the replacement urgent
+  - **Two cheap checks first:** a priority-vs-no-priority data split (Ravi) and 2–3 quartermaster
+    talks.
+- **Both briefs fixed** to pass review-checklist: owner and proposed builders, plus "we'll know it
+  worked when". The Slack copy of Helen's brief is the older version.
+- **Shareable skill:** `06-sidekicks/share/review-checklist/` (generic examples, README) and
+  `review-checklist.zip` (git ignores zips). Posted to Slack `C0B8LTV13EJ` as text, because the
+  connector can't attach files (p1791506130915789, with the skill in the thread).
+- **Scheduled-run lesson:** a pasted Monday run was wrong. It listed bulk-callout twice (by file
+  name and by title), missed `handler-phone-app.txt`, and still printed "4 checked". Proposed fix,
+  **not yet added**: a self-check before the summary (one block per file name, file count must
+  match, no duplicates, full format).
+- **Weekly schedule not created.** The scheduled-task tool stores tasks in
+  `C:\Users\jcfil\.claude\scheduled-tasks\`, outside this folder, which the session scope forbids.
+  It needs the user's explicit exception. (Tasks run only while the app is open; a missed run
+  fires at next launch.)
+- **Comic editions** of the three prototypes (`*-comic.html`, `comic-skin.css`) are published
+  separately; the originals are unchanged. There is no Rook design system in the repo. Sofia
+  would own the real one.

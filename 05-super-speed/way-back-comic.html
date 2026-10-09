@@ -1,0 +1,842 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Way Back Comic</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  :root {
+    --ground: #F3F5F7; --surface: #FFFFFF; --sunk: #EAEEF2; --ink: #17222E; --muted: #55626F; --line: #D9DFE5;
+    --accent: #0E6E6B; --accent-soft: #E1F1F0; --warn: #C2410C; --warn-soft: #FDEBDD; --amber: #A16207;
+    --amber-soft: #FBF1D6; --good: #15803D; --good-soft: #E3F4E8; --today: #8A96A3;
+    --fresh: #6D3FD6; --fresh-soft: #EFE8FD;
+    --phone: #0F1720; --phone-screen: #FAFBFC; --shadow: rgba(15, 23, 32, .16);
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC; --line: #2C3844;
+      --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217; --amber: #E8B64A;
+      --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F; --today: #7C8996;
+      --fresh: #B9A0FF; --fresh-soft: #2A2342;
+      --phone: #05080B; --phone-screen: #18212B; --shadow: rgba(0, 0, 0, .45);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #111820; --surface: #1A232D; --sunk: #222D38; --ink: #E8EDF2; --muted: #A3B0BC; --line: #2C3844;
+    --accent: #4FC3BE; --accent-soft: #1C3332; --warn: #FB8B55; --warn-soft: #3A2217; --amber: #E8B64A;
+    --amber-soft: #362C14; --good: #5BD08A; --good-soft: #17301F; --today: #7C8996;
+    --fresh: #B9A0FF; --fresh-soft: #2A2342;
+    --phone: #05080B; --phone-screen: #18212B; --shadow: rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.5 var(--body); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 22px; }
+  .wrap > * { min-width: 0; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
+  h2 { font-size: 1.2rem; font-weight: 800; }
+  h3 { font-size: 1.02rem; font-weight: 600; }
+  p { margin: 0; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .muted { color: var(--muted); }
+  .small { font-size: .85rem; }
+  .num, .tnum { font-variant-numeric: tabular-nums; }
+  header { display: grid; gap: 8px; }
+  header .lede { color: var(--muted); max-width: 72ch; }
+
+  /* Controls */
+  .controls {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; display: grid; gap: 14px;
+  }
+  @media (min-width: 861px) { .controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; } }
+  .group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; min-width: 0; }
+  .group > .label { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; min-width: 92px; }
+  .seg { display: inline-flex; background: var(--sunk); border-radius: 999px; padding: 3px; gap: 2px; flex-wrap: wrap; min-width: 0; }
+  .seg button {
+    font: 700 .88rem/1 var(--body); color: var(--muted); background: transparent; border: 0;
+    padding: 9px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px var(--shadow); }
+  .seg.fix button[aria-pressed="true"][data-mode="sep"], .seg.fix button[aria-pressed="true"][data-mode="aug"] { background: var(--accent); color: var(--surface); }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .stepper { display: flex; align-items: center; gap: 8px; flex: 1 1 260px; min-width: 0; }
+  .track { flex: 1; min-width: 0; display: grid; gap: 2px; padding-inline: 14px; }
+  .track input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent); }
+  .iconbtn { font: 700 1rem/1 var(--body); width: 38px; height: 38px; border-radius: 999px; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); cursor: pointer; flex: none; }
+  .iconbtn:disabled { opacity: .4; cursor: not-allowed; }
+  .weeklabel { font: 800 1.05rem/1 var(--display); min-width: 96px; font-variant-numeric: tabular-nums; }
+  .ticks { position: relative; height: 16px; font-size: .72rem; color: var(--muted); }
+  .ticks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+  .ticks span.on { color: var(--ink); font-weight: 700; }
+  @media (max-width: 700px) { .ticks { display: none; } }
+
+  .banner { border-radius: 12px; padding: 12px 16px; font-size: .95rem; }
+  .banner.today { background: var(--warn-soft); border-left: 5px solid var(--warn); }
+  .banner.fix { background: var(--accent-soft); border-left: 5px solid var(--accent); }
+  .banner.fresh { background: var(--fresh-soft); border-left: 5px solid var(--fresh); }
+
+  /* Stage */
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+  .stage > * { min-width: 0; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+  .panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 10px; flex-wrap: wrap; }
+
+  /* Phone */
+  .phone-wrap { display: grid; justify-items: center; gap: 10px; }
+  .phone { width: min(320px, 100%); background: var(--phone); border-radius: 36px; padding: 14px; box-shadow: 0 10px 30px var(--shadow); }
+  .screen { background: var(--phone-screen); border-radius: 26px; min-height: 520px; padding: 18px 16px; display: grid; gap: 12px; align-content: start; }
+  .notch { width: 90px; height: 6px; border-radius: 99px; background: var(--line); justify-self: center; }
+  .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 6px; min-width: 0; }
+  .pcard.hiddenview { border-style: dashed; background: transparent; }
+  .meter { height: 10px; background: var(--sunk); border-radius: 99px; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .5s ease; }
+  .meter.dim i { background: var(--today); }
+  .thought { font-style: italic; color: var(--muted); text-align: center; font-size: .92rem; }
+
+  /* Fresh start moment: this page's own accent */
+  .freshnote {
+    border: 2px solid var(--fresh); background: var(--fresh-soft); border-radius: 16px; padding: 12px;
+    display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start;
+    animation: glow 1.6s ease-out 1;
+  }
+  .freshnote svg { width: 34px; height: 34px; color: var(--fresh); }
+  .freshnote b { color: var(--ink); }
+  @keyframes glow { from { box-shadow: 0 0 0 0 var(--fresh); } to { box-shadow: 0 0 0 14px transparent; } }
+
+  /* Console */
+  .console-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--sunk); border-radius: 10px; padding: 8px 12px; font-size: .85rem; color: var(--muted); }
+  .rcard { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: var(--surface); min-width: 0; }
+  .rcard .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: .88rem; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: var(--sunk); color: var(--ink); white-space: nowrap; }
+  .badge.good { background: var(--good-soft); color: var(--good); }
+  .badge.mid { background: var(--amber-soft); color: var(--amber); }
+  .badge.bad { background: var(--warn-soft); color: var(--warn); }
+  .stat { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .stat .n { font: 800 2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+  .spark { width: 100%; height: 56px; display: block; }
+  .note { border-radius: 10px; padding: 10px 12px; font-size: .92rem; }
+  .note.none { background: var(--sunk); color: var(--muted); font-style: italic; }
+  .note.ok { background: var(--good-soft); }
+  .note.mid { background: var(--amber-soft); }
+  .note.bad { background: var(--warn-soft); }
+  .note.fresh { background: var(--fresh-soft); border-left: 4px solid var(--fresh); }
+  .src { font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--sunk); color: var(--muted); white-space: nowrap; }
+  .src.real { background: var(--accent-soft); color: var(--accent); }
+
+  /* Chart */
+  .chart-wrap { overflow-x: auto; }
+  svg.chart { width: 100%; min-width: 480px; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--muted); align-items: center; }
+  .legend i { display: inline-block; width: 22px; height: 3px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+  .summary { font-size: .95rem; }
+
+  /* Lower */
+  .lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .lower { grid-template-columns: 1fr; } }
+  .tests { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .tests li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .mark { font: 800 1.3rem/1 var(--display); width: 34px; height: 34px; border-radius: 99px; display: grid; place-items: center; }
+  .mark.pass { background: var(--good-soft); color: var(--good); }
+  .mark.fail { background: var(--warn-soft); color: var(--warn); }
+  blockquote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--line); color: var(--muted); font-size: .92rem; }
+  .pill { display: inline-block; font-size: .8rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.bad { background: var(--warn-soft); color: var(--warn); }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  td.num { font-weight: 700; white-space: nowrap; }
+  .math { padding: 10px 12px; border-radius: 10px; background: var(--sunk); font-size: .9rem; }
+
+  .footnotes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .fn { border-top: 3px solid var(--line); padding-top: 10px; display: grid; gap: 6px; font-size: .92rem; min-width: 0; }
+  .fn.accent { border-color: var(--fresh); }
+  .fn ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+  [hidden] { display: none !important; }
+
+  /* Flag button, record check, load alert */
+  .flagbox { display: grid; gap: 8px; margin-top: 4px; }
+  .flagbtn { font: 700 .88rem/1.2 var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 10px 14px; cursor: pointer; }
+  .flagbtn:hover { border-color: var(--accent); }
+  .flagdone { background: var(--good-soft); border-left: 4px solid var(--good); border-radius: 12px; padding: 10px 12px; font-size: .9rem; }
+  .checknote { background: var(--amber-soft); border-left: 4px solid var(--amber); border-radius: 12px; padding: 10px 12px; font-size: .9rem; display: grid; gap: 4px; }
+  .note.load { background: var(--amber-soft); border-left: 4px solid var(--amber); }
+  .greyline { color: var(--muted); font-size: .85rem; font-style: italic; }
+  .handler { font-size: .85rem; color: var(--muted); }
+
+  /* Set footer */
+  .setfoot { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; font-size: .92rem; }
+  .setfoot a { color: var(--accent); font-weight: 700; }
+  .setfoot a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .meter i { transition: none; }
+    .freshnote { animation: none; }
+  }
+</style>
+<style id="comic-skin">
+/* COMIC SKIN for the Rook Dispatch prototypes.
+   Layout concept: a comic-book page. Newsprint with halftone dots, ink-outlined panels with hard
+   shadows, yellow caption boxes, speech-bubble notes, a cover strip with an issue number.
+   Applied after each page's own styles; it only re-skins, it never changes behaviour.
+   Prototype styles, not Rook's design system. */
+
+:root {
+  --ground: #F3E9CF; --surface: #FFFBEF; --sunk: #EADFC2; --ink: #141414; --muted: #4B4134; --line: #141414;
+  --accent: #1D5BB8; --accent-soft: #D6E5FA; --warn: #C81E26; --warn-soft: #FBDADB;
+  --amber: #A35F00; --amber-soft: #FFE9A3; --good: #17803C; --good-soft: #D8F0DF;
+  --today: #7A6F5E; --fresh: #B8156F; --fresh-soft: #F9D6EA;
+  --phone: #141414; --phone-screen: #FFFBEF; --shadow: rgba(20, 20, 20, .9); --on-strong: #FFFBEF;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(29, 91, 184, .14); --hard: #141414; --kapow: #E0262E;
+  --display: "Bangers", "Impact", "Arial Black", system-ui, sans-serif;
+  --body: "Comic Neue", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+    --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+    --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+    --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+    --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+    --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #17152B; --surface: #232042; --sunk: #2E2A52; --ink: #FFF6E0; --muted: #CBBFA6; --line: #FFF6E0;
+  --accent: #78AEFF; --accent-soft: #1F2E52; --warn: #FF7070; --warn-soft: #4A1E25;
+  --amber: #FFC24A; --amber-soft: #3D3015; --good: #5EDC8C; --good-soft: #173A27;
+  --today: #9C93B0; --fresh: #FF7AC6; --fresh-soft: #4A1D3D;
+  --phone: #05050F; --phone-screen: #232042; --shadow: rgba(0, 0, 0, .9); --on-strong: #17152B;
+  --pop: #FFD21F; --on-pop: #141414; --dot: rgba(120, 174, 255, .13); --hard: #05050F; --kapow: #FF4D55;
+  color-scheme: dark;
+}
+
+/* Newsprint ground with halftone dots */
+body {
+  background-color: var(--ground);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.7px);
+  background-size: 11px 11px;
+  font-family: var(--body);
+  font-size: 17px;
+}
+
+/* Cover strip, inserted at the top of each page */
+.cover-strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px;
+  background: var(--kapow); color: var(--pop);
+  border: 3px solid var(--hard); box-shadow: 6px 6px 0 var(--hard);
+  padding: 8px 14px; font: 400 1.15rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase;
+}
+.cover-strip .price {
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 8px; transform: rotate(4deg); font-size: 1rem;
+}
+
+/* Headline lettering */
+.wrap h1 {
+  font-family: var(--display); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(2.4rem, 7.5vw, 4.2rem); letter-spacing: .03em; line-height: .95;
+  color: var(--pop); -webkit-text-stroke: 2px var(--hard); paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--hard);
+}
+.wrap h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .05em; font-size: 1.55rem; }
+.wrap h3 { font-family: var(--display); font-weight: 400; letter-spacing: .04em; font-size: 1.25rem; }
+.wrap header .lede, .wrap .lede { font-size: 1.05rem; color: var(--ink); }
+
+/* Caption boxes */
+.wrap .eyebrow {
+  display: inline-block; width: fit-content; justify-self: start;
+  background: var(--pop); color: var(--on-pop); border: 2px solid var(--hard);
+  padding: 4px 9px; font: 400 .95rem/1.1 var(--display); letter-spacing: .08em;
+  box-shadow: 3px 3px 0 var(--hard); transform: rotate(-1deg);
+}
+.wrap .banner, .wrap .pbanner {
+  border: 3px solid var(--hard); border-radius: 2px; box-shadow: 5px 5px 0 var(--hard);
+  font-weight: 700; transform: rotate(-.35deg);
+}
+
+/* Panels */
+.wrap .panel, .wrap .controls, .wrap .rcard, .wrap .tile, .wrap .msgbox {
+  border: 3px solid var(--line); border-radius: 4px; box-shadow: 6px 6px 0 var(--hard); background: var(--surface);
+}
+.wrap .pcard { border: 2.5px solid var(--line); border-radius: 4px; box-shadow: 3px 3px 0 var(--hard); }
+.wrap .console-bar { border: 2px solid var(--line); border-radius: 2px; font-weight: 700; color: var(--ink); }
+
+/* Speech bubbles */
+.wrap .note {
+  position: relative; border: 2.5px solid var(--line); border-radius: 18px; margin-bottom: 12px; font-weight: 700;
+}
+.wrap .note::after {
+  content: ""; position: absolute; left: 26px; bottom: -11px; width: 18px; height: 18px;
+  background: inherit; border-right: 2.5px solid var(--line); border-bottom: 2.5px solid var(--line);
+  transform: rotate(45deg);
+}
+.wrap .thought {
+  border: 2.5px dashed var(--line); border-radius: 999px; padding: 8px 14px; background: var(--surface); font-weight: 700;
+}
+
+/* Buttons: chunky ink outline, press-down feel (backgrounds stay the page's own) */
+.wrap button:not(.dot) {
+  border: 2.5px solid var(--line); border-radius: 6px; box-shadow: 3px 3px 0 var(--hard);
+  font-family: var(--body); font-weight: 700; transition: transform .08s ease, box-shadow .08s ease;
+}
+.wrap button:not(.dot):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.wrap .seg { border: 2.5px solid var(--line); border-radius: 6px; background: var(--surface); box-shadow: 3px 3px 0 var(--hard); }
+.wrap .seg button { border-color: transparent; box-shadow: none; }
+.wrap .seg button:active { transform: none; box-shadow: none; }
+.wrap .seg button[aria-pressed="true"] { background: var(--pop); color: var(--on-pop); border-color: var(--hard); }
+
+/* Phone: comic-panel frame */
+.wrap .phone { border: 3px solid var(--line); box-shadow: 8px 8px 0 var(--kapow); }
+.wrap .screen { border: 2px solid var(--line); }
+
+/* Badges, pills, chips */
+.wrap .badge, .wrap .pill, .wrap .chip, .wrap .src {
+  border: 2px solid var(--line); border-radius: 4px; font-family: var(--display); font-weight: 400; letter-spacing: .06em;
+}
+
+/* Meters: inked with screen-tone stripes */
+.wrap .meter { border: 2px solid var(--line); height: 14px; border-radius: 3px; }
+.wrap .meter i { border-radius: 0; background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, .28) 0 5px, transparent 5px 10px); }
+
+/* Big numbers in display lettering */
+.wrap .stat .n, .wrap .count, .wrap .weeklabel, .wrap .big { font-family: var(--display); font-weight: 400; letter-spacing: .03em; }
+.wrap th { font-family: var(--display); font-weight: 400; letter-spacing: .08em; font-size: .9rem; }
+.wrap table { border: 2.5px solid var(--line); }
+
+/* Footnotes as end-of-issue letters column */
+.wrap .fn { border-top: 3px solid var(--line); }
+.wrap .setfoot, .wrap .set { border-top: 3px dashed var(--line); }
+.wrap a { color: var(--accent); font-weight: 700; }
+
+/* Sound effects: one signature moment per page */
+.wrap .freshnote, .wrap .notif, .wrap .flagdone, .wrap .flag-done { position: relative; overflow: visible; }
+.wrap .freshnote::before, .wrap .notif::before, .wrap .flagdone::before, .wrap .flag-done::before {
+  position: absolute; top: -16px; right: 8px; z-index: 2;
+  font: 400 1.25rem/1 var(--display); letter-spacing: .06em;
+  background: var(--pop); color: var(--kapow); -webkit-text-stroke: 1px var(--hard); paint-order: stroke fill;
+  border: 2.5px solid var(--hard); padding: 3px 9px; transform: rotate(7deg); box-shadow: 2px 2px 0 var(--hard);
+}
+.wrap .freshnote::before { content: "KA-POW!"; }
+.wrap .notif::before { content: "BZZT!"; }
+.wrap .flagdone::before, .wrap .flag-done::before { content: "ZAP!"; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap button:not(.dot) { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <div class="cover-strip" aria-hidden="true"><span>Rook Comics presents</span><span>Issue #1 · The Way Back</span><span class="price">10¢</span></div>
+
+  <header>
+    <div class="eyebrow">Rook Dispatch · Prototype 1 of 3 · draft for Helen</div>
+    <h1>The way back</h1>
+    <p class="lede">Some responders have been stuck since release 4.2 on 12 Aug. Their phones went quiet and nobody could say why. This is the fix that lets them back in. Pick a responder, step through the weeks, and see what their phone shows and what their handler sees.</p>
+  </header>
+
+  <section class="controls" aria-label="Prototype controls">
+    <div class="group">
+      <span class="label" id="pick-label">Responder</span>
+      <div class="seg" role="group" aria-labelledby="pick-label" id="pick"></div>
+    </div>
+    <div class="group">
+      <span class="label" id="fix-label">The fix</span>
+      <div class="seg fix" role="group" aria-labelledby="fix-label" id="fix">
+        <button id="fix-off" data-mode="off" aria-pressed="false">Off (today's rules)</button>
+        <button id="fix-sep" data-mode="sep" aria-pressed="true">Switch on 7 Sep</button>
+        <button id="fix-aug" data-mode="aug" aria-pressed="false">What if: on from 12 Aug</button>
+      </div>
+    </div>
+    <div class="group">
+      <label class="label" for="week-range">Week of</label>
+      <div class="stepper">
+        <button class="iconbtn" id="week-prev" aria-label="Previous week">‹</button>
+        <div class="track">
+          <input type="range" id="week-range" min="0" max="8" step="1" value="5" aria-describedby="week-label">
+          <div class="ticks" id="ticks" aria-hidden="true"></div>
+        </div>
+        <button class="iconbtn" id="week-next" aria-label="Next week">›</button>
+        <output class="weeklabel" id="week-label" for="week-range">7 Sep</output>
+      </div>
+    </div>
+    <div class="group" id="check-group" hidden>
+      <span class="label" id="check-label">Record check result</span>
+      <div class="seg" role="group" aria-labelledby="check-label" id="check">
+        <button id="check-pending" data-check="pending" aria-pressed="true">Pending</button>
+        <button id="check-right" data-check="right" aria-pressed="false">Data was right</button>
+        <button id="check-notreached" data-check="notreached" aria-pressed="false">Offers never reached her phone</button>
+      </div>
+      <span class="muted small">Illustration. The real check needs Ravi's data.</span>
+    </div>
+  </section>
+
+  <div id="banner" class="banner fix" role="status" aria-live="polite"></div>
+
+  <section class="stage">
+    <div class="phone-wrap" aria-label="Responder's phone">
+      <h2 id="phone-title">Meteor Mite's phone</h2>
+      <div class="phone">
+        <div class="screen">
+          <div class="notch" aria-hidden="true"></div>
+          <div id="phone-body" style="display:grid;gap:12px;min-width:0"></div>
+          <div class="flagbox" aria-live="polite">
+            <button id="flag-btn" class="flagbtn" type="button">This doesn't match what I see</button>
+            <p id="flag-done" class="flagdone" hidden>Thanks. Your handler and Rook have been told. We'll check your record.</p>
+            <p class="muted small" style="text-align:center">Prototype only. This button doesn't send anything.</p>
+          </div>
+        </div>
+      </div>
+      <p class="muted small" style="text-align:center">Phone and console are mock-ups. Numbers are an illustration, not a forecast.</p>
+    </div>
+
+    <div class="panel" aria-label="Handler's console">
+      <div class="panel-head">
+        <h2 id="console-title">Kip's console</h2>
+        <span class="muted small" id="console-sub">What Kip sees on the responder's card</span>
+      </div>
+      <div class="console-bar"><span>Coverage view</span><span id="console-week" class="tnum"></span></div>
+      <article class="rcard" id="card"></article>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Standing over time">
+    <div class="panel-head">
+      <h2 id="chart-title">Standing over time</h2>
+      <div class="legend">
+        <span><i style="background:var(--today)"></i>today's rules</span>
+        <span><i style="background:var(--accent);height:4px"></i>with the fix</span>
+      </div>
+    </div>
+    <p class="muted small">Standing is the score that decides who gets asked first. At 0.8 or above, a responder is in the full rotation. Below 0.6, they are stuck and almost never get asked.</p>
+    <div class="chart-wrap"><svg class="chart" id="chart" viewBox="0 0 640 270" role="img" aria-label="Standing over time"></svg></div>
+    <p class="summary" id="chart-summary"></p>
+  </section>
+
+  <section class="lower">
+    <div class="panel" aria-label="Wen's two tests">
+      <div class="panel-head">
+        <h2>Wen's two tests</h2>
+        <span id="tests-pill" class="pill good"></span>
+      </div>
+      <p class="small">In 2019, Wen left a note in the routing code asking if a low score should ease back over time. She saw both sides:</p>
+      <blockquote><b>For:</b> "somebody who had a bad month shouldn't still be carrying it in the spring."</blockquote>
+      <blockquote><b>Against:</b> "if somebody has stopped taking work, we probably want that to stick until they take work again."</blockquote>
+      <p class="muted small">Wen Li, note in <code>history.py</code>. Nobody came back to it until now.</p>
+      <ul class="tests" id="tests"></ul>
+      <p class="muted small">Worked out live from the fix setting above. Uses the model below.</p>
+    </div>
+
+    <div class="panel" aria-label="What changes underneath">
+      <div class="panel-head">
+        <h2>What changes underneath</h2>
+        <span class="muted small">Not shown to handlers or responders</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>When a responder…</th><th>Today</th><th>With the fix</th></tr></thead>
+          <tbody>
+            <tr><td>takes the job</td><td class="num tnum">+0.08</td><td class="num tnum">+0.08</td></tr>
+            <tr><td>says no</td><td class="num tnum">−0.12</td><td class="num tnum">−0.12</td></tr>
+            <tr><td>runs out of time</td><td class="num tnum">−0.12 <span class="muted">(same as no)</span></td><td class="num tnum">−0.04</td></tr>
+            <tr><td>has a low standing</td><td>Stays low. No way back except taking jobs, which rarely come.</td><td>Climbs <span class="tnum">+0.05</span> a week, but only up to the middle (<span class="tnum">0.5</span>).</td></tr>
+            <tr><td>is stuck when the fix switches on</td><td>Stays stuck.</td><td>One-time fresh start, back to full (<span class="tnum">1.0</span>).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="math" id="math"></div>
+    </div>
+  </section>
+
+  <section class="footnotes" aria-label="Notes">
+    <div class="fn accent">
+      <h3>Why the fresh start matters</h3>
+      <p>Recovery on its own doesn't free anyone who is already stuck. They get so few offers that they miss the ones that come, and that cancels out the weekly climb. A fresh start to the middle (0.5) isn't enough either. It has to be a full one. See <code>recovery-simulator.html</code>.</p>
+    </div>
+    <div class="fn">
+      <h3>Where the numbers come from</h3>
+      <ul>
+        <li><b>Real:</b> offers and jobs taken for Meteor Mite, Ironvale and The Gale, 3 Aug to 31 Aug, from <code>callout-history.csv</code>. This sample is not yet confirmed by Ravi. The 10 Aug week is real for every responder.</li>
+        <li><b>Model:</b> everything else, including every standing. An illustration, not a forecast.</li>
+        <li><b>Guess (behind the scenes only):</b> the model treats 80% of missed offers as "ran out of time" and 20% as a "no". This is a guess. Nobody knows the split until we have the per-offer log, so the phones don't show it.</li>
+        <li><b>Example:</b> Ironvale's "reached your phone: 1" is made up to show what that check result would look like.</li>
+      </ul>
+    </div>
+    <div class="fn">
+      <h3>What it doesn't show</h3>
+      <ul>
+        <li>It doesn't move work between responders, so it can't show The Gale's load going down.</li>
+        <li>This ships with the answer-time fix (60 seconds counted from when the offer reaches the phone). Without it, heroes can fall back in.</li>
+        <li>"Stopped working" is made up, to run Wen's test.</li>
+        <li>Screens show offer counts and status only, never anything that could identify a responder.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="setfoot" aria-label="Part of a set">
+    <b>Part of a set:</b>
+    <a href="https://claude.ai/artifact/Tw3TEXM12CNbkFr1ZCBiXC" target="_blank" rel="noopener">Why Haven't I Had Offers?</a>
+    <a href="https://claude.ai/artifact/RfzgQRiEdnZvh5Zk6FXiv8" target="_blank" rel="noopener">The I'm Coming Button</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var WEEKS = ['3 Aug', '10 Aug', '17 Aug', '24 Aug', '31 Aug', '7 Sep', '14 Sep', '21 Sep', '28 Sep'];
+  var LAST = WEEKS.length - 1;
+  var SHARE_LATE = 0.8; // assumption: share of misses that were "ran out of time"
+  var TODAY = { yes: 0.08, no: 0.12, late: 0.12, rec: 0, cap: 0.5 };
+  var FIX = { yes: 0.08, no: 0.12, late: 0.04, rec: 0.05, cap: 0.5 };
+  var START = { off: 99, sep: 5, aug: 1 };
+
+  // usual offers/wk, usual yes rate, 10 Aug sent, 10 Aug taken
+  var PEOPLE = {
+    mite: { name: 'Meteor Mite', short: 'Meteor Mite', handler: 'Kip', usual: 11.2, rate: 0.69, sent: 10, taken: 4,
+      real: { sent: [11, 10, 4, 2, 1], taken: [8, 4, 1, 0, 0] } },
+    undertow: { name: 'The Undertow', short: 'The Undertow', handler: 'Desmond Okafor', usual: 12.0, rate: 0.78, sent: 11, taken: 4 },
+    farlight: { name: 'Farlight', short: 'Farlight', handler: 'Linda Pruitt', usual: 12.0, rate: 0.74, sent: 10, taken: 4 },
+    vesper: { name: 'Vesper', short: 'Vesper', handler: 'Dorothy Pell', handlerFull: 'Dorothy Pell (Aunt Dot)', usual: 13.8, rate: 0.82, sent: 12, taken: 6 },
+    bulwark: { name: 'Sgt. Bulwark', short: 'Sgt. Bulwark', handler: 'Halloran', usual: 9.0, rate: 0.76, sent: 10, taken: 5, tag: 'near miss' },
+    ironvale: { name: 'Ironvale', short: 'Ironvale', handler: 'Teresa Alvarez', usual: 8, rate: 0.77, sent: 9, taken: 5, tag: 'data check', mismatch: true,
+      real: { sent: [8, 9, 10, 11, 12], taken: [7, 5, 6, 8, 9] } },
+    gale: { name: 'The Gale', short: 'The Gale', handler: 'Kip', usual: 13.0, rate: 0.78, sent: 15, taken: 9, tag: 'overloaded', overloaded: true,
+      real: { sent: [13, 15, 17, 20, 21], taken: [10, 9, 12, 14, 16] } },
+    stopped: { name: 'Stopped working', short: 'Stopped working', handler: 'Example handler', usual: 10, rate: 0.75, stopped: true, tag: 'made up' }
+  };
+  var ORDER = ['mite', 'undertow', 'farlight', 'vesper', 'bulwark', 'ironvale', 'gale', 'stopped'];
+  var STUCK_FOUR = ['mite', 'undertow', 'farlight', 'vesper'];
+  var LOAD_ALERT = 1.3; // handler alert when offers are more than 130% of usual
+
+  var state = { pick: 'mite', mode: 'sep', week: 5, check: 'pending', flagged: {} };
+
+  // Ironvale: if the record check finds offers never reached her phone, model her
+  // as stuck after 4.2 (illustration: 9 sent in the 10 Aug week, 1 answered).
+  function person() {
+    var p = PEOPLE[state.pick];
+    if (!p.mismatch || state.check === 'right') return p;
+    var q = {};
+    for (var k in p) q[k] = p[k];
+    if (state.check === 'notreached') { q.sent = 9; q.taken = 1; q.notReached = true; }
+    else q.holdFresh = true; // pending: no fresh-start decision until the check is done
+    return q;
+  }
+  var $ = function (id) { return document.getElementById(id); };
+
+  function factor(s) { return s >= 0.8 ? 1 : s >= 0.6 ? 0.4 : s >= 0.3 ? 0.2 : 0.08; }
+  // round to 6 places so float noise (0.7999999999) can't flip a threshold
+  function clamp(x) { return Math.round(Math.max(0, Math.min(1, x)) * 1e6) / 1e6; }
+
+  function sim(p, mode) {
+    var start = START[mode], s = 1, rows = [];
+    for (var w = 0; w <= LAST; w++) {
+      var on = w >= start, r = on ? FIX : TODAY, s0 = s, fresh = false;
+      if (on && w === start && start > 1 && s < 0.6 && !p.holdFresh) { s = 1; fresh = true; }
+      var sent, taken;
+      if (p.stopped) {
+        sent = p.usual * (w === 0 ? 1 : factor(s));
+        taken = w === 0 ? sent * p.rate : 0;
+      } else if (w === 0) { sent = p.usual; taken = p.usual * p.rate; }
+      else if (w === 1) { sent = p.sent; taken = p.taken; }
+      else { sent = p.usual * factor(s); taken = sent * (s >= 0.8 ? p.rate * 0.92 : 0.15); }
+      var miss = sent - taken;
+      var late = p.stopped ? 0 : miss * SHARE_LATE;
+      var no = miss - late;
+      var afterFresh = s;
+      s = clamp(s + r.yes * taken - r.no * no - r.late * late);
+      var climbed = 0;
+      if (r.rec > 0 && s < r.cap) { var t = clamp(Math.min(r.cap, s + r.rec)); climbed = t - s; s = t; }
+      rows.push({ w: w, on: on, fresh: fresh, s0: s0, sStart: afterFresh, sent: sent, taken: taken, late: late, no: no, climbed: climbed, end: s });
+    }
+    return rows;
+  }
+
+  function status(s) {
+    return s >= 0.8 ? ['Full rotation', 'good'] : s >= 0.6 ? ['Fewer offers', 'mid'] : ['Stuck', 'bad'];
+  }
+  function f2(v) { return v.toFixed(2); }
+  function pct(v) { return Math.round(v * 100); }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+
+  // Shown counts: real sample where it applies, otherwise the model, rounded.
+  function shown(p, row) {
+    var realOk = p.real && row.w <= 4 && (row.w <= 1 || !row.on);
+    if (realOk) return { sent: p.real.sent[row.w], taken: p.real.taken[row.w], real: true };
+    if (row.w === 1 && !p.stopped) return { sent: p.sent, taken: p.taken, real: true };
+    return { sent: Math.round(row.sent), taken: Math.round(row.taken), real: false };
+  }
+
+  var SUN = '<svg viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="20" r="7" fill="currentColor"/>' +
+    '<g stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="17" y1="4" x2="17" y2="8"/><line x1="5" y1="10" x2="8" y2="13"/><line x1="29" y1="10" x2="26" y2="13"/><line x1="2" y1="21" x2="6" y2="21"/><line x1="28" y1="21" x2="32" y2="21"/></g>' +
+    '<line x1="3" y1="30" x2="31" y2="30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>';
+
+  /* ---------- Phone ---------- */
+  // Standing as a word for the phone (no decimals on the phone)
+  function word(s) { return s >= 0.8 ? 'Full' : s >= 0.6 ? 'Fewer offers' : 'Stuck'; }
+  function loadLine(p, c, who) {
+    return '<p class="small tnum"><b>' + c.sent + ' ' + plural(c.sent, 'offer', 'offers') + ' this week.</b> ' + who + ' ' + Math.round(p.usual) + '.</p>';
+  }
+  var SPREAD = 'As stuck responders come back, work should spread out again.';
+
+  function phone(p, rows, w) {
+    var row = rows[w], c = shown(p, row), h = '';
+    h += '<span class="eyebrow">Rook · ' + p.name + '</span>';
+    if (p.mismatch && state.check === 'pending' && row.on) {
+      h += '<div class="checknote" role="note"><b>We\'re checking your record.</b><span>Your tickets and our data don\'t match.</span>' +
+        '<span class="muted small">No fresh start decision until the check is done.</span></div>';
+    }
+    if (p.mismatch && state.check === 'right' && row.on) {
+      h += '<div class="pcard small">We checked your record. Our data was right. Normal rules apply.</div>';
+    }
+    if (!row.on) {
+      var rang = (p.notReached && w >= 1)
+        ? '<p class="small tnum">Offers sent: <b>' + c.sent + '</b> · reached your phone: <b>1</b> <span class="muted">(example)</span></p>'
+        : '<p class="muted small">Your phone rang <b class="tnum">' + c.sent + '</b> ' + plural(c.sent, 'time', 'times') + ' this week.</p>';
+      h += '<div class="pcard"><span class="eyebrow">Status</span><h3>Available ✓</h3>' + rang + '</div>';
+      if (p.overloaded) h += '<div class="pcard">' + loadLine(p, c, 'Your usual is') + '</div>';
+      h += '<div class="pcard"><span class="eyebrow">Your history</span><p class="muted small">Not available. Responders can\'t see their own offers or standing today.</p></div>';
+      if ((w >= 2 && c.sent <= 2) || (p.notReached && w >= 1)) h += '<p class="thought">"Is my account broken?"</p>';
+      else if (p.mismatch && state.check === 'pending' && w >= 2) h += '<p class="thought">"My phone never rings."</p>';
+      h += '<div class="pcard hiddenview"><span class="eyebrow" style="color:var(--muted)">Hidden from ' + p.name + ' today</span>' +
+        '<div class="meter dim" aria-label="Standing: ' + word(row.end) + '"><i style="width:' + pct(row.end) + '%"></i></div>' +
+        '<p class="small">Standing: <b>' + word(row.end) + '</b></p>' +
+        '<p class="muted small">Shown here so you can see it. ' + p.name + ' can\'t.</p></div>';
+      return h;
+    }
+    if (row.fresh) {
+      h += '<div class="freshnote" role="note">' + SUN + '<div style="display:grid;gap:4px"><b>Welcome back: fresh start</b>' +
+        '<span class="small">Our 12 Aug update pushed you down unfairly. We\'ve reset you. You\'ll start getting offers again.</span></div></div>';
+    }
+    var label;
+    if (row.end >= 0.8) label = 'You\'re in the full rotation.';
+    else if (row.end >= 0.6) label = 'Fewer offers for now. Climbing back.';
+    else if (p.stopped) label = 'You said no to recent offers. Take a job to climb back.';
+    else label = 'Climbing back a little each week.';
+    h += '<div class="pcard"><span class="eyebrow">Your standing</span>' +
+      '<div class="meter" aria-label="Standing: ' + word(row.end) + '"><i style="width:' + pct(row.end) + '%"></i></div>' +
+      '<p class="small"><b>' + word(row.end) + '</b> · ' + label + '</p></div>';
+    var missed = Math.max(0, c.sent - c.taken);
+    h += '<div class="pcard"><span class="eyebrow">This week</span><h3 class="tnum">' + c.sent + ' ' + plural(c.sent, 'offer', 'offers') + ' · ' + c.taken + ' taken</h3>' +
+      (missed ? '<p class="greyline">Breakdown coming when we have the per-offer log.</p>' : '') + '</div>';
+    if (p.overloaded) h += '<div class="pcard">' + loadLine(p, c, 'Your usual is') + '<p class="muted small">' + SPREAD + ' We\'ll watch your load each week (illustration).</p></div>';
+    h += '<div class="pcard small">⏱ You\'ll have 60 seconds from when an offer reaches your phone <span class="muted">(pending Wen)</span>.</div>';
+    if (w === 1) h += '<div class="pcard small">Rough week. Running out of time costs less now than saying no, so one bad week won\'t sink you.</div>';
+    else h += '<p class="muted small">Running out of time costs less than saying no. A low standing climbs back a little each week.</p>';
+    return h;
+  }
+
+  /* ---------- Console card ---------- */
+  function spark(p, rows, w) {
+    var vals = rows.map(function (r) { return shown(p, r).sent; });
+    var W = 260, H = 56, pad = 5;
+    var max = Math.max.apply(null, vals.concat([p.usual * 1.6]));
+    var bw = (W - pad * 2) / vals.length;
+    var out = '';
+    vals.forEach(function (v, i) {
+      var bh = Math.max(2, (v / max) * (H - pad * 2));
+      out += '<rect x="' + (pad + i * bw + 2).toFixed(1) + '" y="' + (H - pad - bh).toFixed(1) + '" width="' + (bw - 4).toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="3" fill="' + (i === w ? 'var(--accent)' : 'var(--line)') + '"/>';
+    });
+    return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="Offers per week, 3 Aug to 28 Sep">' + out + '</svg>' +
+      '<p class="muted small">Offers per week, 3 Aug to 28 Sep. This week highlighted.</p>';
+  }
+
+  function consoleNote(p, rows, w, c) {
+    var row = rows[w];
+    if (!row.on) {
+      if (w === 0) return '<div class="note none">A normal week. The console never explains offers today.</div>';
+      if (p.overloaded && c.sent > p.usual * LOAD_ALERT) return '<div class="note none">Today\'s console has no load alert. ' + p.handler + ' only finds out when ' + p.name + ' says so. The alert above is the new design.</div>';
+      if (w >= 2 && c.sent <= 2) return '<div class="note none">No explanation. ' + p.handler + ' can only guess why ' + p.name + ' has gone quiet.</div>';
+      return '<div class="note none">No note shown. Today the console never says why offers change.</div>';
+    }
+    var startWk = WEEKS[START[state.mode]];
+    var missed = Math.max(0, c.sent - c.taken);
+    if (row.fresh && row.end >= 0.8) return '<div class="note fresh"><b>Fresh start applied ' + startWk + '.</b> Back in the rotation.</div>';
+    if (row.fresh) return '<div class="note fresh"><b>Fresh start applied ' + startWk + '.</b> Then said no to all ' + c.sent + ' offers, so standing fell again.</div>';
+    if (row.end >= 0.8) {
+      var hadFresh = rows.some(function (r) { return r.fresh; });
+      if (w === 1 && missed) return '<div class="note mid"><b>Rough week:</b> missed ' + missed + ' of ' + c.sent + ' offers. Running out of time costs less now, so standing held.</div>';
+      return '<div class="note ok"><b>In the rotation:</b> ' + c.sent + ' offers, ' + c.taken + ' taken.' + (hadFresh ? ' Fresh start on ' + startWk + '.' : '') + '</div>';
+    }
+    if (p.stopped) return '<div class="note bad"><b>Low standing:</b> said no to recent offers. Climbs back slowly, but only to the middle, until they take work again.</div>';
+    return '<div class="note mid"><b>Recovering:</b> missed recent offers. Climbs back a little each week.</div>';
+  }
+
+  function card(p, rows, w) {
+    var row = rows[w], c = shown(p, row), st = status(row.end);
+    var badge = row.on ? '<span class="badge ' + st[1] + '">' + st[0] + '</span>' : '<span class="badge">Available</span>';
+    var h = '<div class="top"><div style="display:grid;gap:2px;min-width:0"><h3>' + p.name + (p.tag ? ' <span class="muted small">(' + p.tag + ')</span>' : '') + '</h3>' +
+      '<span class="handler">Handler: ' + (p.handlerFull || p.handler) + '</span></div>' + badge + '</div>';
+    if (state.flagged[state.pick]) h += '<div class="note load" role="note"><b>⚑ Record flagged by responder.</b> ' + p.name + ' says this doesn\'t match what they see.</div>';
+    h += '<div class="stat"><span class="n">' + c.sent + '</span><span class="muted">' + plural(c.sent, 'offer', 'offers') + ' this week · ' + c.taken + ' taken</span>' +
+      '<span class="src' + (c.real ? ' real' : '') + '">' + (c.real ? 'Real sample' : 'Model') + '</span></div>';
+    if (p.overloaded) {
+      h += loadLine(p, c, 'Usual for ' + p.name + ' is');
+      if (c.sent > p.usual * LOAD_ALERT) h += '<div class="note load" role="note"><b>⚠ Above usual load.</b> More than 130% of usual offers this week.</div>';
+    }
+    if (p.mismatch) {
+      h += '<p class="small">Tickets T-008, T-017 and T-025 say ' + p.name + '\'s phone never rings. The data shows more offers. ';
+      if (state.check === 'pending') h += '<b>Record check pending.</b> No fresh start decision until it\'s done.</p>';
+      else if (state.check === 'right') h += '<b>Check done: the data was right.</b> Normal rules apply.</p>';
+      else h += '<b>Check done: offers never reached the phone.</b> Treated as stuck. The taken counts in this sample are in doubt. <span class="muted">(Illustration)</span></p>';
+    }
+    h += spark(p, rows, w) + consoleNote(p, rows, w, c);
+    if (p.overloaded && row.on) h += '<p class="muted small">' + SPREAD + ' We\'ll watch ' + p.name + '\'s load each week (illustration). The model doesn\'t move work between responders, so it can\'t show this yet.</p>';
+    if (p.real && !row.on && w >= 5) h += '<p class="muted small">No real data after 31 Aug. This week is from the model.</p>';
+    return h;
+  }
+
+  /* ---------- Chart ---------- */
+  function chart(p, todayRows, fixRows, w) {
+    var W = 640, H = 270, L = 40, R = 16, T = 22, B = 32;
+    var x = function (i) { return L + i * (W - L - R) / LAST; };
+    var y = function (v) { return T + (1 - v) * (H - T - B); };
+    var path = function (rows) { return rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r.end).toFixed(1); }).join(' '); };
+    var g = '';
+    var step = (W - L - R) / LAST;
+    g += '<rect x="' + (x(w) - step / 2).toFixed(1) + '" y="' + T + '" width="' + step.toFixed(1) + '" height="' + (H - T - B) + '" fill="var(--sunk)"/>';
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (v) {
+      g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--line)"/>' +
+        '<text x="' + (L - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)">' + v.toFixed(2) + '</text>';
+    });
+    g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0.8) + '" y2="' + y(0.8) + '" stroke="var(--good)" stroke-dasharray="5 4"/>' +
+      '<text x="' + (W - R - 4) + '" y="' + (y(0.8) - 5) + '" text-anchor="end" font-size="11" font-weight="700" fill="var(--good)">0.8 full rotation</text>';
+    g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0.6) + '" y2="' + y(0.6) + '" stroke="var(--warn)" stroke-dasharray="5 4"/>' +
+      '<text x="' + (W - R - 4) + '" y="' + (y(0.6) + 14) + '" text-anchor="end" font-size="11" font-weight="700" fill="var(--warn)">below 0.6 stuck</text>';
+    WEEKS.forEach(function (wk, i) {
+      g += '<text x="' + x(i) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="11" fill="' + (i === w ? 'var(--ink)' : 'var(--muted)') + '" font-weight="' + (i === w ? 700 : 400) + '">' + wk + '</text>';
+    });
+    g += '<line x1="' + x(1) + '" x2="' + x(1) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--muted)" stroke-dasharray="2 3"/>' +
+      '<text x="' + (x(1) + 4) + '" y="' + (T - 8) + '" font-size="11" fill="var(--muted)">4.2 ships</text>';
+    var on = state.mode !== 'off';
+    if (on) {
+      var si = START[state.mode];
+      g += '<line x1="' + x(si) + '" x2="' + x(si) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="var(--fresh)" stroke-width="2" stroke-dasharray="3 3"/>' +
+        '<text x="' + (x(si) + 4) + '" y="' + (state.mode === 'aug' ? T + 10 : T - 8) + '" font-size="11" font-weight="700" fill="var(--fresh)">fix on' + (state.mode === 'sep' ? ' + fresh start' : '') + '</text>';
+    }
+    g += '<path d="' + path(todayRows) + '" fill="none" stroke="var(--today)" stroke-width="2.5"/>';
+    if (on) g += '<path d="' + path(fixRows) + '" fill="none" stroke="var(--accent)" stroke-width="3.5"/>';
+    g += '<circle cx="' + x(w) + '" cy="' + y(todayRows[w].end) + '" r="4.5" fill="var(--today)"/>';
+    if (on) g += '<circle cx="' + x(w) + '" cy="' + y(fixRows[w].end) + '" r="5.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>';
+    $('chart').innerHTML = g;
+    $('chart').setAttribute('aria-label', 'Standing for ' + p.name + ' from 3 Aug to 28 Sep. Today\'s rules end at ' + f2(todayRows[LAST].end) + (on ? '. With the fix it ends at ' + f2(fixRows[LAST].end) : '') + '.');
+    $('chart-title').textContent = 'Standing over time: ' + p.name;
+    var tEnd = todayRows[LAST].end, fEnd = fixRows[LAST].end;
+    $('chart-summary').innerHTML = '<b>On 28 Sep:</b> today\'s rules <b class="tnum">' + f2(tEnd) + '</b> (' + status(tEnd)[0] + ')' +
+      (on ? ' · with the fix <b class="tnum">' + f2(fEnd) + '</b> (' + status(fEnd)[0] + ')' : ' · the fix is off. Turn it on above to compare.') +
+      ' <span class="muted small">Illustration, not a forecast.</span>';
+  }
+
+  /* ---------- Wen's tests ---------- */
+  function tests() {
+    var back = STUCK_FOUR.filter(function (k) { return sim(PEOPLE[k], state.mode)[LAST].end >= 0.8; }).length;
+    var stopEnd = sim(PEOPLE.stopped, state.mode)[LAST].end;
+    var t1 = back === 4, t2 = stopEnd < 0.6;
+    function li(pass, title, body) {
+      return '<li><span class="mark ' + (pass ? 'pass' : 'fail') + '" aria-label="' + (pass ? 'Pass' : 'Fail') + '">' + (pass ? '✓' : '✗') + '</span>' +
+        '<div style="display:grid;gap:4px;min-width:0"><b>' + title + '</b><span class="small">' + body + '</span></div></li>';
+    }
+    $('tests').innerHTML =
+      li(t1, '1. Someone who had one bad week comes back',
+        '<span class="tnum">' + back + ' of 4</span> responders stuck since 4.2 are back in the full rotation by 28 Sep (Meteor Mite, The Undertow, Farlight, Vesper).' +
+        (state.mode === 'aug' ? ' This what-if leans on the 80% guess. If most misses were a real "no", some would still get stuck.' : '')) +
+      li(t2, '2. Someone who stopped working stays low',
+        'The made-up "Stopped working" responder ends at <b class="tnum">' + f2(stopEnd) + '</b> on 28 Sep. ' + (t2 ? 'Stays below 0.6, so stopping work is not rewarded.' : 'Climbs back, so stopping work gets rewarded.'));
+    var pill = $('tests-pill');
+    pill.className = 'pill ' + (t1 && t2 ? 'good' : 'bad');
+    pill.textContent = t1 && t2 ? 'Passes both' : (!t1 && !t2 ? 'Fails both' : (!t1 ? 'Fails test 1' : 'Fails test 2'));
+  }
+
+  /* ---------- This week's math ---------- */
+  function math(p, row) {
+    var rules = row.on ? 'with the fix' : 'today\'s rules';
+    var parts = [];
+    parts.push('<b>Week of ' + WEEKS[row.w] + ', ' + p.name + ' (' + rules + '):</b> started at <span class="tnum">' + f2(row.s0) + '</span>.');
+    if (row.fresh) parts.push('Fresh start to <span class="tnum">1.00</span>.');
+    var yes = row.taken, late = row.late, no = row.no;
+    parts.push('About <span class="tnum">' + yes.toFixed(1) + '</span> yes, <span class="tnum">' + late.toFixed(1) + '</span> ran out of time, <span class="tnum">' + no.toFixed(1) + '</span> no. <span class="muted">(The time-out vs no split is a guess: 80% time-out.)</span>');
+    if (row.climbed > 0) parts.push('Weekly climb +<span class="tnum">' + f2(row.climbed) + '</span>.');
+    parts.push('Ended at <b class="tnum">' + f2(row.end) + '</b> (' + status(row.end)[0] + '). Standing can\'t go above 1.00 or below 0.');
+    $('math').innerHTML = parts.join(' ');
+  }
+
+  /* ---------- Banner ---------- */
+  function banner(p, row) {
+    var b = $('banner'), wk = WEEKS[row.w], st = status(row.end), c = shown(p, row);
+    var missed = Math.max(0, c.sent - c.taken), text, cls;
+    if (row.w === 0) { cls = 'fix'; text = '<b>Week of 3 Aug:</b> a normal week before 4.2. ' + p.name + ' is in the full rotation.'; }
+    else if (row.w === 1 && !row.on) { cls = 'today'; text = '<b>Week of 10 Aug:</b> 4.2 ships on 12 Aug. The answer time drops from 90 to 60 seconds. ' + p.name + ' misses ' + missed + ' of ' + c.sent + ' offers.'; }
+    else if (row.w === 1) { cls = 'fix'; text = '<b>What if the fix shipped with 4.2:</b> ' + p.name + ' still misses ' + missed + ' of ' + c.sent + ' offers, but running out of time costs less. Standing ends at ' + f2(row.end) + '.'; }
+    else if (row.fresh) { cls = 'fresh'; text = '<b>Week of ' + wk + ': the fix switches on.</b> ' + p.name + ' gets a one-time fresh start back to full standing.' + (row.end < 0.6 ? ' But they say no to every offer, so standing falls again. That\'s Wen\'s second test working.' : ''); }
+    else if (!row.on) { cls = 'today'; text = '<b>Today\'s rules, week of ' + wk + ':</b> ' + p.name + ' is ' + (st[0] === 'Stuck' ? 'stuck, with about ' + c.sent + ' ' + plural(c.sent, 'offer', 'offers') : st[0] === 'Fewer offers' ? 'getting fewer offers' : 'in the full rotation') + '. Nobody can see why.'; }
+    else { cls = 'fix'; text = '<b>With the fix, week of ' + wk + ':</b> ' + p.name + ' is ' + (st[0] === 'Full rotation' ? 'in the full rotation' : st[0] === 'Stuck' ? 'still low' : 'getting fewer offers') + '. Both the phone and ' + p.handler + '\'s console say so.'; }
+    if (state.mode === 'off' && row.w >= 2) text += ' <span class="muted">The fix is off.</span>';
+    b.className = 'banner ' + cls;
+    b.innerHTML = text;
+  }
+
+  /* ---------- Render ---------- */
+  function render() {
+    var p = person(), w = state.week;
+    var rows = sim(p, state.mode), todayRows = sim(p, 'off'), row = rows[w];
+    Array.prototype.forEach.call($('pick').children, function (b) { b.setAttribute('aria-pressed', b.dataset.key === state.pick ? 'true' : 'false'); });
+    $('check-group').hidden = !p.mismatch;
+    Array.prototype.forEach.call($('check').children, function (b) { b.setAttribute('aria-pressed', b.dataset.check === state.check ? 'true' : 'false'); });
+    $('console-title').textContent = p.handler + '\'s console';
+    $('console-sub').textContent = 'What ' + (p.handlerFull || p.handler) + ' sees on ' + p.name + '\'s card';
+    $('flag-done').hidden = !state.flagged[state.pick];
+    Array.prototype.forEach.call($('fix').children, function (b) { b.setAttribute('aria-pressed', b.dataset.mode === state.mode ? 'true' : 'false'); });
+    $('week-range').value = w;
+    $('week-label').textContent = WEEKS[w];
+    $('week-range').setAttribute('aria-valuetext', 'Week of ' + WEEKS[w]);
+    $('week-prev').disabled = w === 0;
+    $('week-next').disabled = w === LAST;
+    Array.prototype.forEach.call($('ticks').children, function (t, i) { t.className = i === w ? 'on' : ''; });
+    $('phone-title').textContent = p.name + '\'s phone';
+    $('phone-body').innerHTML = phone(p, rows, w);
+    $('console-week').textContent = 'Week of ' + WEEKS[w];
+    $('card').innerHTML = card(p, rows, w);
+    banner(p, row);
+    chart(p, todayRows, rows, w);
+    tests();
+    math(p, row);
+  }
+
+  ORDER.forEach(function (k) {
+    var b = document.createElement('button');
+    b.id = 'pick-' + k;
+    b.dataset.key = k;
+    b.textContent = PEOPLE[k].short;
+    b.addEventListener('click', function () { state.pick = k; render(); });
+    $('pick').appendChild(b);
+  });
+  WEEKS.forEach(function (wk, i) {
+    var t = document.createElement('span');
+    t.textContent = wk;
+    t.style.left = 'calc(8px + (100% - 16px) * ' + (i / LAST) + ')';
+    $('ticks').appendChild(t);
+  });
+  Array.prototype.forEach.call($('fix').children, function (b) {
+    b.addEventListener('click', function () { state.mode = b.dataset.mode; render(); });
+  });
+  Array.prototype.forEach.call($('check').children, function (b) {
+    b.addEventListener('click', function () { state.check = b.dataset.check; render(); });
+  });
+  $('flag-btn').addEventListener('click', function () { state.flagged[state.pick] = true; render(); });
+  $('week-range').addEventListener('input', function () { state.week = Number(this.value); render(); });
+  $('week-prev').addEventListener('click', function () { if (state.week > 0) { state.week--; render(); } });
+  $('week-next').addEventListener('click', function () { if (state.week < LAST) { state.week++; render(); } });
+
+  render();
+})();
+</script>
