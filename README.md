@@ -10,17 +10,18 @@ Everything about Rook Industries in here is a **fictional teaching scenario**. I
 
 ## Final report
 
-**[The Quiet Heroes: final report (final-report.html)](final-report.html)**
+**[▶ Open the final report: The Quiet Heroes](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/final-report.html)**
 
 The story of Release 4.2 in 11 slides: what happened, one finding and my exact prompt from each
-module, the fix, and the skill that stops a repeat. Download the file and open it in a browser
-to see the slides; GitHub shows it as code.
+module, the fix, and the skill that stops a repeat. It opens as live slides through GitHub Pages.
+The source file is [final-report.html](final-report.html).
 
 | Also in this repo | Where |
 |---|---|
 | Full analysis of 4.2 | [synthesis.md](synthesis.md) |
 | Brief for Helen | [05-super-speed/brief.md](05-super-speed/brief.md) |
-| Prototypes | [The Way Back](05-super-speed/way-back.html) · [Why No Offers](05-super-speed/why-no-offers.html) · [I'm Coming](05-super-speed/im-coming.html) · [Recovery simulator](05-super-speed/recovery-simulator.html) |
+| Prototypes (live) | [The Way Back](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/way-back.html) · [Why No Offers](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/why-no-offers.html) · [I'm Coming](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/im-coming.html) · [Recovery simulator](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/recovery-simulator.html) |
+| Comic editions (live) | [The Way Back](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/way-back-comic.html) · [Why No Offers](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/why-no-offers-comic.html) · [I'm Coming](https://jcfilson100.github.io/Claude-Code-for-PMs-Final/05-super-speed/im-coming-comic.html) |
 | Skills | [investigate-and-prototype](.claude/skills/investigate-and-prototype/SKILL.md) · [review-checklist](.claude/skills/review-checklist/SKILL.md) · [shareable copy](06-sidekicks/share/review-checklist/) |
 
 ---
